@@ -36,9 +36,11 @@
             border-radius: 12px;
             padding: 16px;
             text-align: center;
+            margin-top: 12px;
             margin-bottom: 16px;
         }
 
+        /* ĐÃ SỬA: Ép font-weight: 700 (hoặc font-bold) để mọi chữ bạn nhập/chọn đều đậm lên rõ rệt */
         .input-field {
             width: 100%;
             background-color: #f1f5f9;
@@ -46,11 +48,13 @@
             border-radius: 12px;
             padding: 12px;
             font-size: 14px;
+            font-weight: 700; /* Làm đậm chữ trong ô nhập liệu */
+            color: #1e293b;   /* Đổi màu chữ tối hơn để tăng độ tương phản */
             outline: none;
             box-sizing: border-box;
             margin-top: 4px;
             display: block;
-            -webkit-appearance: none; /* Xóa định dạng mặc định của iOS */
+            -webkit-appearance: none;
         }
 
         .btn-base {
@@ -69,17 +73,16 @@
         .btn-blue { background-color: #0084ff; color: white; }
         .btn-gray { background-color: #64748b; color: white; }
 
-        /* SỬA LỖI ĐÈ NHAU: Định dạng lưới chia đôi bằng Flexbox cực kỳ an toàn cho Safari */
         .flex-grid {
             display: flex;
-            gap: 12px; /* Tạo khoảng cách 12px giữa 2 ô, không bao giờ bị đè chồng */
+            gap: 12px; 
             margin-bottom: 12px;
             width: 100%;
         }
         
         .flex-col-6 {
             flex: 1;
-            min-width: 0; /* Ngăn chặn phần tử con làm phình ô */
+            min-width: 0;
         }
 
         table {
@@ -98,11 +101,13 @@
         }
         th:first-child { text-align: left; }
 
+        /* ĐÃ SỬA: Nâng độ đậm của toàn bộ chữ hiển thị kết quả trong bảng dữ liệu */
         td {
             padding: 12px 0;
             vertical-align: middle;
             border-bottom: 1px solid #f8fafc;
             text-align: center;
+            font-weight: 700; /* Ép toàn bộ chữ dữ liệu dưới bảng thành chữ đậm */
         }
         td:first-child { text-align: left; }
     </style>
@@ -112,18 +117,17 @@
     <div class="w-full max-w-md space-y-4 pb-12">
 
         <!-- KHỐI 1: CHẤM CÔNG HÔM NAY -->
-        <div class="card-box text-center space-y-4">
-            <h1 class="text-xl font-bold text-slate-900">Chấm Công Cá Nhân</h1>
+        <div class="card-box text-center">
+            <h1 class="text-xl font-bold text-slate-900 mt-2">Chấm Công Cá Nhân</h1>
             
-            <!-- SỬA LỖI THỜI GIAN NHỎ: Làm đồng hồ to, dày chữ và căn giữa hoàn hảo giống hệt ảnh cũ -->
-            <div id="clock" class="text-3xl font-extrabold tracking-wider text-slate-800 text-center py-1">00:00:00</div>
+            <div id="clock" class="text-3xl font-extrabold tracking-wider text-slate-800 text-center my-3 block w-full">00:00:00</div>
             
             <div class="blue-badge">
                 <div class="text-blue-600 font-semibold text-sm">Tổng công tích lũy (Tất cả)</div>
                 <div id="total-work" class="text-2xl font-black text-blue-600 mt-1">0 công</div>
             </div>
             
-            <div class="text-left">
+            <div class="text-left mb-4">
                 <label class="text-xs font-semibold text-slate-500 block mb-1">Chọn loại công hôm nay:</label>
                 <select id="today-work-type" class="input-field">
                     <option value="1">1 công (Ngày làm đủ)</option>
@@ -132,7 +136,6 @@
                 </select>
             </div>
             
-            <!-- Nút bấm chia đôi bằng Flex grid an toàn -->
             <div class="flex-grid">
                 <div class="flex-col-6">
                     <button onclick="quickCheck('Vào')" class="btn-base btn-green">Vào Làm (Hôm Nay)</button>
@@ -147,7 +150,6 @@
         <div class="card-box space-y-4">
             <h2 class="text-base font-bold border-b pb-2 text-slate-900">Chấm công ngày bất kỳ</h2>
             
-            <!-- SỬA LỖI ĐÈ NHAU: Hàng Chọn Ngày và Tính Công -->
             <div class="flex-grid">
                 <div class="flex-col-6">
                     <label class="text-xs font-semibold text-slate-500 block">Chọn Ngày:</label>
@@ -163,7 +165,6 @@
                 </div>
             </div>
             
-            <!-- SỬA LỖI ĐÈ NHAU: Hàng Giờ Vào và Giờ Về tách nhau 12px rõ ràng -->
             <div class="flex-grid">
                 <div class="flex-col-6">
                     <label class="text-xs font-semibold text-slate-500 block">Giờ Vào:</label>
@@ -182,7 +183,6 @@
         <div class="card-box space-y-4">
             <h2 class="text-base font-bold border-b pb-2 text-slate-900">Bộ lọc & Bảng công chi tiết</h2>
             
-            <!-- Hàng bộ lọc ngày chia đôi -->
             <div class="flex-grid">
                 <div class="flex-col-6">
                     <label class="text-xs font-semibold text-slate-500 block">Từ ngày:</label>
@@ -205,7 +205,8 @@
                             <th class="pb-2 font-semibold text-center" style="width: 18%;">Hành động</th>
                         </tr>
                     </thead>
-                    <tbody id="log-table-body" class="divide-y divide-slate-100 font-medium text-slate-700">
+                    <!-- Toàn bộ font dữ liệu bảng công được đồng bộ đậm màu siêu nét -->
+                    <tbody id="log-table-body" class="divide-y divide-slate-100 text-slate-800">
                         <!-- Dữ liệu chấm công hiển thị tại đây -->
                     </tbody>
                 </table>
