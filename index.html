@@ -128,7 +128,6 @@
                 <div class="flex-col-6"><button onclick="quickCheck('Về')" class="btn-base btn-red">Tan Làm (Hôm Nay)</button></div>
             </div>
         </div>
-
         <!-- KHỐI 2: CHẤM CÔNG NGÀY BẤT KỲ -->
         <div class="card-box">
             <div class="border-b">Chấm công ngày bất kỳ</div>
@@ -143,19 +142,13 @@
                 </div>
             </div>
             <div class="flex-grid">
-                <div class="flex-col-6">
-                    <label class="label-text">Giờ Vào:</label>
-                    <input type="time" id="custom-in" value="08:00" class="input-field">
-                </div>
-                <div class="flex-col-6">
-                    <label class="label-text">Giờ Về:</label>
-                    <input type="time" id="custom-out" value="17:00" class="input-field">
-                </div>
+                <div class="flex-col-6"><label class="label-text">Giờ Vào:</label><input type="time" id="custom-in" value="08:00" class="input-field"></div>
+                <div class="flex-col-6"><label class="label-text">Giờ Về:</label><input type="time" id="custom-out" value="17:00" class="input-field"></div>
             </div>
             <button onclick="saveCustomDate()" class="btn-base btn-indigo" style="margin-top: 4px;">Lưu Ngày Đã Chọn</button>
         </div>
 
-                <!-- KHỐI 3: BỘ LỌC & BẢNG CÔNG CHI TIẾT -->
+        <!-- KHỐI 3: BỘ LỌC & BẢNG CÔNG CHI TIẾT -->
         <div class="card-box">
             <div class="border-b">Bộ lọc & Bảng công chi tiết</div>
             <div class="flex-grid">
@@ -189,31 +182,32 @@
         </div>
     </div>
 
-    <script>
+        <script>
         let attendanceLogs = JSON.parse(localStorage.getItem('attendanceLogs')) || [];
         let userCode = localStorage.getItem('userCode') || '121221';
 
+        // Đồng hồ tự động lấy theo giờ Cộng hòa Séc
         function updateClock() {
-            const nowTime = new Date();
-            const hours = String(nowTime.getHours()).padStart(2, '0');
-            const minutes = String(nowTime.getMinutes()).padStart(2, '0');
-            const seconds = String(nowTime.getSeconds()).padStart(2, '0');
             const clockEl = document.getElementById('clock');
-            if (clockEl) clockEl.innerText = `${hours}:${minutes}:${seconds}`;
+            if (clockEl) {
+                clockEl.innerText = new Date().toLocaleTimeString('vi-VN', {
+                    timeZone: 'Europe/Prague',
+                    hour12: false
+                });
+            }
         }
         setInterval(updateClock, 1000);
 
+        // Ô chọn ngày mặc định nhảy theo ngày hiện tại ở Séc
         function getTodayYYYYMMDD() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`; 
+            const options = { timeZone: 'Europe/Prague', year: 'numeric', month: '2-digit', day: '2-digit' };
+            const formatter = new Intl.DateTimeFormat('fr-CA', options); 
+            return formatter.format(new Date());
         }
+
         function quickCheck(type) {
             const dateKey = getTodayYYYYMMDD(); 
-            const nowTime = new Date();
-            const timeStr = `${String(nowTime.getHours()).padStart(2, '0')}:${String(nowTime.getMinutes()).padStart(2, '0')}`;
+            const timeStr = new Date().toLocaleTimeString('vi-VN', { timeZone: 'Europe/Prague', hour: '2-digit', minute: '2-digit', hour12: false });
             const workValue = parseFloat(document.getElementById('today-work-type').value);
             let logIndex = attendanceLogs.findIndex(item => item.date === dateKey);
             if (logIndex > -1) {
@@ -221,17 +215,12 @@
                 if (type === 'Về') attendanceLogs[logIndex].outTime = timeStr;
                 attendanceLogs[logIndex].work = workValue;
             } else {
-                attendanceLogs.push({ 
-                    date: dateKey, 
-                    inTime: type === 'Vào' ? timeStr : '--:--', 
-                    outTime: type === 'Về' ? timeStr : '--:--', 
-                    work: workValue 
-                });
+                attendanceLogs.push({ date: dateKey, inTime: type === 'Vào' ? timeStr : '--:--', outTime: type === 'Về' ? timeStr : '--:--', work: workValue });
             }
             saveAndRender();
-            alert(`Đã ghi nhận ${type} ca lúc ${timeStr}`);
+            alert(`Đã ghi nhận ${type} ca lúc ${timeStr} (Giờ Séc)`);
         }
-
+    
         function saveCustomDate() {
             const selectedDate = document.getElementById('custom-date').value;
             const workValue = parseFloat(document.getElementById('custom-work-type').value);
@@ -251,19 +240,21 @@
         }
 
         function getVietnameseDayName(dateString) {
+            const parts = dateString.split('-');
+            const date = new Date(parts[0], parts[1] - 1, parts[2]);
             const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-            return days[new Date(dateString).getDay()];
+            return days[date.getDay()];
         }
         function formatDateSub(dateString) {
             const [year, month, day] = dateString.split('-');
             return `${day}/${month}/${year}`;
         }
         function formatDateVN(dateString) {
-            const date = new Date(dateString);
-            return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+            const [year, month, day] = dateString.split('-');
+            return `${parseInt(day)}.${parseInt(month)}.${year}`;
         }
 
-        // ĐÃ VÁ LỖI HOÀN TOÀN: Loại bỏ chuỗi lạ '--:--', ép định dạng giờ chuẩn cho Safari iPhone
+        // ĐA SỬA HOÀN TOÀN: Đổ dữ liệu chuẩn cấu trúc, loại bỏ ký tự lạ để Safari iPhone bắt buộc mở khóa nút sửa
         function editLog(index) {
             const log = attendanceLogs[index];
             let cleanDate = String(log.date).trim().substring(0, 10);
@@ -271,7 +262,6 @@
             document.getElementById('custom-date').value = cleanDate;
             document.getElementById('custom-work-type').value = log.work;
             
-            // Xử lý thông minh: Nếu chưa check-in hoặc chưa check-out, gán giờ mặc định chuẩn để tránh sập app
             let inValue = (log.inTime === '--:--' || !log.inTime) ? '08:00' : log.inTime;
             let outValue = (log.outTime === '--:--' || !log.outTime) ? '17:00' : log.outTime;
             
@@ -282,7 +272,7 @@
         }
 
         function deleteLog(index) {
-            if (confirm("Bạn có chắc chắn muốn xóa ngày này không?")) {
+            if (confirm("Bạn có chắc chắn muốn xóa không?")) {
                 attendanceLogs.splice(index, 1);
                 saveAndRender();
             }
@@ -361,5 +351,4 @@
 </body>
 </html>
 
-        
     
