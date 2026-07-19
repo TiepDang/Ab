@@ -4,351 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chấm Công Cá Nhân</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
     <style>
-        body {
-            background-color: #f8fafc;
-            color: #1e293b;
-            font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 16px;
-            display: flex;
-            justify-content: center;
-        }
-        .container { width: 100%; max-width: 440px; box-sizing: border-box; }
-        .card-box {
-            background-color: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            margin-bottom: 16px;
-            box-sizing: border-box;
-            width: 100%;
-        }
-        .title { font-size: 22px; font-weight: 800; text-align: center; margin: 8px 0; color: #0f172a; }
-        #clock {
-            font-size: 34px !important;
-            font-weight: 900 !important;
-            text-align: center !important;
-            margin: 16px 0 !important;
-            color: #0f172a !important;
-            display: block !important;
-            width: 100% !important;
-            letter-spacing: 1px;
-        }
-        .blue-badge {
-            background-color: #f0f7ff;
-            border: 1px solid #e0f2fe;
-            border-radius: 12px;
-            padding: 18px;
-            text-align: center;
-            margin: 12px 0 20px 0;
-        }
-        .badge-title { color: #2563eb; font-weight: 700; font-size: 14px; }
-        #total-work {
-            font-size: 30px !important;
-            font-weight: 900 !important;
-            color: #2563eb !important;
-            margin-top: 8px !important;
-            display: block !important;
-        }
-        .label-text { font-size: 12px; font-weight: 700; color: #64748b; display: block; margin-bottom: 4px; text-align: left; }
-        .input-field {
-            width: 100%;
-            background-color: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 15px;
-            font-weight: 700; 
-            color: #0f172a;   
-            outline: none;
-            box-sizing: border-box;
-            margin-top: 4px;
-            display: block;
-            -webkit-appearance: none;
-        }
-        .flex-grid { display: flex; gap: 12px; margin-bottom: 12px; width: 100%; }
-        .flex-col-6 { flex: 1; min-width: 0; }
-        .btn-base {
-            width: 100%;
-            font-weight: 800;
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-        .btn-green { background-color: #2ecc71; color: white; }
-        .btn-red { background-color: #ff4757; color: white; }
-        .btn-indigo { background-color: #546de5; color: white; }
-        .btn-blue { background-color: #0084ff; color: white; }
-        .btn-gray { background-color: #64748b; color: white; }
-        .border-b { font-size: 16px; font-weight: 800; margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; color: #0f172a; }
-        table { width: 100% !important; border-collapse: collapse !important; margin-top: 12px; table-layout: fixed; }
-        th { color: #94a3b8; font-weight: 700; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 12px; }
-        th:first-child { text-align: left; }
-        td { padding: 12px 0; vertical-align: middle; border-bottom: 1px solid #f8fafc; text-align: center; font-weight: 700; font-size: 13px; }
-        td:first-child { text-align: left; }
-        .action-btn {
-            background-color: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            padding: 8px 12px;
-            display: inline-block;
-            touch-action: manipulation;
-        }
-        .action-btn:active { background-color: #e2e8f0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; color: #1a1a1a; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; }
+        .card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; }
+        .title { font-size: 1.5rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
+        .clock { font-size: 2.8rem; font-weight: 800; text-align: center; color: #0f172a; margin: 15px 0; }
+        .stats-box { background-color: #edf5ff; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 25px; }
+        .stats-title { font-size: 0.85rem; font-weight: 700; color: #2563eb; margin-bottom: 8px; }
+        .stats-count { font-size: 2rem; font-weight: 800; color: #2563eb; }
+        .label-text { font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-align: left; display: block; }
+        select, input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; background-color: #f8fafc; font-size: 1rem; font-weight: 700; color: #334155; box-sizing: border-box; margin-bottom: 20px; outline: none; }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+        button { border: none; padding: 16px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+        button:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-in { background-color: #10b981; }
+        .btn-out { background-color: #ff4b55; }
+        .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 10px; }
+        .btn-excel { background-color: #0084ff; width: 100%; margin-top: 15px; font-size: 1rem; padding: 14px;}
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 10px; font-size: 0.95rem; padding: 14px; color: white; width: 100%; }
+        .table-container { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; }
+        th { color: #64748b; background: #f8fafc; font-weight: 700;}
+        .action-btn { padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; margin: 2px; font-weight: bold; border: none; cursor: pointer; }
+        .btn-edit { background-color: #ff9800; color: white; }
+        .btn-delete { background-color: #e53935; color: white; }
+        .network-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; }
+        .online { background: #d1fae5; color: #065f46; }
+        .offline { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- KHỐI 1: CHẤM CÔNG HÔM NAY -->
-        <div class="card-box">
-            <div class="title">Chấm Công Cá Nhân</div>
-            <div id="clock">00:00:00</div>
-            <div class="blue-badge">
-                <div class="badge-title">Tổng công tích lũy (Tất cả)</div>
-                <div id="total-work">0 công</div>
-            </div>
-            <div style="text-align: left; margin-bottom: 16px;">
-                <label class="label-text">Chọn loại công hôm nay:</label>
-                <select id="today-work-type" class="input-field">
-                    <option value="1">1 công (Ngày làm đủ)</option>
-                    <option value="0.5">0.5 công (Nửa ngày)</option>
-                    <option value="0">0 công (Nghỉ phép/Lễ)</option>
-                </select>
-            </div>
-            <div class="flex-grid">
-                <div class="flex-col-6"><button onclick="quickCheck('Vào')" class="btn-base btn-green">Vào Làm (Hôm Nay)</button></div>
-                <div class="flex-col-6"><button onclick="quickCheck('Về')" class="btn-base btn-red">Tan Làm (Hôm Nay)</button></div>
-            </div>
+<div class="container">
+    <div class="card">
+        <div id="networkStatus" class="network-badge online">Đang trực tuyến</div>
+        <div class="title">Chấm Công Cá Nhân</div>
+        <div class="clock" id="liveClock">00:00:00</div>
+        <div class="stats-box">
+            <div class="stats-title">Tổng công tích lũy (Tất cả)</div>
+            <div class="stats-count"><span id="txtTotalCong">0</span> công</div>
         </div>
-        <!-- KHỐI 2: CHẤM CÔNG NGÀY BẤT KỲ -->
-        <div class="card-box">
-            <div class="border-b">Chấm công ngày bất kỳ</div>
-            <div class="flex-grid">
-                <div class="flex-col-6">
-                    <label class="label-text">Chọn Ngày:</label>
-                    <input type="date" id="custom-date" class="input-field">
-                </div>
-                <div class="flex-col-6">
-                    <label class="label-text">Tính Công:</label>
-                    <select id="custom-work-type" class="input-field"><option value="1">1 công</option><option value="0.5">0.5 công</option><option value="0">0 công</option></select>
-                </div>
-            </div>
-            <div class="flex-grid">
-                <div class="flex-col-6"><label class="label-text">Giờ Vào:</label><input type="time" id="custom-in" value="08:00" class="input-field"></div>
-                <div class="flex-col-6"><label class="label-text">Giờ Về:</label><input type="time" id="custom-out" value="17:00" class="input-field"></div>
-            </div>
-            <button onclick="saveCustomDate()" class="btn-base btn-indigo" style="margin-top: 4px;">Lưu Ngày Đã Chọn</button>
-        </div>
-
-        <!-- KHỐI 3: BỘ LỌC & BẢNG CÔNG CHI TIẾT -->
-        <div class="card-box">
-            <div class="border-b">Bộ lọc & Bảng công chi tiết</div>
-            <div class="flex-grid">
-                <div class="flex-col-6">
-                    <label class="label-text">Từ ngày:</label>
-                    <input type="date" id="filter-from" onchange="renderLogs()" class="input-field">
-                </div>
-                <div class="flex-col-6">
-                    <label class="label-text">Đến ngày:</label>
-                    <input type="date" id="filter-to" onchange="renderLogs()" class="input-field">
-                </div>
-            </div>
-            <div style="width: 100%; overflow-x: auto; margin-top: 8px;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 32%;">Ngày</th>
-                            <th style="width: 18%;">Vào</th>
-                            <th style="width: 18%;">Về</th>
-                            <th style="width: 14%;">Công</th>
-                            <th style="width: 18%;">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="log-table-body" style="color: #334155;"></tbody>
-                </table>
-            </div>
-            <div style="margin-top: 20px;">
-                <button onclick="exportToCSV()" class="btn-base btn-blue" style="margin-bottom: 8px;">Xuất file Excel (CSV)</button>
-                <button onclick="regenerateUserCode()" id="user-code-btn" class="btn-base btn-gray" style="font-size: 12px; padding: 12px;"></button>
-            </div>
+        <label class="label-text">Chọn loại công hôm nay:</label>
+        <select id="selCongHomNay">
+            <option value="1">1 công (Ngày làm đủ)</option>
+            <option value="0.5">0.5 công (Nửa ngày)</option>
+            <option value="0">0 công (Nghỉ lễ/Phép)</option>
+        </select>
+        <div class="btn-row">
+            <button class="btn-in" onclick="chamCongMee('Vào', document.getElementById('selCongHomNay').value)">Vào Làm (Hôm Nay)</button>
+            <button class="btn-out" onclick="chamCongMee('Về', document.getElementById('selCongHomNay').value)">Tan Làm (Hôm Nay)</button>
         </div>
     </div>
+    <div class="card">
+        <div class="title" style="font-size: 1.25rem; text-align: left; margin-bottom: 15px;">Chấm công ngày bất kỳ</div>
+        <div class="grid-2">
+            <div><label class="label-text">Chọn Ngày:</label><input type="date" id="txtBatKyNgay"></div>
+            <div>
+                <label class="label-text">Tính Công:</label>
+                <select id="selBatKyCong"><option value="1">1 công</option><option value="0.5">0.5 công</option><option value="0">0 công</option></select>
+            </div>
+        </div>
+        <div class="grid-2">
+            <div><label class="label-text">Giờ Vào:</label><input type="time" id="txtBatKyGioVao" value="08:00"></div>
+            <div><label class="label-text">Giờ Về:</label><input type="time" id="txtBatKyGioVe" value="17:00"></div>
+        </div>
+        <button class="btn-save" onclick="chamCongNgayBatKyMee()">Lưu Ngày Đã Chọn</button>
+    </div>
+    <div class="card">
+        <div class="title" style="font-size: 1.25rem; text-align: left; margin-bottom: 15px;">Bộ lọc & Bảng công chi tiết</div>
+        <div class="grid-2">
+            <div><label class="label-text">Từ ngày:</label><input type="date" id="filterTuNgay" onchange="hienThiGiaoDien()"></div>
+            <div><label class="label-text">Đến ngày:</label><input type="date" id="filterDenNgay" onchange="hienThiGiaoDien()"></div>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>Ngày</th><th>Vào</th><th>Về</th><th>Công</th><th>Hành động</th></tr></thead>
+                <tbody id="tableBodyLogs"></tbody>
+            </table>
+        </div>
+        <button class="btn-excel" onclick="xuatFileExcel()">Xuất file Excel (CSV)</button>
+        <button class="footer-id-btn" id="btnIdFooter" onclick="kichHoatDoiMa()">Mã của bạn: ...... (Bấm để tải lại hoặc tự đặt mã mới)</button>
+    </div>
+</div>
+<script>
+    const GOOGLE_FORM_URL = "https://google.com";
+    let userId = localStorage.getItem('app_user_id');
+    let localLogs = JSON.parse(localStorage.getItem('saved_logs_backup_v2')) || [];
+    let pendingSyncQueue = JSON.parse(localStorage.getItem('pending_sync_queue_v2')) || [];
 
-        <script>
-        let attendanceLogs = JSON.parse(localStorage.getItem('attendanceLogs')) || [];
-        let userCode = localStorage.getItem('userCode') || '121221';
+    if (!userId) {
+        userId = Math.floor(100000 + Math.random() * 900000).toString();
+        localStorage.setItem('app_user_id', userId);
+    }
+    capNhatChuoiNutFooter();
+    document.getElementById('txtBatKyNgay').valueAsDate = new Date();
 
-        // Đồng hồ tự động lấy theo giờ Cộng hòa Séc
-        function updateClock() {
-            const clockEl = document.getElementById('clock');
-            if (clockEl) {
-                clockEl.innerText = new Date().toLocaleTimeString('vi-VN', {
-                    timeZone: 'Europe/Prague',
-                    hour12: false
-                });
-            }
-        }
-        setInterval(updateClock, 1000);
+    function capNhatChuoiNutFooter() {
+        document.getElementById('btnIdFooter').textContent = `Mã của bạn: ${userId} (Bấm để tải lại hoặc tự đặt mã mới)`;
+    }
 
-        // Ô chọn ngày mặc định nhảy theo ngày hiện tại ở Séc
-        function getTodayYYYYMMDD() {
-            const options = { timeZone: 'Europe/Prague', year: 'numeric', month: '2-digit', day: '2-digit' };
-            const formatter = new Intl.DateTimeFormat('fr-CA', options); 
-            return formatter.format(new Date());
+    function updateNetworkStatus() {
+        const badge = document.getElementById('networkStatus');
+        if (navigator.onLine) {
+            badge.textContent = "Đang trực tuyến"; badge.className = "network-badge online";
+            xuLyDongBoNgam();
+        } else {
+            badge.textContent = "Đang ngoại tuyến (Offline)"; badge.className = "network-badge offline";
         }
+    }
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+    updateNetworkStatus();
 
-        function quickCheck(type) {
-            const dateKey = getTodayYYYYMMDD(); 
-            const timeStr = new Date().toLocaleTimeString('vi-VN', { timeZone: 'Europe/Prague', hour: '2-digit', minute: '2-digit', hour12: false });
-            const workValue = parseFloat(document.getElementById('today-work-type').value);
-            let logIndex = attendanceLogs.findIndex(item => item.date === dateKey);
-            if (logIndex > -1) {
-                if (type === 'Vào') attendanceLogs[logIndex].inTime = timeStr;
-                if (type === 'Về') attendanceLogs[logIndex].outTime = timeStr;
-                attendanceLogs[logIndex].work = workValue;
-            } else {
-                attendanceLogs.push({ date: dateKey, inTime: type === 'Vào' ? timeStr : '--:--', outTime: type === 'Về' ? timeStr : '--:--', work: workValue });
-            }
-            saveAndRender();
-            alert(`Đã ghi nhận ${type} ca lúc ${timeStr} (Giờ Séc)`);
-        }
-    
-        function saveCustomDate() {
-            const selectedDate = document.getElementById('custom-date').value;
-            const workValue = parseFloat(document.getElementById('custom-work-type').value);
-            const inTime = document.getElementById('custom-in').value || '08:00';
-            const outTime = document.getElementById('custom-out').value || '17:00';
-            if (!selectedDate) return alert("Vui lòng chọn ngày trước!");
-            let logIndex = attendanceLogs.findIndex(item => item.date === selectedDate);
-            if (logIndex > -1) {
-                attendanceLogs[logIndex].inTime = inTime;
-                attendanceLogs[logIndex].outTime = outTime;
-                attendanceLogs[logIndex].work = workValue;
-            } else {
-                attendanceLogs.push({ date: selectedDate, inTime, outTime, work: workValue });
-            }
-            saveAndRender();
-            alert("Đã lưu thành công!");
-        }
+    setInterval(function() {
+        const now = new Date();
+        var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+        if(h < 10) h = "0" + h; if(m < 10) m = "0" + m; if(s < 10) s = "0" + s;
+        document.getElementById('liveClock').textContent = `${h}:${m}:${s}`;
+    }, 1000);
 
-        function getVietnameseDayName(dateString) {
-            const parts = dateString.split('-');
-            const date = new Date(parts[0], parts[1] - 1, parts[2]);
-            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-            return days[date.getDay()];
-        }
-        function formatDateSub(dateString) {
-            const [year, month, day] = dateString.split('-');
-            return `${day}/${month}/${year}`;
-        }
-        function formatDateVN(dateString) {
-            const [year, month, day] = dateString.split('-');
-            return `${parseInt(day)}.${parseInt(month)}.${year}`;
-        }
+    function hienThiGiaoDien() {
+        const tbody = document.getElementById('tableBodyLogs');
+        tbody.innerHTML = '';
+        let filterTu = document.getElementById('filterTuNgay').value;
+        let filterDen = document.getElementById('filterDenNgay').value;
+        let tongCong = 0, filteredLogs = [...localLogs];
 
-        // ĐA SỬA HOÀN TOÀN: Đổ dữ liệu chuẩn cấu trúc, loại bỏ ký tự lạ để Safari iPhone bắt buộc mở khóa nút sửa
-        function editLog(index) {
-            const log = attendanceLogs[index];
-            let cleanDate = String(log.date).trim().substring(0, 10);
-            
-            document.getElementById('custom-date').value = cleanDate;
-            document.getElementById('custom-work-type').value = log.work;
-            
-            let inValue = (log.inTime === '--:--' || !log.inTime) ? '08:00' : log.inTime;
-            let outValue = (log.outTime === '--:--' || !log.outTime) ? '17:00' : log.outTime;
-            
-            document.getElementById('custom-in').value = inValue;
-            document.getElementById('custom-out').value = outValue;
-            
-            document.getElementById('custom-date').scrollIntoView({ behavior: 'smooth' });
+        if (filterTu) {
+            filteredLogs = filteredLogs.filter(item => new Date(item.date.split('/').reverse().join('-')) >= new Date(filterTu));
         }
-
-        function deleteLog(index) {
-            if (confirm("Bạn có chắc chắn muốn xóa không?")) {
-                attendanceLogs.splice(index, 1);
-                saveAndRender();
-            }
+        if (filterDen) {
+            filteredLogs = filteredLogs.filter(item => new Date(item.date.split('/').reverse().join('-')) <= new Date(filterDen));
         }
-        function saveAndRender() {
-            attendanceLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
-            localStorage.setItem('attendanceLogs', JSON.stringify(attendanceLogs));
-            renderLogs();
+        if(filteredLogs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5">Chưa có dữ liệu chấm công.</td></tr>';
+            document.getElementById('txtTotalCong').textContent = 0;
+            return;
         }
-
-        function renderLogs() {
-            const tableBody = document.getElementById('log-table-body');
-            const filterFrom = document.getElementById('filter-from').value;
-            const filterTo = document.getElementById('filter-to').value;
-            if (!tableBody) return;
-            tableBody.innerHTML = '';
-            let totalWork = 0;
-            attendanceLogs.forEach((log, index) => {
-                if (filterFrom && log.date < filterFrom) return;
-                if (filterTo && log.date > filterTo) return;
-                totalWork += log.work;
-                const row = document.createElement('tr');
-                row.className = "border-b border-slate-100";
-                row.innerHTML = `
-                    <td class="py-3 text-left">
-                        <div style="font-weight: 800; color: #1e293b;">${getVietnameseDayName(log.date)}</div>
-                        <div style="font-size: 10px; color: #94a3b8; font-weight: 500;">${formatDateSub(log.date)}</div>
-                    </td>
-                    <td class="py-3 text-center" style="color: #2ecc71;">${log.inTime}</td>
-                    <td class="py-3 text-center" style="color: #ff4757;">${log.outTime}</td>
-                    <td class="py-3 text-center" style="color: #546de5;">${log.work}</td>
-                    <td class="py-3 text-center" style="white-space: nowrap;">
-                        <button onclick="editLog(${index})" class="action-btn" style="margin-right: 6px;">✏️</button>
-                        <button onclick="deleteLog(${index})" class="action-btn">❌</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-            const totalWorkEl = document.getElementById('total-work');
-            if (totalWorkEl) totalWorkEl.innerText = `${totalWork} công`;
-            const userCodeBtn = document.getElementById('user-code-btn');
-            if (userCodeBtn) userCodeBtn.innerText = `Mã của bạn: ${userCode} (Bấm để tải lại hoặc tự đặt mã mới)`;
-        }
-
-        function exportToCSV() {
-            if (attendanceLogs.length === 0) return alert("Không có dữ liệu!");
-            let csvContent = "\uFEFFThu,Ngay,Gio Vao,Gio Ve,So Cong\n";
-            attendanceLogs.forEach(log => {
-                csvContent += `"${getVietnameseDayName(log.date)}","${formatDateVN(log.date)}","${log.inTime}","${log.outTime}","${log.work}"\n`;
-            });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Bang_Cong_${userCode}.csv`;
-            link.click();
-        }
-
-        function regenerateUserCode() {
-            let newCode = prompt("Nhập mã số cá nhân mới của bạn:", userCode);
-            if (newCode && newCode.trim() !== "") {
-                userCode = newCode.trim();
-                localStorage.setItem('userCode', userCode);
-                renderLogs();
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const customDateInput = document.getElementById('custom-date');
-            if (customDateInput) {
-                customDateInput.value = getTodayYYYYMMDD(); 
-            }
-            updateClock();
-            renderLogs();
+        filteredLogs.forEach((item, index) => {
+            tongCong += parseFloat(item.công || 0);
+            tbody.innerHTML += `<tr><td>${item.date}</td><td style="color:#10b981">${item.gioVao || '--:--'}</td><td style="color:#ff4b55">${item.gioVe || '--:--'}</td><td style="color:#2563eb">${item.công}</td><td><button class="action-btn btn-edit" onclick="suaGhiNhan(${index})">Sửa</button><button class="action-btn btn-delete" onclick="xoaGhiNhan(${index})">Xóa</button></td></tr>`;
         });
-    </script>
+        document.getElementById('txtTotalCong').textContent = tongCong.toFixed(1).replace('.0', '');
+    }    function chamCongMee(kieu, giaTriCong) {
+        const now = new Date();
+        const ngayString = now.toLocaleDateString('vi-VN');
+        var hh = now.getHours(), mm = now.getMinutes();
+        if(hh < 10) hh = "0" + hh; if(mm < 10) mm = "0" + mm;
+        const gioString = `${hh}:${mm}`;
+        let trungNgayIndex = localLogs.findIndex(l => l.date === ngayString);
+        
+        if (trungNgayIndex !== -1) {
+            if (kieu === 'Vào') localLogs[trungNgayIndex].gioVao = gioString;
+            else localLogs[trungNgayIndex].gioVe = gioString;
+            localLogs[trungNgayIndex].công = giaTriCong;
+        } else {
+            localLogs.unshift({ date: ngayString, gioVao: kieu === 'Vào' ? gioString : '', gioVe: kieu === 'Về' ? gioString : '', công: giaTriCong });
+        }
+        luuVaDongBo();
+        alert(`Đã ghi nhận thành công giờ ${kieu}!`);
+    }
+
+    function chamCongNgayBatKyMee() {
+        const ngayChon = new Date(document.getElementById('txtBatKyNgay').value);
+        if (isNaN(ngayChon)) return alert("Vui lòng chọn ngày hợp lệ!");
+        localLogs.unshift({ date: ngayChon.toLocaleDateString('vi-VN'), gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value });
+        luuVaDongBo();
+        alert("Đã lưu ngày công bất kỳ thành công!");
+    }
+
+    function suaGhiNhan(index) {
+        let item = localLogs[index];
+        let congMoi = prompt(`Sửa số công cho ngày ${item.date}:`, item.công);
+        let gioVaoMoi = prompt(`Sửa giờ VÀO (hh:mm):`, item.gioVao);
+        let gioVeMoi = prompt(`Sửa giờ VỀ (hh:mm):`, item.gioVe);
+        if (congMoi !== null && gioVaoMoi !== null && gioVeMoi !== null) {
+            item.công = congMoi; item.gioVao = gioVaoMoi; item.gioVe = gioVeMoi;
+            luuVaDongBo();
+        }
+    }
+
+    function xoaGhiNhan(index) {
+        if (confirm("Bạn có chắc chắn muốn xóa bản ghi ngày này không?")) {
+            localLogs.splice(index, 1);
+            luuVaDongBo();
+        }
+    }
+
+    function luuVaDongBo() {
+        localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs));
+        hienThiGiaoDien();
+        pendingSyncQueue = [{ userId: userId, data: JSON.stringify(localLogs) }];
+        localStorage.setItem('pending_sync_queue_v2', JSON.stringify(pendingSyncQueue));
+        xuLyDongBoNgam();
+    }
+
+    function xuLyDongBoNgam() {
+        if (!navigator.onLine || pendingSyncQueue.length === 0) return;
+        const syncItem = pendingSyncQueue;
+        const formData = new FormData();
+        formData.append('entry.1000001', syncItem.userId);
+        formData.append('entry.1000002', syncItem.data);
+        fetch(GOOGLE_FORM_URL, { method: 'POST', body: formData, mode: 'no-cors' }).then(function() {
+            pendingSyncQueue.shift();
+            localStorage.setItem('pending_sync_queue_v2', JSON.stringify(pendingSyncQueue));
+        });
+    }
+
+    function kichHoatDoiMa() {
+        let nhapMa = prompt("Nhập mã số thiết bị cũ để đồng bộ:", userId);
+        if (nhapMa && nhapMa.trim() !== "") {
+            userId = nhapMa.trim(); localStorage.setItem('app_user_id', userId); capNhatChuoiNutFooter();
+            let chuoiSaoLuuCu = prompt("Dán chuỗi sao lưu công từ máy cũ vào đây (nếu có):");
+            if (chuoiSaoLuuCu) {
+                try { localLogs = JSON.parse(chuoiSaoLuuCu); localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs)); } catch(e) { alert("Chuỗi lỗi!"); }
+            }
+            hienThiGiaoDien();
+        }
+    }
+
+    function xuatFileExcel() {
+        if(localLogs.length === 0) return alert("Không có dữ liệu!");
+        let chuoiSaoLuu = JSON.stringify(localLogs);
+        prompt("Hãy sao chép chuỗi dự phòng này để nhập khi đổi thiết bị máy mới:", chuoiSaoLuu);
+        let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Số Công\n";
+        localLogs.forEach(i => { csv += `${i.date},${i.gioVao || '--'},${i.gioVe || '--'},${i.công}\n`; });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob); link.download = `Bang_Cong_${userId}.csv`; link.click();
+    }
+
+    hienThiGiaoDien();
+</script>
 </body>
 </html>
 
+
+    
     
