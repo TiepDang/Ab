@@ -13,18 +13,20 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 
-// SỬA LỖI TẠI ĐÂY: Ép buộc hàm luôn trả về CHUỖI CHỮ thuần túy định dạng YYYY-MM-DD
+// SỬA LỖI GỐC: Hàm lấy ngày hôm nay chuẩn ISO YYYY-MM-DD (Bắt buộc phải có số 0 ở trước ngày/tháng nhỏ)
 function getTodayYYYYMMDD() {
     const now = new Date();
     const year = now.getFullYear();
+    // Sử dụng padStart(2, '0') để ép tháng luôn có 2 chữ số (ví dụ: 07)
     const month = String(now.getMonth() + 1).padStart(2, '0');
+    // Sử dụng padStart(2, '0') để ép ngày luôn có 2 chữ số (ví dụ: 20)
     const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`; // Trả về chuỗi chữ chuẩn "2026-07-20"
+    return `${year}-${month}-${day}`; 
 }
 
 // 2. Hàm Chấm công nhanh cho nút Vào Làm / Tan Làm Hôm Nay
 function quickCheck(type) {
-    const dateKey = getTodayYYYYMMDD(); // Đã đồng bộ thành chuỗi chữ chuẩn
+    const dateKey = getTodayYYYYMMDD(); 
     const nowTime = new Date();
     const timeStr = `${String(nowTime.getHours()).padStart(2, '0')}:${String(nowTime.getMinutes()).padStart(2, '0')}`;
     const workValue = parseFloat(document.getElementById('today-work-type').value);
@@ -77,31 +79,35 @@ function getVietnameseDayName(dateString) {
     return days[new Date(dateString).getDay()];
 }
 
-// Định dạng hiển thị ngày phụ dạng DD/MM/YYYY
+// Định dạng hiển thị ngày phụ dạng DD/MM/YYYY dưới tên Thứ
 function formatDateSub(dateString) {
     const [year, month, day] = dateString.split('-');
     return `${day}/${month}/${year}`;
 }
 
-// Hàm bổ trợ định dạng xuất file excel ngày dạng DD.M.YYYY
+// Định dạng xuất file excel ngày dạng DD.M.YYYY
 function formatDateVN(dateString) {
     const date = new Date(dateString);
     return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
 }
 
-// 5. ĐA VÁ LỖI HOÀN TOÀN: Hàm sửa dữ liệu dòng khi bấm nút Bút chì
+// 5. ĐÃ VÁ LỖI HOÀN TOÀN TRÊN SAFARI: Hàm sửa dữ liệu dòng khi bấm nút Bút chì
 function editLog(index) {
     const log = attendanceLogs[index];
     
-    // Đảm bảo dữ liệu ngày truyền vào thẻ input luôn là chuỗi chữ sạch
-    const cleanDate = String(log.date).trim();
+    // Chuẩn hóa ép buộc chuỗi ngày về đúng cấu trúc YYYY-MM-DD sạch trước khi nạp vào ô nhập liệu
+    const parts = log.date.split('-');
+    const cleanDate = `${parts[0]}-${String(parts[1]).padStart(2, '0')}-${String(parts[2]).padStart(2, '0')}`;
     
+    // Đẩy dữ liệu ngược lên các ô nhập liệu ở Khối 2
     document.getElementById('custom-date').value = cleanDate;
     document.getElementById('custom-work-type').value = log.work;
-    document.getElementById('custom-in').value = log.inTime === '--:--' ? '08:00' : log.inTime;
-    document.getElementById('custom-out').value = log.outTime === '--:--' ? '17:00' : log.outTime;
     
-    // Cuộn màn hình lên Khối 2 để bạn chỉnh sửa vô cùng tiện lợi
+    // Kiểm tra và gán giờ vào/giờ về, nếu trống thì điền giờ mặc định để tránh lỗi trắng ô
+    document.getElementById('custom-in').value = (log.inTime === '--:--' || !log.inTime) ? '08:00' : log.inTime;
+    document.getElementById('custom-out').value = (log.outTime === '--:--' || !log.outTime) ? '17:00' : log.outTime;
+    
+    // Tự động cuộn màn hình lên Khối 2 mượt mà để tiến hành sửa đổi
     document.getElementById('custom-date').scrollIntoView({ behavior: 'smooth' });
 }
 
