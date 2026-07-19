@@ -2,7 +2,7 @@
 let attendanceLogs = JSON.parse(localStorage.getItem('attendanceLogs')) || [];
 let userCode = localStorage.getItem('userCode') || '121221';
 
-// 1. Chạy đồng hồ hiển thị thời gian thực theo từng giây giống ảnh
+// 1. Chạy đồng hồ hiển thị thời gian thực theo từng giây
 function updateClock() {
     const nowTime = new Date();
     const hours = String(nowTime.getHours()).padStart(2, '0');
@@ -13,12 +13,20 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 
+// Hàm lấy ngày hôm nay định dạng chuẩn YYYY-MM-DD cho hệ thống máy hiểu
+function getTodayYYYYMMDD() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 // 2. Hàm Chấm công nhanh cho nút Vào Làm / Tan Làm Hôm Nay
 function quickCheck(type) {
-    const now = new Date();
-    // Lấy ngày theo định dạng YYYY-MM-DD làm Key lưu trữ hệ thống
-    const dateKey = now.toLocaleDateString('sv').split(' ')[0]; 
-    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const dateKey = getTodayYYYYMMDD(); 
+    const nowTime = new Date();
+    const timeStr = `${String(nowTime.getHours()).padStart(2, '0')}:${String(nowTime.getMinutes()).padStart(2, '0')}`;
     const workValue = parseFloat(document.getElementById('today-work-type').value);
 
     let logIndex = attendanceLogs.findIndex(item => item.date === dateKey);
@@ -69,30 +77,25 @@ function getVietnameseDayName(dateString) {
     return days[new Date(dateString).getDay()];
 }
 
-// Định dạng hiển thị ngày dạng DD.M.YYYY giống hệt trong ảnh mẫu của bạn (19.7.2026)
-function formatDateVN(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day}.${month}.${year}`;
-}
-
-// Định dạng hiển thị ngày phụ dạng DD/MM/YYYY nằm nhỏ ở dưới tên Thứ (19/07/2026)
+// Định dạng hiển thị ngày phụ dạng DD/MM/YYYY
 function formatDateSub(dateString) {
     const [year, month, day] = dateString.split('-');
     return `${day}/${month}/${year}`;
 }
 
-// 5. Hàm xử lý sửa đổi dữ liệu dòng khi bấm nút Bút chì
+// Hàm bổ trợ định dạng xuất file excel ngày dạng DD.M.YYYY
+function formatDateVN(dateString) {
+    const date = new Date(dateString);
+    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+}
+
+// 5. Hàm sửa dữ liệu dòng khi bấm nút Bút chì (Đồng bộ điền ngược thông tin)
 function editLog(index) {
     const log = attendanceLogs[index];
     document.getElementById('custom-date').value = log.date;
     document.getElementById('custom-work-type').value = log.work;
     document.getElementById('custom-in').value = log.inTime === '--:--' ? '08:00' : log.inTime;
     document.getElementById('custom-out').value = log.outTime === '--:--' ? '17:00' : log.outTime;
-    
-    // Cuộn màn hình lên khối nhập liệu để người dùng sửa tiện lợi
     document.getElementById('custom-date').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -111,7 +114,7 @@ function saveAndRender() {
     renderLogs();
 }
 
-// 8. Hàm hiển thị danh sách dữ liệu lên màn hình bảng công chi tiết
+// 8. ĐÃ SỬA: Tách rời 2 nút hành động độc lập, tạo không gian chạm nút bấm siêu nhạy
 function renderLogs() {
     const tableBody = document.getElementById('log-table-body');
     const filterFrom = document.getElementById('filter-from').value;
@@ -122,32 +125,28 @@ function renderLogs() {
     let totalWork = 0;
 
     attendanceLogs.forEach((log, index) => {
-        // Lọc dữ liệu theo khoảng ngày nếu người dùng chọn bộ lọc
         if (filterFrom && log.date < filterFrom) return;
         if (filterTo && log.date > filterTo) return;
 
         totalWork += log.work;
         const row = document.createElement('tr');
-        row.className = "border-b border-slate-100 hover:bg-slate-50";
+        row.className = "border-b border-slate-100";
         row.innerHTML = `
-            <td class="py-3 font-medium">
-                <div class="font-bold text-slate-800">${getVietnameseDayName(log.date)}</div>
-                <div class="text-[10px] text-slate-400">${formatDateSub(log.date)}</div>
+            <td class="py-3 text-left">
+                <div style="font-weight: 800; color: #1e293b;">${getVietnameseDayName(log.date)}</div>
+                <div style="font-size: 10px; color: #94a3b8; font-weight: 500;">${formatDateSub(log.date)}</div>
             </td>
-            <td class="py-3 text-center text-green-600 font-semibold">${log.inTime}</td>
-            <td class="py-3 text-center text-red-500 font-semibold">${log.outTime}</td>
-            <td class="py-3 text-center font-bold text-indigo-600">${log.work}</td>
-            <td class="py-3 text-center space-x-2">
-                <!-- Nút sửa hình cây bút chì giống ảnh -->
-                <button onclick="editLog(${index})" class="text-blue-500 hover:text-blue-700 text-sm p-1 transition" title="Sửa">✏️</button>
-                <!-- Nút xóa hình dấu X màu đỏ giống ảnh -->
-                <button onclick="deleteLog(${index})" class="text-red-500 hover:text-red-700 text-sm p-1 transition" title="Xóa">❌</button>
+            <td class="py-3 text-center" style="color: #2ecc71;">${log.inTime}</td>
+            <td class="py-3 text-center" style="color: #ff4757;">${log.outTime}</td>
+            <td class="py-3 text-center" style="color: #546de5;">${log.work}</td>
+            <td class="py-3 text-center" style="white-space: nowrap;">
+                <button onclick="editLog(${index})" class="action-btn" style="margin-right: 10px;">✏️</button>
+                <button onclick="deleteLog(${index})" class="action-btn">❌</button>
             </td>
         `;
         tableBody.appendChild(row);
     });
 
-    // Cập nhật lại số công tích lũy hiển thị ở khối trên cùng
     const totalWorkEl = document.getElementById('total-work');
     if (totalWorkEl) totalWorkEl.innerText = `${totalWork} công`;
     
@@ -155,7 +154,7 @@ function renderLogs() {
     if (userCodeBtn) userCodeBtn.innerText = `Mã của bạn: ${userCode} (Bấm để tải lại hoặc tự đặt mã mới)`;
 }
 
-// 9. Xuất file báo cáo dạng Excel (CSV) không lỗi font tiếng Việt
+// 9. Xuất file báo cáo dạng Excel (CSV)
 function exportToCSV() {
     if (attendanceLogs.length === 0) {
         alert("Không có dữ liệu để xuất file!");
@@ -182,14 +181,12 @@ function regenerateUserCode() {
     }
 }
 
-// 11. Đảm bảo toàn bộ cấu trúc giao diện HTML đã tải xong mới bắt đầu dựng dữ liệu
+// 11. Đảm bảo toàn bộ cấu trúc giao diện HTML đã tải xong mới khởi tạo dữ liệu mặc định
 document.addEventListener("DOMContentLoaded", function() {
     const customDateInput = document.getElementById('custom-date');
     if (customDateInput) {
-        // Khởi tạo ngày hiển thị mặc định trên ô nhập liệu
-        const today = new Date();
-        customDateInput.value = today.toLocaleDateString('sv').split(' ')[0];
+        customDateInput.value = getTodayYYYYMMDD(); 
     }
     updateClock();
-    renderLogs(); // Đọc dữ liệu từ bộ nhớ LocalStorage hiển thị lên bảng công
+    renderLogs();
 });
