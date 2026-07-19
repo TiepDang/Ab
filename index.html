@@ -139,11 +139,7 @@
                 </div>
                 <div class="flex-col-6">
                     <label class="label-text">Tính Công:</label>
-                    <select id="custom-work-type" class="input-field">
-                        <option value="1">1 công</option>
-                        <option value="0.5">0.5 công</option>
-                        <option value="0">0 công</option>
-                    </select>
+                    <select id="custom-work-type" class="input-field"><option value="1">1 công</option><option value="0.5">0.5 công</option><option value="0">0 công</option></select>
                 </div>
             </div>
             <div class="flex-grid">
@@ -214,8 +210,7 @@
             const day = String(now.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`; 
         }
-
-                function quickCheck(type) {
+        function quickCheck(type) {
             const dateKey = getTodayYYYYMMDD(); 
             const nowTime = new Date();
             const timeStr = `${String(nowTime.getHours()).padStart(2, '0')}:${String(nowTime.getMinutes()).padStart(2, '0')}`;
@@ -226,7 +221,12 @@
                 if (type === 'Về') attendanceLogs[logIndex].outTime = timeStr;
                 attendanceLogs[logIndex].work = workValue;
             } else {
-                attendanceLogs.push({ date: dateKey, inTime: type === 'Vào' ? timeStr : '--:--', outTime: type === 'Về' ? timeStr : '--:--', work: workValue });
+                attendanceLogs.push({ 
+                    date: dateKey, 
+                    inTime: type === 'Vào' ? timeStr : '--:--', 
+                    outTime: type === 'Về' ? timeStr : '--:--', 
+                    work: workValue 
+                });
             }
             saveAndRender();
             alert(`Đã ghi nhận ${type} ca lúc ${timeStr}`);
@@ -235,8 +235,8 @@
         function saveCustomDate() {
             const selectedDate = document.getElementById('custom-date').value;
             const workValue = parseFloat(document.getElementById('custom-work-type').value);
-            const inTime = document.getElementById('custom-in').value || '--:--';
-            const outTime = document.getElementById('custom-out').value || '--:--';
+            const inTime = document.getElementById('custom-in').value || '08:00';
+            const outTime = document.getElementById('custom-out').value || '17:00';
             if (!selectedDate) return alert("Vui lòng chọn ngày trước!");
             let logIndex = attendanceLogs.findIndex(item => item.date === selectedDate);
             if (logIndex > -1) {
@@ -263,13 +263,21 @@
             return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
         }
 
+        // ĐÃ VÁ LỖI HOÀN TOÀN: Loại bỏ chuỗi lạ '--:--', ép định dạng giờ chuẩn cho Safari iPhone
         function editLog(index) {
             const log = attendanceLogs[index];
             let cleanDate = String(log.date).trim().substring(0, 10);
+            
             document.getElementById('custom-date').value = cleanDate;
             document.getElementById('custom-work-type').value = log.work;
-            document.getElementById('custom-in').value = (log.inTime === '--:--' || !log.inTime) ? '08:00' : log.inTime;
-            document.getElementById('custom-out').value = (log.outTime === '--:--' || !log.outTime) ? '17:00' : log.outTime;
+            
+            // Xử lý thông minh: Nếu chưa check-in hoặc chưa check-out, gán giờ mặc định chuẩn để tránh sập app
+            let inValue = (log.inTime === '--:--' || !log.inTime) ? '08:00' : log.inTime;
+            let outValue = (log.outTime === '--:--' || !log.outTime) ? '17:00' : log.outTime;
+            
+            document.getElementById('custom-in').value = inValue;
+            document.getElementById('custom-out').value = outValue;
+            
             document.getElementById('custom-date').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -343,7 +351,9 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             const customDateInput = document.getElementById('custom-date');
-            if (customDateInput) customDateInput.value = getTodayYYYYMMDD(); 
+            if (customDateInput) {
+                customDateInput.value = getTodayYYYYMMDD(); 
+            }
             updateClock();
             renderLogs();
         });
@@ -351,4 +361,5 @@
 </body>
 </html>
 
+        
     
