@@ -32,6 +32,7 @@
                 </select>
             </div>
             
+            <!-- Hàng nút bấm chia đôi 2 bên hoàn hảo -->
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="quickCheck('Vào')" class="btn-base btn-green py-3">Vào Làm (Hôm Nay)</button>
                 <button onclick="quickCheck('Về')" class="btn-base btn-red py-3">Tan Làm (Hôm Nay)</button>
@@ -41,6 +42,8 @@
         <!-- KHỐI 2: CHẤM CÔNG NGÀY BẤT KỲ -->
         <div class="card-box space-y-4">
             <h2 class="text-base font-bold border-b pb-2 text-slate-900">Chấm công ngày bất kỳ</h2>
+            
+            <!-- ĐÃ SỬA: Ép buộc hàng Chọn Ngày và Tính Công phải chia 2 bên bằng grid -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="text-xs font-semibold text-slate-500 block mb-1">Chọn Ngày:</label>
@@ -55,6 +58,8 @@
                     </select>
                 </div>
             </div>
+            
+            <!-- ĐÃ SỬA: Ép buộc hàng Giờ Vào và Giờ Về phải chia 2 bên bằng grid -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="text-xs font-semibold text-slate-500 block mb-1">Giờ Vào:</label>
@@ -65,12 +70,15 @@
                     <input type="time" id="custom-out" value="17:00" class="input-field">
                 </div>
             </div>
+            
             <button onclick="saveCustomDate()" class="btn-base btn-indigo py-3">Lưu Ngày Đã Chọn</button>
         </div>
 
         <!-- KHỐI 3: BỘ LỌC & BẢNG CÔNG CHI TIẾT -->
         <div class="card-box space-y-4">
             <h2 class="text-base font-bold border-b pb-2 text-slate-900">Bộ lọc & Bảng công chi tiết</h2>
+            
+            <!-- ĐÃ SỬA: Ép buộc hàng Từ Ngày và Đến Ngày phải chia 2 bên bằng grid -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="text-xs font-semibold text-slate-500 block mb-1">Từ ngày:</label>
@@ -82,7 +90,7 @@
                 </div>
             </div>
             
-            <!-- ĐÃ SỬA: Cấu trúc bảng chia tỷ lệ rộng rãi, chuẩn responsive di động -->
+            <!-- Khung bảng công chi tiết giãn đều chuẩn di động -->
             <div class="w-full overflow-x-auto pt-2">
                 <table class="w-full border-collapse text-xs">
                     <thead>
