@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Chấm Công</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <style>
+        :root {
+            --ios-blue: #007aff;
+            --ios-green: #34c759;
+            --ios-red: #ff3b30;
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: calc(40px + env(safe-area-inset-top)) 16px env(safe-area-inset-bottom) 16px;
+            color: #000;
+            user-select: none;
+        }
+        .app-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        h2 { text-align: center; margin: 0 0 5px 0; font-size: 22px; font-weight: 600; }
+        .clock {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1c1c1e;
+            letter-spacing: -0.5px;
+        }
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        button {
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:active { opacity: 0.7; }
+        .btn-in { background-color: var(--ios-green); }
+        .btn-out { background-color: var(--ios-red); }
+        .btn-export { background-color: var(--ios-blue); width: 100%; }
+        
+        h3 { font-size: 17px; font-weight: 600; color: #3a3a3c; margin: 0 0 10px 0; }
+        .table-container { max-height: 350px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 15px; }
+        th { text-align: left; padding: 10px 5px; border-bottom: 1px solid #c6c6c8; color: #8e8e93; font-weight: 500; }
+        td { padding: 12px 5px; border-bottom: 0.5px solid #e5e5ea; }
+        tr:last-child td { border-bottom: none; }
+        .time-in { color: var(--ios-green); font-weight: 600; }
+        .time-out { color: var(--ios-red); font-weight: 600; }
+        .empty { text-align: center; color: #8e8e93; padding: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <h2>Chấm Công Cá Nhân</h2>
+    <div class="clock" id="liveClock">00:00:00</div>
+
+    <div class="btn-group">
+        <button class="btn-in" onclick="stamp('in')">Vào Làm</button>
+        <button class="btn-out" onclick="stamp('out')">Tan Làm</button>
+    </div>
+
+    <button class="btn-export" onclick="exportCSV()">Xuất file Excel (CSV)</button>
+</div>
+
+<div class="app-card">
+    <h3>Bảng công theo ngày</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Giờ Vào</th>
+                    <th>Giờ Về</th>
+                </tr>
+            </thead>
+            <tbody id="logTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Cập nhật đồng hồ thời gian thực
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString('vi-VN');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Dữ liệu cấu trúc dạng: { "19/07/2026": { in: "08:00", out: "17:00" } }
+    let attendanceData = JSON.parse(localStorage.getItem('dailyAttendance')) || {};
+    renderLogs();
+
+    // Hàm chấm công chung cho cả Vào và Về
+    function stamp(type) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('vi-VN'); // Định dạng DD/MM/YYYY
+        const timeStr = now.toLocaleTimeString('vi-VN').substring(0, 5); // Lấy Giờ:Phút
+
+        // Nếu ngày hôm nay chưa có bản ghi, tạo mới
+        if (!attendanceData[dateStr]) {
+            attendanceData[dateStr] = { in: '--:--', out: '--:--' };
+        }
+
+        // Cập nhật giá trị tương ứng
+        if (type === 'in') {
+            attendanceData[dateStr].in = timeStr;
+        } else {
+            attendanceData[dateStr].out = timeStr;
+        }
+
+        localStorage.setItem('dailyAttendance', JSON.stringify(attendanceData));
+        renderLogs();
+    }
+
+    // Hiển thị dữ liệu lên bảng theo ngày
+    function renderLogs() {
+        const tbody = document.getElementById('logTableBody');
+        tbody.innerHTML = '';
+
+        const dates = Object.keys(attendanceData).sort((a, b) => {
+            // Sắp xếp ngày mới nhất lên đầu danh sách
+            const partsA = a.split('/');
+            const partsB = b.split('/');
+            return new Date(partsB[2], partsB[1] - 1, partsB[0]) - new Date(partsA[2], partsA[1] - 1, partsA[0]);
+        });
+
+        if (dates.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" class="empty">Chưa có dữ liệu chấm công</td></tr>`;
+            return;
+        }
+
+        dates.forEach(date => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>${date}</strong></td>
+                <td class="time-in">${attendanceData[date].in}</td>
+                <td class="time-out">${attendanceData[date].out}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Xuất file báo cáo Excel (CSV) gom nhóm theo ngày
+    function exportCSV() {
+        const dates = Object.keys(attendanceData);
+        if (dates.length === 0) return alert('Chưa có dữ liệu để xuất!');
+        
+        let csvContent = "\uFEFFNgày,Giờ Vào,Giờ Về\n";
+        dates.forEach(date => {
+            csvContent += `${date},${attendanceData[date].in},${attendanceData[date].out}\n`;
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "bang_cham_cong_theo_ngay.csv";
+        link.click();
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+</script>
+</body>
+</html>
+
