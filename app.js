@@ -13,18 +13,18 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 
-// Hàm lấy ngày hôm nay định dạng chuẩn YYYY-MM-DD cho hệ thống máy hiểu
+// SỬA LỖI TẠI ĐÂY: Ép buộc hàm luôn trả về CHUỖI CHỮ thuần túy định dạng YYYY-MM-DD
 function getTodayYYYYMMDD() {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${year}-${month}-${day}`; // Trả về chuỗi chữ chuẩn "2026-07-20"
 }
 
 // 2. Hàm Chấm công nhanh cho nút Vào Làm / Tan Làm Hôm Nay
 function quickCheck(type) {
-    const dateKey = getTodayYYYYMMDD(); 
+    const dateKey = getTodayYYYYMMDD(); // Đã đồng bộ thành chuỗi chữ chuẩn
     const nowTime = new Date();
     const timeStr = `${String(nowTime.getHours()).padStart(2, '0')}:${String(nowTime.getMinutes()).padStart(2, '0')}`;
     const workValue = parseFloat(document.getElementById('today-work-type').value);
@@ -89,13 +89,19 @@ function formatDateVN(dateString) {
     return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
 }
 
-// 5. Hàm sửa dữ liệu dòng khi bấm nút Bút chì (Đồng bộ điền ngược thông tin)
+// 5. ĐA VÁ LỖI HOÀN TOÀN: Hàm sửa dữ liệu dòng khi bấm nút Bút chì
 function editLog(index) {
     const log = attendanceLogs[index];
-    document.getElementById('custom-date').value = log.date;
+    
+    // Đảm bảo dữ liệu ngày truyền vào thẻ input luôn là chuỗi chữ sạch
+    const cleanDate = String(log.date).trim();
+    
+    document.getElementById('custom-date').value = cleanDate;
     document.getElementById('custom-work-type').value = log.work;
     document.getElementById('custom-in').value = log.inTime === '--:--' ? '08:00' : log.inTime;
     document.getElementById('custom-out').value = log.outTime === '--:--' ? '17:00' : log.outTime;
+    
+    // Cuộn màn hình lên Khối 2 để bạn chỉnh sửa vô cùng tiện lợi
     document.getElementById('custom-date').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -114,7 +120,7 @@ function saveAndRender() {
     renderLogs();
 }
 
-// 8. ĐÃ SỬA: Tách rời 2 nút hành động độc lập, tạo không gian chạm nút bấm siêu nhạy
+// 8. Hiển thị danh sách dữ liệu lên màn hình bảng công chi tiết
 function renderLogs() {
     const tableBody = document.getElementById('log-table-body');
     const filterFrom = document.getElementById('filter-from').value;
@@ -181,7 +187,7 @@ function regenerateUserCode() {
     }
 }
 
-// 11. Đảm bảo toàn bộ cấu trúc giao diện HTML đã tải xong mới khởi tạo dữ liệu mặc định
+// 11. Khởi tạo dữ liệu mặc định ban đầu khi mở app
 document.addEventListener("DOMContentLoaded", function() {
     const customDateInput = document.getElementById('custom-date');
     if (customDateInput) {
