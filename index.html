@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chấm Công Cá Nhân</title>
     <link rel="manifest" href="manifest.json">
-    
     <style>
         body {
             background-color: #f8fafc;
@@ -16,13 +15,7 @@
             display: flex;
             justify-content: center;
         }
-
-        .container {
-            width: 100%;
-            max-width: 440px;
-            box-sizing: border-box;
-        }
-
+        .container { width: 100%; max-width: 440px; box-sizing: border-box; }
         .card-box {
             background-color: #ffffff;
             border-radius: 16px;
@@ -33,15 +26,7 @@
             box-sizing: border-box;
             width: 100%;
         }
-
-        .title {
-            font-size: 22px;
-            font-weight: 800;
-            text-align: center;
-            margin: 8px 0;
-            color: #0f172a;
-        }
-
+        .title { font-size: 22px; font-weight: 800; text-align: center; margin: 8px 0; color: #0f172a; }
         #clock {
             font-size: 34px !important;
             font-weight: 900 !important;
@@ -52,7 +37,6 @@
             width: 100% !important;
             letter-spacing: 1px;
         }
-
         .blue-badge {
             background-color: #f0f7ff;
             border: 1px solid #e0f2fe;
@@ -61,13 +45,7 @@
             text-align: center;
             margin: 12px 0 20px 0;
         }
-
-        .badge-title {
-            color: #2563eb;
-            font-weight: 700;
-            font-size: 14px;
-        }
-
+        .badge-title { color: #2563eb; font-weight: 700; font-size: 14px; }
         #total-work {
             font-size: 30px !important;
             font-weight: 900 !important;
@@ -75,16 +53,7 @@
             margin-top: 8px !important;
             display: block !important;
         }
-
-        .label-text {
-            font-size: 12px;
-            font-weight: 700;
-            color: #64748b;
-            display: block;
-            margin-bottom: 4px;
-            text-align: left;
-        }
-
+        .label-text { font-size: 12px; font-weight: 700; color: #64748b; display: block; margin-bottom: 4px; text-align: left; }
         .input-field {
             width: 100%;
             background-color: #f1f5f9;
@@ -100,19 +69,8 @@
             display: block;
             -webkit-appearance: none;
         }
-
-        .flex-grid {
-            display: flex;
-            gap: 12px; 
-            margin-bottom: 12px;
-            width: 100%;
-        }
-        
-        .flex-col-6 {
-            flex: 1;
-            min-width: 0;
-        }
-
+        .flex-grid { display: flex; gap: 12px; margin-bottom: 12px; width: 100%; }
+        .flex-col-6 { flex: 1; min-width: 0; }
         .btn-base {
             width: 100%;
             font-weight: 800;
@@ -128,69 +86,35 @@
         .btn-indigo { background-color: #546de5; color: white; }
         .btn-blue { background-color: #0084ff; color: white; }
         .btn-gray { background-color: #64748b; color: white; }
-
-        .border-b {
-            font-size: 16px;
-            font-weight: 800;
-            margin: 0 0 12px 0;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e2e8f0;
-            color: #0f172a;
-        }
-
-        table {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            margin-top: 12px;
-            table-layout: fixed;
-        }
-
-        th {
-            color: #94a3b8;
-            font-weight: 700;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: center;
-            font-size: 12px;
-        }
+        .border-b { font-size: 16px; font-weight: 800; margin: 0 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; color: #0f172a; }
+        table { width: 100% !important; border-collapse: collapse !important; margin-top: 12px; table-layout: fixed; }
+        th { color: #94a3b8; font-weight: 700; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; text-align: center; font-size: 12px; }
         th:first-child { text-align: left; }
-
-        td {
-            padding: 12px 0;
-            vertical-align: middle;
-            border-bottom: 1px solid #f8fafc;
-            text-align: center;
-            font-weight: 700; 
-            font-size: 13px;
-        }
+        td { padding: 12px 0; vertical-align: middle; border-bottom: 1px solid #f8fafc; text-align: center; font-weight: 700; font-size: 13px; }
         td:first-child { text-align: left; }
-
-        /* Vùng bấm rộng rãi cho nút sửa/xóa trên màn hình cảm ứng */
         .action-btn {
-            background: none;
-            border: none;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-            padding: 8px;
+            padding: 8px 12px;
             display: inline-block;
             touch-action: manipulation;
         }
+        .action-btn:active { background-color: #e2e8f0; }
     </style>
 </head>
 <body>
-
     <div class="container">
-
         <!-- KHỐI 1: CHẤM CÔNG HÔM NAY -->
         <div class="card-box">
             <div class="title">Chấm Công Cá Nhân</div>
             <div id="clock">00:00:00</div>
-            
             <div class="blue-badge">
                 <div class="badge-title">Tổng công tích lũy (Tất cả)</div>
                 <div id="total-work">0 công</div>
             </div>
-            
             <div style="text-align: left; margin-bottom: 16px;">
                 <label class="label-text">Chọn loại công hôm nay:</label>
                 <select id="today-work-type" class="input-field">
@@ -199,21 +123,15 @@
                     <option value="0">0 công (Nghỉ phép/Lễ)</option>
                 </select>
             </div>
-            
             <div class="flex-grid">
-                <div class="flex-col-6">
-                    <button onclick="quickCheck('Vào')" class="btn-base btn-green">Vào Làm (Hôm Nay)</button>
-                </div>
-                <div class="flex-col-6">
-                    <button onclick="quickCheck('Về')" class="btn-base btn-red">Tan Làm (Hôm Nay)</button>
-                </div>
+                <div class="flex-col-6"><button onclick="quickCheck('Vào')" class="btn-base btn-green">Vào Làm (Hôm Nay)</button></div>
+                <div class="flex-col-6"><button onclick="quickCheck('Về')" class="btn-base btn-red">Tan Làm (Hôm Nay)</button></div>
             </div>
         </div>
 
         <!-- KHỐI 2: CHẤM CÔNG NGÀY BẤT KỲ -->
         <div class="card-box">
             <div class="border-b">Chấm công ngày bất kỳ</div>
-            
             <div class="flex-grid">
                 <div class="flex-col-6">
                     <label class="label-text">Chọn Ngày:</label>
@@ -228,7 +146,6 @@
                     </select>
                 </div>
             </div>
-            
             <div class="flex-grid">
                 <div class="flex-col-6">
                     <label class="label-text">Giờ Vào:</label>
@@ -239,14 +156,12 @@
                     <input type="time" id="custom-out" value="17:00" class="input-field">
                 </div>
             </div>
-            
             <button onclick="saveCustomDate()" class="btn-base btn-indigo" style="margin-top: 4px;">Lưu Ngày Đã Chọn</button>
         </div>
 
-        <!-- KHỐI 3: BỘ LỌC & BẢNG CÔNG CHI TIẾT -->
+                <!-- KHỐI 3: BỘ LỌC & BẢNG CÔNG CHI TIẾT -->
         <div class="card-box">
             <div class="border-b">Bộ lọc & Bảng công chi tiết</div>
-            
             <div class="flex-grid">
                 <div class="flex-col-6">
                     <label class="label-text">Từ ngày:</label>
@@ -257,7 +172,6 @@
                     <input type="date" id="filter-to" onchange="renderLogs()" class="input-field">
                 </div>
             </div>
-            
             <div style="width: 100%; overflow-x: auto; margin-top: 8px;">
                 <table>
                     <thead>
@@ -269,25 +183,172 @@
                             <th style="width: 18%;">Hành động</th>
                         </tr>
                     </thead>
-                    <tbody id="log-table-body" style="color: #334155;">
-                        <!-- Dữ liệu hiển thị tại đây -->
-                    </tbody>
+                    <tbody id="log-table-body" style="color: #334155;"></tbody>
                 </table>
             </div>
-            
             <div style="margin-top: 20px;">
                 <button onclick="exportToCSV()" class="btn-base btn-blue" style="margin-bottom: 8px;">Xuất file Excel (CSV)</button>
                 <button onclick="regenerateUserCode()" id="user-code-btn" class="btn-base btn-gray" style="font-size: 12px; padding: 12px;"></button>
             </div>
         </div>
-
     </div>
 
-    <script src="app.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        let attendanceLogs = JSON.parse(localStorage.getItem('attendanceLogs')) || [];
+        let userCode = localStorage.getItem('userCode') || '121221';
+
+        function updateClock() {
+            const nowTime = new Date();
+            const hours = String(nowTime.getHours()).padStart(2, '0');
+            const minutes = String(nowTime.getMinutes()).padStart(2, '0');
+            const seconds = String(nowTime.getSeconds()).padStart(2, '0');
+            const clockEl = document.getElementById('clock');
+            if (clockEl) clockEl.innerText = `${hours}:${minutes}:${seconds}`;
         }
+        setInterval(updateClock, 1000);
+
+        function getTodayYYYYMMDD() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`; 
+        }
+
+                function quickCheck(type) {
+            const dateKey = getTodayYYYYMMDD(); 
+            const nowTime = new Date();
+            const timeStr = `${String(nowTime.getHours()).padStart(2, '0')}:${String(nowTime.getMinutes()).padStart(2, '0')}`;
+            const workValue = parseFloat(document.getElementById('today-work-type').value);
+            let logIndex = attendanceLogs.findIndex(item => item.date === dateKey);
+            if (logIndex > -1) {
+                if (type === 'Vào') attendanceLogs[logIndex].inTime = timeStr;
+                if (type === 'Về') attendanceLogs[logIndex].outTime = timeStr;
+                attendanceLogs[logIndex].work = workValue;
+            } else {
+                attendanceLogs.push({ date: dateKey, inTime: type === 'Vào' ? timeStr : '--:--', outTime: type === 'Về' ? timeStr : '--:--', work: workValue });
+            }
+            saveAndRender();
+            alert(`Đã ghi nhận ${type} ca lúc ${timeStr}`);
+        }
+
+        function saveCustomDate() {
+            const selectedDate = document.getElementById('custom-date').value;
+            const workValue = parseFloat(document.getElementById('custom-work-type').value);
+            const inTime = document.getElementById('custom-in').value || '--:--';
+            const outTime = document.getElementById('custom-out').value || '--:--';
+            if (!selectedDate) return alert("Vui lòng chọn ngày trước!");
+            let logIndex = attendanceLogs.findIndex(item => item.date === selectedDate);
+            if (logIndex > -1) {
+                attendanceLogs[logIndex].inTime = inTime;
+                attendanceLogs[logIndex].outTime = outTime;
+                attendanceLogs[logIndex].work = workValue;
+            } else {
+                attendanceLogs.push({ date: selectedDate, inTime, outTime, work: workValue });
+            }
+            saveAndRender();
+            alert("Đã lưu thành công!");
+        }
+
+        function getVietnameseDayName(dateString) {
+            const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+            return days[new Date(dateString).getDay()];
+        }
+        function formatDateSub(dateString) {
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
+        function formatDateVN(dateString) {
+            const date = new Date(dateString);
+            return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+        }
+
+        function editLog(index) {
+            const log = attendanceLogs[index];
+            let cleanDate = String(log.date).trim().substring(0, 10);
+            document.getElementById('custom-date').value = cleanDate;
+            document.getElementById('custom-work-type').value = log.work;
+            document.getElementById('custom-in').value = (log.inTime === '--:--' || !log.inTime) ? '08:00' : log.inTime;
+            document.getElementById('custom-out').value = (log.outTime === '--:--' || !log.outTime) ? '17:00' : log.outTime;
+            document.getElementById('custom-date').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteLog(index) {
+            if (confirm("Bạn có chắc chắn muốn xóa ngày này không?")) {
+                attendanceLogs.splice(index, 1);
+                saveAndRender();
+            }
+        }
+        function saveAndRender() {
+            attendanceLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+            localStorage.setItem('attendanceLogs', JSON.stringify(attendanceLogs));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const tableBody = document.getElementById('log-table-body');
+            const filterFrom = document.getElementById('filter-from').value;
+            const filterTo = document.getElementById('filter-to').value;
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            let totalWork = 0;
+            attendanceLogs.forEach((log, index) => {
+                if (filterFrom && log.date < filterFrom) return;
+                if (filterTo && log.date > filterTo) return;
+                totalWork += log.work;
+                const row = document.createElement('tr');
+                row.className = "border-b border-slate-100";
+                row.innerHTML = `
+                    <td class="py-3 text-left">
+                        <div style="font-weight: 800; color: #1e293b;">${getVietnameseDayName(log.date)}</div>
+                        <div style="font-size: 10px; color: #94a3b8; font-weight: 500;">${formatDateSub(log.date)}</div>
+                    </td>
+                    <td class="py-3 text-center" style="color: #2ecc71;">${log.inTime}</td>
+                    <td class="py-3 text-center" style="color: #ff4757;">${log.outTime}</td>
+                    <td class="py-3 text-center" style="color: #546de5;">${log.work}</td>
+                    <td class="py-3 text-center" style="white-space: nowrap;">
+                        <button onclick="editLog(${index})" class="action-btn" style="margin-right: 6px;">✏️</button>
+                        <button onclick="deleteLog(${index})" class="action-btn">❌</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            const totalWorkEl = document.getElementById('total-work');
+            if (totalWorkEl) totalWorkEl.innerText = `${totalWork} công`;
+            const userCodeBtn = document.getElementById('user-code-btn');
+            if (userCodeBtn) userCodeBtn.innerText = `Mã của bạn: ${userCode} (Bấm để tải lại hoặc tự đặt mã mới)`;
+        }
+
+        function exportToCSV() {
+            if (attendanceLogs.length === 0) return alert("Không có dữ liệu!");
+            let csvContent = "\uFEFFThu,Ngay,Gio Vao,Gio Ve,So Cong\n";
+            attendanceLogs.forEach(log => {
+                csvContent += `"${getVietnameseDayName(log.date)}","${formatDateVN(log.date)}","${log.inTime}","${log.outTime}","${log.work}"\n`;
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Bang_Cong_${userCode}.csv`;
+            link.click();
+        }
+
+        function regenerateUserCode() {
+            let newCode = prompt("Nhập mã số cá nhân mới của bạn:", userCode);
+            if (newCode && newCode.trim() !== "") {
+                userCode = newCode.trim();
+                localStorage.setItem('userCode', userCode);
+                renderLogs();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const customDateInput = document.getElementById('custom-date');
+            if (customDateInput) customDateInput.value = getTodayYYYYMMDD(); 
+            updateClock();
+            renderLogs();
+        });
     </script>
 </body>
 </html>
+
+    
