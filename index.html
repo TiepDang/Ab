@@ -185,7 +185,7 @@
 
     function getDayOfWeek(dateStr) {
         var p = dateStr.split('/');
-        var dateObj = new Date(p[2], p[1] - 1, p[0]);
+        var dateObj = new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
         var dayIndex = dateObj.getDay();
         var days = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
         return days[dayIndex];
@@ -218,7 +218,7 @@
         if (!dateInput) return alert('Vui lòng chọn ngày!');
 
         var p = dateInput.split('-');
-        var formattedDate = p[2] + '/' + p[1] + '/' + p[0];
+        var formattedDate = [p[2], p[1], p[0]].join('/');
 
         attendanceData[formattedDate] = {
             in: timeIn || '--:--',
@@ -272,13 +272,13 @@
             const newIn = document.getElementById('editIn').value;
             const newOut = document.getElementById('editOut').value;
             const newVal = parseFloat(document.getElementById('editVal').value);
+
             attendanceData[date] = { in: newIn || '--:--', out: newOut || '--:--', val: newVal };
             document.body.removeChild(modalDiv);
             saveAndRefresh();
         };
     }
-
-       function deleteLog(date) {
+    function deleteLog(date) {
         if (confirm('Xóa dữ liệu ngày ' + date + '?')) {
             delete attendanceData[date];
             saveAndRefresh();
@@ -302,19 +302,19 @@
         var dFrom = null; 
         if (fromVal) { 
             var pF = fromVal.split('-'); 
-            dFrom = new Date(pF[0], pF[1] - 1, pF[2]); 
+            dFrom = new Date(parseInt(pF[0]), parseInt(pF[1]) - 1, parseInt(pF[2])); 
         }
         
         var dTo = null; 
         if (toVal) { 
             var pT = toVal.split('-'); 
-            dTo = new Date(pT[0], pT[1] - 1, pT[2]); 
+            dTo = new Date(parseInt(pT[0]), parseInt(pT[1]) - 1, parseInt(pT[2])); 
         }
 
-        if (fromVal && dTo) {
+        if (fromVal && toVal) {
             var pF2 = fromVal.split('-'); 
             var pT2 = toVal.split('-');
-            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF2[2] + '/' + pF2[1] + ' đến ' + pT2[2] + '/' + pT2[1];
+            document.getElementById('filterText').innerText = 'Tổng công từ ' + [pF2[2], pF2[1]].join('/') + ' đến ' + [pT2[2], pT2[1]].join('/');
             document.getElementById('filterResultBox').style.display = 'block';
         } else {
             document.getElementById('filterResultBox').style.display = 'none';
@@ -323,7 +323,7 @@
         var dates = Object.keys(attendanceData).sort(function(a, b) {
             var pA = a.split('/'); 
             var pB = b.split('/');
-            return new Date(pB[2], pB[1] - 1, pB[0]) - new Date(pA[2], pA[1] - 1, pA[0]);
+            return new Date(parseInt(pB[2]), parseInt(pB[1]) - 1, parseInt(pB[0])) - new Date(parseInt(pA[2]), parseInt(pA[1]) - 1, parseInt(pA[0]));
         });
 
         var hasData = false;
@@ -334,7 +334,7 @@
             totalAll += currentVal; 
 
             var p = date.split('/');
-            var dCurrent = new Date(p[2], p[1] - 1, p[0]);
+            var dCurrent = new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
 
             if (dFrom && dCurrent < dFrom) return;
             if (dTo && dCurrent > dTo) return;
@@ -389,5 +389,7 @@
 </script>
 </body>
 </html>
+
+    
  
     
