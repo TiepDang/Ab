@@ -32,6 +32,7 @@ body {
     padding: 0.65rem;
     font-size: 0.875rem;
     outline: none;
+    box-sizing: border-box;
 }
 
 /* Nút bấm hành động nhanh */
@@ -51,3 +52,28 @@ body {
     border: none;
     cursor: pointer;
 }
+
+/* SỬA TẠI ĐÂY: Định dạng bảng công chi tiết chuẩn tỷ lệ màn hình dọc */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+}
+
+th {
+    color: #94a3b8;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+td {
+    padding: 0.75rem 0;
+    vertical-align: middle;
+    border-bottom: 1px solid #f8fafc;
+}
+
+/* Căn chỉnh khoảng cách các cột hợp lý */
+.col-left { text-align: left; width: 30%; }
+.col-center { text-align: center; width: 18%; }
+.col-action { text-align: center; width: 16%; }
