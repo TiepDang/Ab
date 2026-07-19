@@ -110,13 +110,13 @@
     </style>
 </head>
 
-    <body>
+<body>
 <div class="app-card">
     <h2>Chấm Công Cá Nhân</h2>
     <div class="clock" id="liveClock">00:00:00</div>
     
     <div class="total-box">
-        <div id="filterText">Tổng công tích lũy</div>
+        <div>Tổng công tích lũy (Tất cả)</div>
         <div style="font-size: 24px; margin-top: 5px;"><span id="grandTotal">0</span> công</div>
     </div>
 
@@ -167,7 +167,7 @@
 <div class="app-card">
     <h3>Bộ lọc & Bảng công chi tiết</h3>
     
-    <div class="form-row" style="margin-bottom: 15px;">
+    <div class="form-row" style="margin-bottom: 10px;">
         <div class="form-group">
             <label>Từ ngày:</label>
             <input type="date" id="filterFrom" onchange="renderLogs()">
@@ -176,6 +176,11 @@
             <label>Đến ngày:</label>
             <input type="date" id="filterTo" onchange="renderLogs()">
         </div>
+    </div>
+
+    <!-- Ô hiển thị kết quả tổng công sau khi lọc ngày -->
+    <div id="filterResultBox" style="display: none; background: #e5e5ea; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; color: #5856d6; margin-bottom: 15px; font-size: 14px;">
+        <span id="filterText">Tổng công từ ngày đến ngày</span>: <span id="filteredTotal">0</span> công
     </div>
 
     <div class="table-container">
@@ -195,7 +200,7 @@
     <button class="btn-export" onclick="exportCSV()">Xuất file Excel (CSV)</button>
 </div>
 
-    <script>
+<script>
     function updateClock() {
         const now = new Date();
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('vi-VN');
@@ -209,7 +214,6 @@
     let attendanceData = JSON.parse(localStorage.getItem('dailyAttendance')) || {};
     renderLogs();
 
-    // Hàm chuyển đổi ngày chuỗi DD/MM/YYYY thành tên Thứ trong tuần
     function getDayOfWeek(dateStr) {
         const parts = dateStr.split('/');
         const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
@@ -301,28 +305,22 @@
     function renderLogs() {
         const tbody = document.getElementById('logTableBody');
         tbody.innerHTML = '';
-        let totalVal = 0;
+        let totalAll = 0;   // Tổng công tích lũy tất cả các ngày
+        let totalFilter = 0; // Tổng công riêng trong khoảng ngày được chọn
 
         const fromVal = document.getElementById('filterFrom').value;
         const toVal = document.getElementById('filterTo').value;
         
-        let dFrom = null;
-        if (fromVal) {
-            const pF = fromVal.split('-');
-            dFrom = new Date(pF[0], pF[1] - 1, pF[2]);
-        }
-        
-        let dTo = null;
-        if (toVal) {
-            const pT = toVal.split('-');
-            dTo = new Date(pT[0], pT[1] - 1, pT[2]);
-        }
+        let dFrom = null; if (fromVal) { const pF = fromVal.split('-'); dFrom = new Date(pF[0], pF[1] - 1, pF[2]); }
+        let dTo = null; if (toVal) { const pT = toVal.split('-'); dTo = new Date(pT[0], pT[1] - 1, pT[2]); }
 
+        // Hiển thị/Ẩn hộp thông báo tổng số công sau lọc ngày
         if (fromVal && toVal) {
             const pF = fromVal.split('-'); const pT = toVal.split('-');
-            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF[2]+'/'+pF[1] + ' đến ' + pT[2]+'/'+pT[1];
+            document.getElementById('filterText').innerText = 'Tổng trong khoảng từ ' + pF[2]+'/'+pF[1] + ' đến ' + pT[2]+'/'+pT[1];
+            document.getElementById('filterResultBox').style.display = 'block';
         } else {
-            document.getElementById('filterText').innerText = 'Tổng công tích lũy';
+            document.getElementById('filterResultBox').style.display = 'none';
         }
 
         const dates = Object.keys(attendanceData).sort((a, b) => {
@@ -333,16 +331,19 @@
         let hasData = false;
 
         dates.forEach(date => {
+            const dayData = attendanceData[date];
+            const currentVal = dayData.val !== undefined ? dayData.val : 1;
+            totalAll += currentVal; // Cộng dồn vào tổng tích lũy chung
+
             const p = date.split('/');
             const dCurrent = new Date(p[2], p[1] - 1, p[0]);
 
+            // Nếu đang bật bộ lọc mà ngày nằm ngoài khoảng thì ẩn dòng đó đi
             if (dFrom && dCurrent < dFrom) return;
             if (dTo && dCurrent > dTo) return;
 
             hasData = true;
-            const dayData = attendanceData[date];
-            const currentVal = dayData.val !== undefined ? dayData.val : 1;
-            totalVal += currentVal;
+            totalFilter += currentVal; // Cộng dồn vào tổng riêng của bộ lọc
 
             const dayOfWeek = getDayOfWeek(date);
 
@@ -364,7 +365,8 @@
             tbody.innerHTML = '<tr><td colspan="5" class="empty">Không có dữ liệu trong khoảng này</td></tr>';
         }
 
-        document.getElementById('grandTotal').innerText = totalVal;
+        document.getElementById('grandTotal').innerText = totalAll;
+        document.getElementById('filteredTotal').innerText = totalFilter;
     }
 
     function exportCSV() {
@@ -388,8 +390,6 @@
         navigator.serviceWorker.register('sw.js');
     }
 </script>
-
-
 </body>
 </html>
 
