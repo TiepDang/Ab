@@ -6,7 +6,6 @@
     <title>Chấm Công Cá Nhân</title>
     <link rel="manifest" href="manifest.json">
     
-    <!-- KHÓA CỨNG TOÀN BỘ GIAO DIỆN CHỮ ĐẬM SIÊU TO BẰNG CSS THUẦN -->
     <style>
         body {
             background-color: #f8fafc;
@@ -43,7 +42,6 @@
             color: #0f172a;
         }
 
-        /* KHÓA CỨNG: Đồng hồ chữ siêu to, cực đậm, bắt buộc nằm giữa màn hình */
         #clock {
             font-size: 34px !important;
             font-weight: 900 !important;
@@ -55,7 +53,6 @@
             letter-spacing: 1px;
         }
 
-        /* KHÓA CỨNG: Khối tổng công tích lũy chữ khổng lồ, siêu đậm */
         .blue-badge {
             background-color: #f0f7ff;
             border: 1px solid #e0f2fe;
@@ -88,7 +85,6 @@
             text-align: left;
         }
 
-        /* Khóa cứng chữ đậm cho toàn bộ ô nhập liệu */
         .input-field {
             width: 100%;
             background-color: #f1f5f9;
@@ -96,7 +92,7 @@
             border-radius: 12px;
             padding: 12px;
             font-size: 15px;
-            font-weight: 700; /* Bắt buộc chữ đậm */
+            font-weight: 700; 
             color: #0f172a;   
             outline: none;
             box-sizing: border-box;
@@ -164,10 +160,21 @@
             vertical-align: middle;
             border-bottom: 1px solid #f8fafc;
             text-align: center;
-            font-weight: 700; /* Bắt buộc bảng công hiện chữ đậm */
+            font-weight: 700; 
             font-size: 13px;
         }
         td:first-child { text-align: left; }
+
+        /* Vùng bấm rộng rãi cho nút sửa/xóa trên màn hình cảm ứng */
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 8px;
+            display: inline-block;
+            touch-action: manipulation;
+        }
     </style>
 </head>
 <body>
@@ -177,11 +184,8 @@
         <!-- KHỐI 1: CHẤM CÔNG HÔM NAY -->
         <div class="card-box">
             <div class="title">Chấm Công Cá Nhân</div>
-            
-            <!-- Đồng hồ khổng lồ -->
             <div id="clock">00:00:00</div>
             
-            <!-- Khối tổng công tích lũy -->
             <div class="blue-badge">
                 <div class="badge-title">Tổng công tích lũy (Tất cả)</div>
                 <div id="total-work">0 công</div>
