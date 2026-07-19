@@ -195,7 +195,7 @@
     <button class="btn-export" onclick="exportCSV()">Xuất file Excel (CSV)</button>
 </div>
 
-       <script>
+    <script>
     function updateClock() {
         const now = new Date();
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('vi-VN');
@@ -204,10 +204,19 @@
     updateClock();
 
     const todayISO = new Date().toISOString().split('T');
-    document.getElementById('manualDate').value = todayISO[0];
+    document.getElementById('manualDate').value = todayISO;
 
     let attendanceData = JSON.parse(localStorage.getItem('dailyAttendance')) || {};
     renderLogs();
+
+    // Hàm chuyển đổi ngày chuỗi DD/MM/YYYY thành tên Thứ trong tuần
+    function getDayOfWeek(dateStr) {
+        const parts = dateStr.split('/');
+        const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+        const dayIndex = dateObj.getDay();
+        const days = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+        return days[dayIndex];
+    }
 
     function stampToday(type) {
         const now = new Date();
@@ -236,7 +245,7 @@
         if (!dateInput) return alert('Vui lòng chọn ngày!');
 
         const parts = dateInput.split('-');
-        const formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0]; // Định dạng chuẩn DD/MM/YYYY
+        const formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0];
 
         attendanceData[formattedDate] = {
             in: timeIn || '--:--',
@@ -335,8 +344,10 @@
             const currentVal = dayData.val !== undefined ? dayData.val : 1;
             totalVal += currentVal;
 
+            const dayOfWeek = getDayOfWeek(date);
+
             const row = document.createElement('tr');
-            row.innerHTML = '<td><strong>' + date + '</strong></td>' +
+            row.innerHTML = '<td>' + dayOfWeek + '<br><span style="font-size:11px;color:#8e8e93;">' + date + '</span></td>' +
                             '<td class="time-in">' + dayData.in + '</td>' +
                             '<td class="time-out">' + dayData.out + '</td>' +
                             '<td class="work-value">' + currentVal + '</td>' +
@@ -359,10 +370,11 @@
     function exportCSV() {
         const dates = Object.keys(attendanceData);
         if (dates.length === 0) return alert('Chưa có dữ liệu!');
-        let csvContent = "\uFEFFNgày,Giờ Vào,Giờ Về,Số Công\n";
+        let csvContent = "\uFEFFThứ,Ngày,Giờ Vào,Giờ Về,Số Công\n";
         dates.forEach(date => {
             const currentVal = attendanceData[date].val !== undefined ? attendanceData[date].val : 1;
-            csvContent += date + ',' + attendanceData[date].in + ',' + attendanceData[date].out + ',' + currentVal + '\n';
+            const dayOfWeek = getDayOfWeek(date);
+            csvContent += dayOfWeek + ',' + date + ',' + attendanceData[date].in + ',' + attendanceData[date].out + ',' + currentVal + '\n';
         });
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -376,6 +388,7 @@
         navigator.serviceWorker.register('sw.js');
     }
 </script>
+
 
 </body>
 </html>
