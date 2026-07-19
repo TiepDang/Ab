@@ -183,7 +183,10 @@
 
     var attendanceData = JSON.parse(localStorage.getItem('dailyAttendance')) || {};
     var cloudBinId = localStorage.getItem('cloudBinId') || '';
-    renderLogs();
+    
+    window.onload = function() {
+        renderLogs();
+    };
 
     function getDayOfWeek(dateStr) {
         var p = dateStr.split('/');
@@ -292,35 +295,52 @@
         backupToCloud();
     }
 
+    // TÍNH NĂNG TỰ ĐẶT MÃ THEO Ý MUỐN
+    function changeCloudId() {
+        var newId = prompt('Nhập Mã sao lưu dễ nhớ bạn muốn tự đặt (Viết liền không dấu, ví dụ: chamcongtiep, tiep123...):', cloudBinId);
+        if (!newId) return;
+        
+        newId = newId.trim().toLowerCase();
+        if (newId.length < 4) {
+            alert('Mã số tự đặt phải có ít nhất 4 ký tự!');
+            return;
+        }
+
+        cloudBinId = newId;
+        localStorage.setItem('cloudBinId', cloudBinId);
+        renderLogs();
+        backupToCloud();
+        alert('Đã đổi Mã sao lưu thành: ' + cloudBinId + '. Từ bây giờ dữ liệu sẽ cất vào kho này!');
+    }
+
     function backupToCloud() {
-        if (!navigator.onLine || Object.keys(attendanceData).length === 0) return;
+        if (!navigator.onLine || Object.keys(attendanceData).length === 0 || !cloudBinId) return;
+        
         var headers = { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$WjE7gqR7L9R8j7hR8j7hReR8j7hR8j7hR8j7hR8j7hR8j7hR8j7hR' };
         var bodyData = JSON.stringify({ data: attendanceData });
-        if (!cloudBinId) {
+
+        fetch('https://jsonbin.io' + cloudBinId, {
+            method: 'PUT',
+            headers: headers,
+            body: bodyData
+        }).catch(function() {
+            // Nếu mã tự đặt chưa có sẵn trên mạng, hệ thống tự động đăng ký kho mới với tên đó
             fetch('https://jsonbin.io', {
                 method: 'POST',
-                headers: Object.assign({ 'X-Bin-Name': 'chamcong_user' }, headers),
-                body: bodyData
-            }).then(function(res) { return res.json(); }).then(function(resData) {
-                if(resData.metadata && resData.metadata.id) {
-                    cloudBinId = resData.metadata.id;
-                    localStorage.setItem('cloudBinId', cloudBinId);
-                }
-            });
-        } else {
-            fetch('https://jsonbin.io/' + cloudBinId, {
-                method: 'PUT',
-                headers: headers,
+                headers: Object.assign({ 'X-Bin-Name': cloudBinId }, headers),
                 body: bodyData
             });
-        }
+        });
     }
 
     function restoreFromCloud() {
         if (!navigator.onLine) return alert('Vui lòng bật mạng để kết nối đám mây!');
-        var userKey = prompt('Nhập Mã số sao lưu để khôi phục:', cloudBinId);
+        var userKey = prompt('Nhập Mã sao lưu của bạn để khôi phục dữ liệu:', cloudBinId);
         if (!userKey) return;
-        fetch('https://jsonbin.io/' + userKey + '/latest', {
+        
+        userKey = userKey.trim().toLowerCase();
+
+        fetch('https://jsonbin.io' + userKey + '/latest', {
             method: 'GET',
             headers: { 'X-Master-Key': '$2a$10$WjE7gqR7L9R8j7hR8j7hReR8j7hR8j7hR8j7hR8j7hR8j7hR8j7hR' }
         })
@@ -332,11 +352,11 @@
                 localStorage.setItem('cloudBinId', cloudBinId);
                 localStorage.setItem('dailyAttendance', JSON.stringify(attendanceData));
                 renderLogs();
-                alert('Khôi phục dữ liệu đám mây thành công!');
+                alert('Khôi phục dữ liệu thành công từ kho: ' + userKey);
             } else {
-                alert('Không tìm thấy dữ liệu hợp lệ!');
+                alert('Không tìm thấy dữ liệu hợp lệ trong kho này!');
             }
-        }).catch(function() { alert('Mã số không tồn tại!'); });
+        }).catch(function() { alert('Mã số không tồn tại hoặc chưa có dữ liệu sao lưu!'); });
     }
 
     document.getElementById('btnRestore').onclick = restoreFromCloud;
@@ -415,8 +435,11 @@
         document.getElementById('grandTotal').innerText = totalAll;
         document.getElementById('filteredTotal').innerText = totalFilter;
         
+        // Nút bấm hiển thị mã số và cho phép đổi tên mã
         if (cloudBinId) {
-            document.getElementById('btnRestore').innerText = "Mã sao lưu của bạn: " + cloudBinId;
+            document.getElementById('btnRestore').innerText = "Mã của bạn: " + cloudBinId + " (Bấm để tải lại hoặc tự đặt mã mới)";
+        } else {
+            document.getElementById('btnRestore').innerText = "Chưa đặt Mã sao lưu (Bấm vào đây để tự đặt mã)";
         }
     }
 
@@ -436,6 +459,16 @@
         link.download = "bang_tinh_cong.csv";
         link.click();
     }
+
+    // Biến nút xám thành nút bấm đa năng cho phép kích hoạt hàm tự đặt tên mã số
+    document.getElementById('btnRestore').onclick = function() {
+        var menu = confirm("Bấm [OK] nếu bạn muốn TỰ ĐẶT MÃ SAO LƯU DỄ NHỚ.\n\nBấm [Hủy/Cancel] nếu bạn muốn TẢI LẠI DỮ LIỆU CŨ TỪ ĐÁM MÂY.");
+        if (menu) {
+            changeCloudId();
+        } else {
+            restoreFromCloud();
+        }
+    };
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js');
