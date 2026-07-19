@@ -44,10 +44,11 @@
             background: #e5e5ea;
             padding: 12px;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--ios-blue);
             margin-bottom: 15px;
+            line-height: 1.4;
         }
         .btn-group {
             display: grid;
@@ -95,22 +96,28 @@
             color: #000;
         }
         .table-container { max-height: 250px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { text-align: left; padding: 10px 3px; border-bottom: 1px solid #c6c6c8; color: #8e8e93; font-weight: 500; }
-        td { padding: 12px 3px; border-bottom: 0.5px solid #e5e5ea; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 10px 2px; border-bottom: 1px solid #c6c6c8; color: #8e8e93; font-weight: 500; }
+        td { padding: 10px 2px; border-bottom: 0.5px solid #e5e5ea; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         .time-in { color: var(--ios-green); font-weight: 600; }
         .time-out { color: var(--ios-red); font-weight: 600; }
-        .work-value { font-weight: bold; color: #5856d6; }
         .empty { text-align: center; color: #8e8e93; padding: 20px 0; }
         .btn-del { color: var(--ios-red); background: none; border: none; padding: 0; font-size: 14px; width: auto; cursor: pointer; }
+        .inline-select { padding: 4px; font-size: 13px; border: 1px solid #c6c6c8; border-radius: 4px; background: #fff; width: 60px; }
     </style>
 </head>
-   <body>
+<body>
 <div class="app-card">
     <h2>Chấm Công Cá Nhân</h2>
     <div class="clock" id="liveClock">00:00:00</div>
-    <div class="total-box">Tổng công tích lũy: <span id="grandTotal">0</span></div>
+    
+    <!-- Tổng công theo bộ lọc từ ngày đến ngày -->
+    <div class="total-box">
+        <div id="filterText">Tổng công tích lũy</div>
+        <div style="font-size: 24px; margin-top: 5px;"><span id="grandTotal">0</span> công</div>
+    </div>
+
     <div class="form-group" style="margin-bottom: 12px;">
         <label>Chọn loại công hôm nay:</label>
         <select id="todayWorkValue">
@@ -119,11 +126,13 @@
             <option value="0">0 công (Chỉ ghi nhận giờ)</option>
         </select>
     </div>
+
     <div class="btn-group">
         <button class="btn-in" onclick="stampToday('in')">Vào Làm (Hôm Nay)</button>
         <button class="btn-out" onclick="stampToday('out')">Tan Làm (Hôm Nay)</button>
     </div>
 </div>
+
 <div class="app-card">
     <h3>Chấm công ngày bất kỳ</h3>
     <div class="form-row">
@@ -152,8 +161,22 @@
     </div>
     <button class="btn-save-manual" onclick="saveManual()">Lưu Ngày Đã Chọn</button>
 </div>
+
 <div class="app-card">
-    <h3>Bảng công chi tiết</h3>
+    <h3>Bộ lọc & Bảng công chi tiết</h3>
+    
+    <!-- Form lọc từ ngày đến ngày -->
+    <div class="form-row" style="margin-bottom: 15px;">
+        <div class="form-group">
+            <label>Từ ngày:</label>
+            <input type="date" id="filterFrom" onchange="renderLogs()">
+        </div>
+        <div class="form-group">
+            <label>Đến ngày:</label>
+            <input type="date" id="filterTo" onchange="renderLogs()">
+        </div>
+    </div>
+
     <div class="table-container">
         <table>
             <thead>
@@ -161,7 +184,7 @@
                     <th>Ngày</th>
                     <th>Vào</th>
                     <th>Về</th>
-                    <th>Công</th>
+                    <th>Sửa Công</th>
                     <th>Xóa</th>
                 </tr>
             </thead>
@@ -189,13 +212,16 @@
         const dateStr = now.toLocaleDateString('vi-VN');
         const timeStr = now.toLocaleTimeString('vi-VN').substring(0, 5);
         const workVal = parseFloat(document.getElementById('todayWorkValue').value);
+
         if (!attendanceData[dateStr]) {
             attendanceData[dateStr] = { in: '--:--', out: '--:--', val: workVal };
         } else {
             attendanceData[dateStr].val = workVal;
         }
+
         if (type === 'in') attendanceData[dateStr].in = timeStr;
         if (type === 'out') attendanceData[dateStr].out = timeStr;
+
         saveAndRefresh();
     }
 
@@ -204,16 +230,30 @@
         const timeIn = document.getElementById('manualIn').value;
         const timeOut = document.getElementById('manualOut').value;
         const workVal = parseFloat(document.getElementById('manualWorkValue').value);
+
         if (!dateInput) return alert('Vui lòng chọn ngày!');
+
         const parts = dateInput.split('-');
         const formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0];
+
         attendanceData[formattedDate] = {
             in: timeIn || '--:--',
             out: timeOut || '--:--',
             val: workVal
         };
+
         saveAndRefresh();
         alert('Đã lưu dữ liệu thành công!');
+    }
+
+    // Hàm cho phép sửa số công trực tiếp trên bảng và lưu tự động
+    function changeRowValue(date, selectElement) {
+        const newVal = parseFloat(selectElement.value);
+        if (attendanceData[date]) {
+            attendanceData[date].val = newVal;
+            localStorage.setItem('dailyAttendance', JSON.stringify(attendanceData));
+            calculateTotalOnly(); // Tính lại tổng công ngay lập tức
+        }
     }
 
     function deleteLog(date) {
@@ -228,31 +268,85 @@
         renderLogs();
     }
 
+    // Hàm phụ để tính lại tổng công nhanh không cần vẽ lại bảng
+    function calculateTotalOnly() {
+        let totalVal = 0;
+        const fromVal = document.getElementById('filterFrom').value;
+        const toVal = document.getElementById('filterTo').value;
+        const dFrom = fromVal ? new Date(fromVal) : null;
+        const dTo = toVal ? new Date(toVal) : null;
+
+        Object.keys(attendanceData).forEach(date => {
+            const p = date.split('/');
+            const dCurrent = new Date(p[2], p[1] - 1, p[0]);
+            if ((!dFrom || dCurrent >= dFrom) && (!dTo || dCurrent <= dTo)) {
+                totalVal += (attendanceData[date].val !== undefined ? attendanceData[date].val : 1);
+            }
+        });
+        document.getElementById('grandTotal').innerText = totalVal;
+    }
+
     function renderLogs() {
         const tbody = document.getElementById('logTableBody');
         tbody.innerHTML = '';
         let totalVal = 0;
+
+        const fromVal = document.getElementById('filterFrom').value;
+        const toVal = document.getElementById('filterTo').value;
+        const dFrom = fromVal ? new Date(fromVal) : null;
+        const dTo = toVal ? new Date(toVal) : null;
+
+        if (fromVal && toVal) {
+            const pF = fromVal.split('-'); const pT = toVal.split('-');
+            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF[2]+'/'+pF[1] + ' đến ' + pT[2]+'/'+pT[1];
+        } else {
+            document.getElementById('filterText').innerText = 'Tổng công tích lũy';
+        }
+
         const dates = Object.keys(attendanceData).sort((a, b) => {
             const pA = a.split('/'); const pB = b.split('/');
             return new Date(pB[2], pB[1]-1, pB[0]) - new Date(pA[2], pA[1]-1, pA[0]);
         });
-        if (dates.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="empty">Chưa có dữ liệu chấm công</td></tr>';
-            document.getElementById('grandTotal').innerText = 0;
-            return;
-        }
+
+        let hasData = false;
+
         dates.forEach(date => {
+            const p = date.split('/');
+            const dCurrent = new Date(p[2], p[1] - 1, p[0]);
+
+            // Kiểm tra điều kiện lọc ngày
+            if (dFrom && dCurrent < dFrom) return;
+            if (dTo && dCurrent > dTo) return;
+
+            hasData = true;
             const dayData = attendanceData[date];
             const currentVal = dayData.val !== undefined ? dayData.val : 1;
             totalVal += currentVal;
+
+            // Tạo các tùy chọn cho thẻ chọn sửa công nhanh
+            const opt1 = currentVal === 1 ? 'selected' : '';
+            const opt05 = currentVal === 0.5 ? 'selected' : '';
+            const opt0 = currentVal === 0 ? 'selected' : '';
+
             const row = document.createElement('tr');
-            row.innerHTML = '<td><strong>' + date + '</strong></td>' +
+            row.innerHTML = '<td><strong>' + date.substring(0, 5) + '</strong></td>' +
                             '<td class="time-in">' + dayData.in + '</td>' +
                             '<td class="time-out">' + dayData.out + '</td>' +
-                            '<td class="work-value">' + currentVal + '</td>' +
+                            '<td>' +
+                                '<select class="inline-select" onchange="changeRowValue(\'' + date + '\', this)">' +
+                                    '<option value="1" ' + opt1 + '>1</option>' +
+                                    '<option value="0.5" ' + opt05 + '>0.5</option>' +
+                                    '<option value="0" ' + opt0 + '>0</option>' +
+                                '</select>' +
+                            '</td>' +
                             '<td><button class="btn-del" onclick="deleteLog(\'' + date + '\')">❌</button></td>';
             tbody.appendChild(row);
         });
+
+        if (!hasData) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty">Không có dữ liệu trong khoảng này</td></tr>';
+        }
+
         document.getElementById('grandTotal').innerText = totalVal;
     }
 
@@ -279,6 +373,8 @@
 </body>
 </html>
 
+    
+    
 
        
 
