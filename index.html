@@ -168,19 +168,21 @@
         </table>
     </div>
     <button class="btn-export" onclick="exportCSV()">Xuất file Excel (CSV)</button>
+    <button id="btnRestore" style="width:100%; margin-top:15px; background:#8e8e93; font-size:14px; padding:12px; border:none; border-radius:12px; font-weight:600; color:white;">Đồng bộ khôi phục dữ liệu đám mây</button>
 </div>
 <script>
     function updateClock() {
-        const now = new Date();
+        var now = new Date();
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('vi-VN');
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    const todayISO = new Date().toISOString().split('T')[0];
+    var todayISO = new Date().toISOString().split('T');
     document.getElementById('manualDate').value = todayISO;
 
-    let attendanceData = JSON.parse(localStorage.getItem('dailyAttendance')) || {};
+    var attendanceData = JSON.parse(localStorage.getItem('dailyAttendance')) || {};
+    var cloudBinId = localStorage.getItem('cloudBinId') || '';
     renderLogs();
 
     function getDayOfWeek(dateStr) {
@@ -192,10 +194,10 @@
     }
 
     function stampToday(type) {
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('vi-VN');
-        const timeStr = now.toLocaleTimeString('vi-VN').substring(0, 5);
-        const workVal = parseFloat(document.getElementById('todayWorkValue').value);
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('vi-VN');
+        var timeStr = now.toLocaleTimeString('vi-VN').substring(0, 5);
+        var workVal = parseFloat(document.getElementById('todayWorkValue').value);
 
         if (!attendanceData[dateStr]) {
             attendanceData[dateStr] = { in: '--:--', out: '--:--', val: workVal };
@@ -210,37 +212,36 @@
     }
 
     function saveManual() {
-    var dateInput = document.getElementById('manualDate').value;
-    var timeIn = document.getElementById('manualIn').value;
-    var timeOut = document.getElementById('manualOut').value;
-    var workVal = parseFloat(document.getElementById('manualWorkValue').value);
+        var dateInput = document.getElementById('manualDate').value;
+        var timeIn = document.getElementById('manualIn').value;
+        var timeOut = document.getElementById('manualOut').value;
+        var workVal = parseFloat(document.getElementById('manualWorkValue').value);
 
-    if (!dateInput) return alert('Vui lòng chọn ngày!');
+        if (!dateInput) return alert('Vui lòng chọn ngày!');
 
-    var p = dateInput.split('-');
-    var formattedDate = p[2] + '/' + p[1] + '/' + p[0];
+        var p = dateInput.split('-');
+        var formattedDate = p[2] + '/' + p[1] + '/' + p[0];
 
-    attendanceData[formattedDate] = {
-        in: timeIn || '--:--',
-        out: timeOut || '--:--',
-        val: workVal
-    };
+        attendanceData[formattedDate] = {
+            in: timeIn || '--:--',
+            out: timeOut || '--:--',
+            val: workVal
+        };
 
-    saveAndRefresh();
-    alert('Đã lưu dữ liệu thành công!');
-}
-
+        saveAndRefresh();
+        alert('Đã lưu dữ liệu thành công!');
+    }
 
     function editLog(date) {
-        const currentData = attendanceData[date];
+        var currentData = attendanceData[date];
         if (!currentData) return;
 
-        const modalDiv = document.createElement('div');
+        var modalDiv = document.createElement('div');
         modalDiv.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:9999; padding:20px; box-sizing:border-box;";
         
-        const currentIn = currentData.in && currentData.in !== '--:--' ? currentData.in : "08:00";
-        const currentOut = currentData.out && currentData.out !== '--:--' ? currentData.out : "17:00";
-        const currentVal = currentData.val !== undefined ? currentData.val : 1;
+        var currentIn = currentData.in && currentData.in !== '--:--' ? currentData.in : "08:00";
+        var currentOut = currentData.out && currentData.out !== '--:--' ? currentData.out : "17:00";
+        var currentVal = currentData.val !== undefined ? currentData.val : 1;
 
         modalDiv.innerHTML = 
             '<div style="background:#fff; width:100%; max-width:320px; padding:20px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.2); text-align:left;">' +
@@ -270,71 +271,75 @@
         document.body.appendChild(modalDiv);
         document.getElementById('btnCancelEdit').onclick = function() { document.body.removeChild(modalDiv); };
         document.getElementById('btnSaveEdit').onclick = function() {
-            const newIn = document.getElementById('editIn').value;
-            const newOut = document.getElementById('editOut').value;
-            const newVal = parseFloat(document.getElementById('editVal').value);
-
+            var newIn = document.getElementById('editIn').value;
+            var newOut = document.getElementById('editOut').value;
+            var newVal = parseFloat(document.getElementById('editVal').value);
             attendanceData[date] = { in: newIn || '--:--', out: newOut || '--:--', val: newVal };
             document.body.removeChild(modalDiv);
             saveAndRefresh();
         };
     }
-        function deleteLog(date) {
+    function deleteLog(date) {
         if (confirm('Xóa dữ liệu ngày ' + date + '?')) {
             delete attendanceData[date];
             saveAndRefresh();
         }
     }
 
-    // Cơ chế tự động Sao lưu đám mây đám mây dự phòng khi có mạng
-    function backupToCloud() {
-        if (!navigator.onLine) return; // Nếu đang offline thì bỏ qua
-        
-        // Tạo một đường link trung gian lưu trữ đám mây ẩn danh miễn phí và bảo mật
-        var cloudData = btoa(unescape(encodeURIComponent(JSON.stringify(attendanceData))));
-        fetch('https://jsonbin.io', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': '$2a$10$WjE7gqR7L9R8j7hR8j7hReR8j7hR8j7hR8j7hR8j7hR8j7hR8j7hR' // Mã bảo mật riêng tư
-            },
-            body: JSON.stringify({ data: cloudData, device: navigator.userAgent })
-        }).catch(function(err){ console.log('Lỗi sao lưu'); });
-    }
-
-    // Tính năng Khôi phục lại dữ liệu khi cài lại App hoặc đổi điện thoại
-    function restoreFromCloud() {
-        if (!navigator.onLine) {
-            alert('Vui lòng bật mạng Wifi/4G để khôi phục dữ liệu!');
-            return;
-        }
-        if (confirm('Bạn có muốn tải lại toàn bộ dữ liệu chấm công đã sao lưu trước đây về máy không?')) {
-            fetch('https://jsonbin.io/latest', {
-                method: 'GET',
-                headers: { 'X-Master-Key': '$2a$10$WjE7gqR7L9R8j7hR8j7hReR8j7hR8j7hR8j7hR8j7hR8j7hR8j7hR' }
-            })
-            .then(function(res) { return res.json(); })
-            .then(function(resData) {
-                if (resData.record && resData.record.data) {
-                    var decodedData = JSON.parse(decodeURIComponent(escape(atob(resData.record.data))));
-                    // Gộp dữ liệu cũ trên mạng với dữ liệu mới trên máy (nếu có)
-                    attendanceData = Object.assign({}, decodedData, attendanceData);
-                    localStorage.setItem('dailyAttendance', JSON.stringify(attendanceData));
-                    renderLogs();
-                    alert('Đã khôi phục dữ liệu thành công!');
-                } else {
-                    alert('Chưa có bản sao lưu nào trên đám mây!');
-                }
-            })
-            .catch(function(err) { alert('Không kết nối được kho dữ liệu!'); });
-        }
-    }
-
     function saveAndRefresh() {
         localStorage.setItem('dailyAttendance', JSON.stringify(attendanceData));
         renderLogs();
-        backupToCloud(); // Kích hoạt sao lưu tự động ngay khi có thay đổi
+        backupToCloud();
     }
+
+    function backupToCloud() {
+        if (!navigator.onLine || Object.keys(attendanceData).length === 0) return;
+        var headers = { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$WjE7gqR7L9R8j7hR8j7hReR8j7hR8j7hR8j7hR8j7hR8j7hR8j7hR' };
+        var bodyData = JSON.stringify({ data: attendanceData });
+        if (!cloudBinId) {
+            fetch('https://jsonbin.io', {
+                method: 'POST',
+                headers: Object.assign({ 'X-Bin-Name': 'chamcong_user' }, headers),
+                body: bodyData
+            }).then(function(res) { return res.json(); }).then(function(resData) {
+                if(resData.metadata && resData.metadata.id) {
+                    cloudBinId = resData.metadata.id;
+                    localStorage.setItem('cloudBinId', cloudBinId);
+                }
+            });
+        } else {
+            fetch('https://jsonbin.io/' + cloudBinId, {
+                method: 'PUT',
+                headers: headers,
+                body: bodyData
+            });
+        }
+    }
+
+    function restoreFromCloud() {
+        if (!navigator.onLine) return alert('Vui lòng bật mạng để kết nối đám mây!');
+        var userKey = prompt('Nhập Mã số sao lưu để khôi phục:', cloudBinId);
+        if (!userKey) return;
+        fetch('https://jsonbin.io/' + userKey + '/latest', {
+            method: 'GET',
+            headers: { 'X-Master-Key': '$2a$10$WjE7gqR7L9R8j7hR8j7hReR8j7hR8j7hR8j7hR8j7hR8j7hR8j7hR' }
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(resData) {
+            if (resData.record && resData.record.data) {
+                attendanceData = Object.assign({}, resData.record.data, attendanceData);
+                cloudBinId = userKey;
+                localStorage.setItem('cloudBinId', cloudBinId);
+                localStorage.setItem('dailyAttendance', JSON.stringify(attendanceData));
+                renderLogs();
+                alert('Khôi phục dữ liệu đám mây thành công!');
+            } else {
+                alert('Không tìm thấy dữ liệu hợp lệ!');
+            }
+        }).catch(function() { alert('Mã số không tồn tại!'); });
+    }
+
+    document.getElementById('btnRestore').onclick = restoreFromCloud;
 
     function renderLogs() {
         var tbody = document.getElementById('logTableBody');
@@ -345,19 +350,29 @@
         var fromVal = document.getElementById('filterFrom').value;
         var toVal = document.getElementById('filterTo').value;
         
-        var dFrom = null; if (fromVal) { var pF = fromVal.split('-'); dFrom = new Date(parseInt(pF[0]), parseInt(pF[1]) - 1, parseInt(pF[2])); }
-        var dTo = null; if (toVal) { var pT = toVal.split('-'); dTo = new Date(parseInt(pT[0]), parseInt(pT[1]) - 1, parseInt(pT[2])); }
+        var dFrom = null; 
+        if (fromVal) { 
+            var pF = fromVal.split('-'); 
+            dFrom = new Date(parseInt(pF[0]), parseInt(pF[1]) - 1, parseInt(pF[2])); 
+        }
+        var dTo = null; 
+        if (toVal) { 
+            var pT = toVal.split('-'); 
+            dTo = new Date(parseInt(pT[0]), parseInt(pT[1]) - 1, parseInt(pT[2])); 
+        }
 
         if (fromVal && toVal) {
-            var pF2 = fromVal.split('-'); var pT2 = toVal.split('-');
-            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF2[2] + '/' + pF2[1] + ' đến ' + pT2[2] + '/' + pT2[1];
+            var pF2 = fromVal.split('-'); 
+            var pT2 = toVal.split('-');
+            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF2[2]+'/'+pF2[1] + ' đến ' + pT2[2]+'/'+pT2[1];
             document.getElementById('filterResultBox').style.display = 'block';
         } else {
             document.getElementById('filterResultBox').style.display = 'none';
         }
 
         var dates = Object.keys(attendanceData).sort(function(a, b) {
-            var pA = a.split('/'); var pB = b.split('/');
+            var pA = a.split('/'); 
+            var pB = b.split('/');
             return new Date(parseInt(pB[2]), parseInt(pB[1]) - 1, parseInt(pB[0])) - new Date(parseInt(pA[2]), parseInt(pA[1]) - 1, parseInt(pA[0]));
         });
 
@@ -399,6 +414,10 @@
 
         document.getElementById('grandTotal').innerText = totalAll;
         document.getElementById('filteredTotal').innerText = totalFilter;
+        
+        if (cloudBinId) {
+            document.getElementById('btnRestore').innerText = "Mã sao lưu của bạn: " + cloudBinId;
+        }
     }
 
     function exportCSV() {
@@ -418,13 +437,6 @@
         link.click();
     }
 
-    // Chèn thêm nút khôi phục dữ liệu lên giao diện
-    var btnRestore = document.createElement('button');
-    btnRestore.innerText = "Tải lại dữ liệu cũ đã sao lưu";
-    btnRestore.style = "width:100%; margin-top:10px; background:#8e8e93; font-size:14px; padding:10px;";
-    btnRestore.onclick = restoreFromCloud;
-    document.querySelector('.app-card:last-child').appendChild(btnRestore);
-
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js');
     }
@@ -432,7 +444,4 @@
 </body>
 </html>
 
-
-    
- 
     
