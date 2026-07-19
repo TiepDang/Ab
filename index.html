@@ -96,23 +96,25 @@
             color: #000;
         }
         .table-container { max-height: 250px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th { text-align: left; padding: 10px 2px; border-bottom: 1px solid #c6c6c8; color: #8e8e93; font-weight: 500; }
-        td { padding: 10px 2px; border-bottom: 0.5px solid #e5e5ea; vertical-align: middle; }
+        td { padding: 12px 2px; border-bottom: 0.5px solid #e5e5ea; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         .time-in { color: var(--ios-green); font-weight: 600; }
         .time-out { color: var(--ios-red); font-weight: 600; }
+        .work-value { font-weight: bold; color: #5856d6; }
         .empty { text-align: center; color: #8e8e93; padding: 20px 0; }
-        .btn-del { color: var(--ios-red); background: none; border: none; padding: 0; font-size: 14px; width: auto; cursor: pointer; }
-        .inline-select { padding: 4px; font-size: 13px; border: 1px solid #c6c6c8; border-radius: 4px; background: #fff; width: 60px; }
+        
+        .action-cell { display: flex; gap: 15px; align-items: center; justify-content: flex-start; }
+        .btn-action { background: none; border: none; padding: 5px; font-size: 16px; width: auto; cursor: pointer; }
     </style>
 </head>
-<body>
+
+    <body>
 <div class="app-card">
     <h2>Chấm Công Cá Nhân</h2>
     <div class="clock" id="liveClock">00:00:00</div>
     
-    <!-- Tổng công theo bộ lọc từ ngày đến ngày -->
     <div class="total-box">
         <div id="filterText">Tổng công tích lũy</div>
         <div style="font-size: 24px; margin-top: 5px;"><span id="grandTotal">0</span> công</div>
@@ -165,7 +167,6 @@
 <div class="app-card">
     <h3>Bộ lọc & Bảng công chi tiết</h3>
     
-    <!-- Form lọc từ ngày đến ngày -->
     <div class="form-row" style="margin-bottom: 15px;">
         <div class="form-group">
             <label>Từ ngày:</label>
@@ -184,8 +185,8 @@
                     <th>Ngày</th>
                     <th>Vào</th>
                     <th>Về</th>
-                    <th>Sửa Công</th>
-                    <th>Xóa</th>
+                    <th>Công</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody id="logTableBody"></tbody>
@@ -193,7 +194,8 @@
     </div>
     <button class="btn-export" onclick="exportCSV()">Xuất file Excel (CSV)</button>
 </div>
-<script>
+
+        <script>
     function updateClock() {
         const now = new Date();
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('vi-VN');
@@ -201,7 +203,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    const todayISO = new Date().toISOString().split('T')[0];
+    const todayISO = new Date().toISOString().split('T');
     document.getElementById('manualDate').value = todayISO;
 
     let attendanceData = JSON.parse(localStorage.getItem('dailyAttendance')) || {};
@@ -234,7 +236,7 @@
         if (!dateInput) return alert('Vui lòng chọn ngày!');
 
         const parts = dateInput.split('-');
-        const formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0];
+        const formattedDate = parts + '/' + parts + '/' + parts;
 
         attendanceData[formattedDate] = {
             in: timeIn || '--:--',
@@ -246,14 +248,38 @@
         alert('Đã lưu dữ liệu thành công!');
     }
 
-    // Hàm cho phép sửa số công trực tiếp trên bảng và lưu tự động
-    function changeRowValue(date, selectElement) {
-        const newVal = parseFloat(selectElement.value);
-        if (attendanceData[date]) {
-            attendanceData[date].val = newVal;
-            localStorage.setItem('dailyAttendance', JSON.stringify(attendanceData));
-            calculateTotalOnly(); // Tính lại tổng công ngay lập tức
+    // Hàm chỉnh sửa toàn bộ thông tin của một ngày bất kỳ
+    function editLog(date) {
+        const currentData = attendanceData[date];
+        if (!currentData) return;
+
+        // Hỏi sửa giờ vào
+        const newIn = prompt('Nhập Giờ Vào mới cho ngày ' + date + ' (Ví dụ: 08:00):', currentData.in);
+        if (newIn === null) return; // Người dùng ấn Hủy
+
+        // Hỏi sửa giờ về
+        const newOut = prompt('Nhập Giờ Về mới cho ngày ' + date + ' (Ví dụ: 17:30):', currentData.out);
+        if (newOut === null) return;
+
+        // Hỏi sửa số công
+        const newValStr = prompt('Nhập Số Công mới (Chỉ điền: 1 hoặc 0.5 hoặc 0):', currentData.val !== undefined ? currentData.val : 1);
+        if (newValStr === null) return;
+        
+        const newVal = parseFloat(newValStr);
+        if (isNaN(newVal) || (newVal !== 1 && newVal !== 0.5 && newVal !== 0)) {
+            alert('Số công không hợp lệ! Vui lòng chỉ nhập 1, 0.5 hoặc 0.');
+            return;
         }
+
+        // Cập nhật lại toàn bộ
+        attendanceData[date] = {
+            in: newIn || '--:--',
+            out: newOut || '--:--',
+            val: newVal
+        };
+
+        saveAndRefresh();
+        alert('Đã cập nhật ngày công thành công!');
     }
 
     function deleteLog(date) {
@@ -268,24 +294,6 @@
         renderLogs();
     }
 
-    // Hàm phụ để tính lại tổng công nhanh không cần vẽ lại bảng
-    function calculateTotalOnly() {
-        let totalVal = 0;
-        const fromVal = document.getElementById('filterFrom').value;
-        const toVal = document.getElementById('filterTo').value;
-        const dFrom = fromVal ? new Date(fromVal) : null;
-        const dTo = toVal ? new Date(toVal) : null;
-
-        Object.keys(attendanceData).forEach(date => {
-            const p = date.split('/');
-            const dCurrent = new Date(p[2], p[1] - 1, p[0]);
-            if ((!dFrom || dCurrent >= dFrom) && (!dTo || dCurrent <= dTo)) {
-                totalVal += (attendanceData[date].val !== undefined ? attendanceData[date].val : 1);
-            }
-        });
-        document.getElementById('grandTotal').innerText = totalVal;
-    }
-
     function renderLogs() {
         const tbody = document.getElementById('logTableBody');
         tbody.innerHTML = '';
@@ -298,23 +306,22 @@
 
         if (fromVal && toVal) {
             const pF = fromVal.split('-'); const pT = toVal.split('-');
-            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF[2]+'/'+pF[1] + ' đến ' + pT[2]+'/'+pT[1];
+            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF+'/'+pF + ' đến ' + pT+'/'+pT;
         } else {
             document.getElementById('filterText').innerText = 'Tổng công tích lũy';
         }
 
         const dates = Object.keys(attendanceData).sort((a, b) => {
             const pA = a.split('/'); const pB = b.split('/');
-            return new Date(pB[2], pB[1]-1, pB[0]) - new Date(pA[2], pA[1]-1, pA[0]);
+            return new Date(pB, pB-1, pB) - new Date(pA, pA-1, pA);
         });
 
         let hasData = false;
 
         dates.forEach(date => {
             const p = date.split('/');
-            const dCurrent = new Date(p[2], p[1] - 1, p[0]);
+            const dCurrent = new Date(p, p - 1, p);
 
-            // Kiểm tra điều kiện lọc ngày
             if (dFrom && dCurrent < dFrom) return;
             if (dTo && dCurrent > dTo) return;
 
@@ -323,23 +330,17 @@
             const currentVal = dayData.val !== undefined ? dayData.val : 1;
             totalVal += currentVal;
 
-            // Tạo các tùy chọn cho thẻ chọn sửa công nhanh
-            const opt1 = currentVal === 1 ? 'selected' : '';
-            const opt05 = currentVal === 0.5 ? 'selected' : '';
-            const opt0 = currentVal === 0 ? 'selected' : '';
-
             const row = document.createElement('tr');
             row.innerHTML = '<td><strong>' + date.substring(0, 5) + '</strong></td>' +
                             '<td class="time-in">' + dayData.in + '</td>' +
                             '<td class="time-out">' + dayData.out + '</td>' +
+                            '<td class="work-value">' + currentVal + '</td>' +
                             '<td>' +
-                                '<select class="inline-select" onchange="changeRowValue(\'' + date + '\', this)">' +
-                                    '<option value="1" ' + opt1 + '>1</option>' +
-                                    '<option value="0.5" ' + opt05 + '>0.5</option>' +
-                                    '<option value="0" ' + opt0 + '>0</option>' +
-                                '</select>' +
-                            '</td>' +
-                            '<td><button class="btn-del" onclick="deleteLog(\'' + date + '\')">❌</button></td>';
+                                '<div class="action-cell">' +
+                                    '<button class="btn-action" onclick="editLog(\'' + date + '\')">✏️</button>' +
+                                    '<button class="btn-action" onclick="deleteLog(\'' + date + '\')">❌</button>' +
+                                '</div>' +
+                            '</td>';
             tbody.appendChild(row);
         });
 
