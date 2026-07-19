@@ -4,23 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chấm Công Cá Nhân</title>
-    <!-- Nhúng thư viện CSS và file style tách rời -->
+    <!-- Nhúng Tailwind CSS và file CSS cá nhân -->
     <script src="https://tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
-<body class="flex justify-center items-start p-4">
+<body class="flex justify-center items-start p-4 bg-slate-50">
 
-    <div class="w-full max-w-md space-y-4 pb-10">
+    <div class="w-full max-w-md space-y-4 pb-12">
 
-        <!-- KHỐI 1 -->
+        <!-- KHỐI 1: CHẤM CÔNG HÔM NAY -->
         <div class="card-box text-center space-y-4">
-            <h1 class="text-xl font-bold">Chấm Công Cá Nhân</h1>
-            <div id="clock" class="text-3xl font-extrabold tracking-wider">00:00:00</div>
+            <h1 class="text-xl font-bold text-slate-900">Chấm Công Cá Nhân</h1>
+            <div id="clock" class="text-3xl font-extrabold tracking-wider text-slate-800">00:00:00</div>
+            
             <div class="blue-badge">
                 <div class="text-blue-600 font-semibold text-sm">Tổng công tích lũy (Tất cả)</div>
                 <div id="total-work" class="text-2xl font-black text-blue-600 mt-1">0 công</div>
             </div>
+            
             <div class="text-left">
                 <label class="text-xs font-semibold text-slate-500 block mb-1">Chọn loại công hôm nay:</label>
                 <select id="today-work-type" class="input-field">
@@ -29,15 +31,16 @@
                     <option value="0">0 công (Nghỉ phép/Lễ)</option>
                 </select>
             </div>
+            
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="quickCheck('Vào')" class="btn-base btn-green">Vào Làm (Hôm Nay)</button>
-                <button onclick="quickCheck('Về')" class="btn-base btn-red">Tan Làm (Hôm Nay)</button>
+                <button onclick="quickCheck('Vào')" class="btn-base btn-green py-3">Vào Làm (Hôm Nay)</button>
+                <button onclick="quickCheck('Về')" class="btn-base btn-red py-3">Tan Làm (Hôm Nay)</button>
             </div>
         </div>
 
-        <!-- KHỐI 2 -->
+        <!-- KHỐI 2: CHẤM CÔNG NGÀY BẤT KỲ -->
         <div class="card-box space-y-4">
-            <h2 class="text-base font-bold border-b pb-2">Chấm công ngày bất kỳ</h2>
+            <h2 class="text-base font-bold border-b pb-2 text-slate-900">Chấm công ngày bất kỳ</h2>
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="text-xs font-semibold text-slate-500 block mb-1">Chọn Ngày:</label>
@@ -62,12 +65,12 @@
                     <input type="time" id="custom-out" value="17:00" class="input-field">
                 </div>
             </div>
-            <button onclick="saveCustomDate()" class="btn-base btn-indigo">Lưu Ngày Đã Chọn</button>
+            <button onclick="saveCustomDate()" class="btn-base btn-indigo py-3">Lưu Ngày Đã Chọn</button>
         </div>
 
-        <!-- KHỐI 3 -->
+        <!-- KHỐI 3: BỘ LỌC & BẢNG CÔNG CHI TIẾT -->
         <div class="card-box space-y-4">
-            <h2 class="text-base font-bold border-b pb-2">Bộ lọc & Bảng công chi tiết</h2>
+            <h2 class="text-base font-bold border-b pb-2 text-slate-900">Bộ lọc & Bảng công chi tiết</h2>
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="text-xs font-semibold text-slate-500 block mb-1">Từ ngày:</label>
@@ -78,29 +81,34 @@
                     <input type="date" id="filter-to" onchange="renderLogs()" class="input-field">
                 </div>
             </div>
-            <div class="overflow-x-auto pt-2">
-                <table class="w-full text-left text-xs">
+            
+            <!-- ĐÃ SỬA: Cấu trúc bảng chia tỷ lệ rộng rãi, chuẩn responsive di động -->
+            <div class="w-full overflow-x-auto pt-2">
+                <table class="w-full border-collapse text-xs">
                     <thead>
-                        <tr class="text-slate-400 border-b">
-                            <th class="py-2 font-semibold">Ngày</th>
-                            <th class="py-2 font-semibold text-center">Vào</th>
-                            <th class="py-2 font-semibold text-center">Về</th>
-                            <th class="py-2 font-semibold text-center">Công</th>
-                            <th class="py-2 font-semibold text-center">Hành động</th>
+                        <tr class="text-slate-400 border-b border-slate-100">
+                            <th class="pb-2 font-semibold text-left" style="width: 32%;">Ngày</th>
+                            <th class="pb-2 font-semibold text-center" style="width: 18%;">Vào</th>
+                            <th class="pb-2 font-semibold text-center" style="width: 18%;">Về</th>
+                            <th class="pb-2 font-semibold text-center" style="width: 14%;">Công</th>
+                            <th class="pb-2 font-semibold text-center" style="width: 18%;">Hành động</th>
                         </tr>
                     </thead>
-                    <tbody id="log-table-body" class="divide-y font-medium"></tbody>
+                    <tbody id="log-table-body" class="divide-y divide-slate-100 font-medium text-slate-700">
+                        <!-- Dữ liệu chấm công hiển thị tại đây -->
+                    </tbody>
                 </table>
             </div>
-            <div class="space-y-2 pt-2">
-                <button onclick="exportToCSV()" class="btn-base btn-blue">Xuất file Excel (CSV)</button>
-                <button onclick="regenerateUserCode()" id="user-code-btn" class="btn-base btn-gray text-xs"></button>
+            
+            <div class="space-y-2 pt-4">
+                <button onclick="exportToCSV()" class="btn-base btn-blue py-3">Xuất file Excel (CSV)</button>
+                <button onclick="regenerateUserCode()" id="user-code-btn" class="btn-base btn-gray text-xs py-3 px-4 leading-normal"></button>
             </div>
         </div>
 
     </div>
 
-    <!-- Nhúng file logic JavaScript tách riêng -->
+    <!-- Nhúng file logic JavaScript -->
     <script src="app.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
