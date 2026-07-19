@@ -71,55 +71,32 @@
         .btn-out { background-color: var(--ios-red); }
         .btn-export { background-color: var(--ios-blue); width: 100%; margin-top: 10px; }
         .btn-save-manual { background-color: #5856d6; width: 100%; margin-top: 10px; }
-        
         h3 { font-size: 17px; font-weight: 600; color: #3a3a3c; margin: 0 0 12px 0; border-bottom: 0.5px solid #c6c6c8; padding-bottom: 5px; }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         label { font-size: 14px; color: #8e8e93; font-weight: 500; }
-        input[type="date"], input[type="time"], select {
-            padding: 10px;
-            border: 1px solid #c6c6c8;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
-            background: #f2f2f7;
-            color: #000;
-        }
+        input[type="date"], input[type="time"], select { padding: 10px; border: 1px solid #c6c6c8; border-radius: 8px; font-size: 16px; font-family: inherit; background: #f2f2f7; color: #000; }
         .table-container { max-height: 250px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th { text-align: left; padding: 10px 2px; border-bottom: 1px solid #c6c6c8; color: #8e8e93; font-weight: 500; }
-        td { padding: 12px 2px; border-bottom: 0.5px solid #e5e5ea; vertical-align: middle; }
+        td { padding: 10px 2px; border-bottom: 0.5px solid #e5e5ea; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         .time-in { color: var(--ios-green); font-weight: 600; }
         .time-out { color: var(--ios-red); font-weight: 600; }
         .work-value { font-weight: bold; color: #5856d6; }
         .empty { text-align: center; color: #8e8e93; padding: 20px 0; }
-        
         .action-cell { display: flex; gap: 15px; align-items: center; justify-content: flex-start; }
         .btn-action { background: none; border: none; padding: 5px; font-size: 16px; width: auto; cursor: pointer; }
     </style>
 </head>
-
 <body>
 <div class="app-card">
     <h2>Chấm Công Cá Nhân</h2>
     <div class="clock" id="liveClock">00:00:00</div>
-    
     <div class="total-box">
         <div>Tổng công tích lũy (Tất cả)</div>
         <div style="font-size: 24px; margin-top: 5px;"><span id="grandTotal">0</span> công</div>
     </div>
-
     <div class="form-group" style="margin-bottom: 12px;">
         <label>Chọn loại công hôm nay:</label>
         <select id="todayWorkValue">
@@ -128,13 +105,11 @@
             <option value="0">0 công (Chỉ ghi nhận giờ)</option>
         </select>
     </div>
-
     <div class="btn-group">
         <button class="btn-in" onclick="stampToday('in')">Vào Làm (Hôm Nay)</button>
         <button class="btn-out" onclick="stampToday('out')">Tan Làm (Hôm Nay)</button>
     </div>
 </div>
-
 <div class="app-card">
     <h3>Chấm công ngày bất kỳ</h3>
     <div class="form-row">
@@ -163,10 +138,8 @@
     </div>
     <button class="btn-save-manual" onclick="saveManual()">Lưu Ngày Đã Chọn</button>
 </div>
-
 <div class="app-card">
     <h3>Bộ lọc & Bảng công chi tiết</h3>
-    
     <div class="form-row" style="margin-bottom: 10px;">
         <div class="form-group">
             <label>Từ ngày:</label>
@@ -177,12 +150,9 @@
             <input type="date" id="filterTo" onchange="renderLogs()">
         </div>
     </div>
-
-    <!-- Ô hiển thị kết quả tổng công sau khi lọc ngày -->
     <div id="filterResultBox" style="display: none; background: #e5e5ea; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; color: #5856d6; margin-bottom: 15px; font-size: 14px;">
         <span id="filterText">Tổng công từ ngày đến ngày</span>: <span id="filteredTotal">0</span> công
     </div>
-
     <div class="table-container">
         <table>
             <thead>
@@ -200,7 +170,7 @@
     <button class="btn-export" onclick="exportCSV()">Xuất file Excel (CSV)</button>
 </div>
 
-<script>
+    <script>
     function updateClock() {
         const now = new Date();
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('vi-VN');
@@ -265,32 +235,49 @@
         const currentData = attendanceData[date];
         if (!currentData) return;
 
-        const newIn = prompt('Nhập Giờ Vào mới cho ngày ' + date + ' (Ví dụ: 08:00):', currentData.in);
-        if (newIn === null) return;
-
-        const newOut = prompt('Nhập Giờ Về mới cho ngày ' + date + ' (Ví dụ: 17:30):', currentData.out);
-        if (newOut === null) return;
-
-        const newValStr = prompt('Nhập Số Công mới (Chỉ điền: 1 hoặc 0.5 hoặc 0):', currentData.val !== undefined ? currentData.val : 1);
-        if (newValStr === null) return;
+        const modalDiv = document.createElement('div');
+        modalDiv.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:9999; padding:20px; box-sizing:border-box;";
         
-        const newVal = parseFloat(newValStr);
-        if (isNaN(newVal) || (newVal !== 1 && newVal !== 0.5 && newVal !== 0)) {
-            alert('Số công không hợp lệ! Vui lòng chỉ nhập 1, 0.5 hoặc 0.');
-            return;
-        }
+        const currentIn = currentData.in && currentData.in !== '--:--' ? currentData.in : "08:00";
+        const currentOut = currentData.out && currentData.out !== '--:--' ? currentData.out : "17:00";
+        const currentVal = currentData.val !== undefined ? currentData.val : 1;
 
-        attendanceData[date] = {
-            in: newIn || '--:--',
-            out: newOut || '--:--',
-            val: newVal
+        modalDiv.innerHTML = 
+            '<div style="background:#fff; width:100%; max-width:320px; padding:20px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,0.2); text-align:left;">' +
+                '<h4 style="margin:0 0 15px 0; font-size:16px; text-align:center; color:#1c1c1e;">Sửa công ngày ' + date + '</h4>' +
+                '<div style="margin-bottom:12px; display:flex; flex-direction:column; gap:4px;">' +
+                    '<label style="font-size:13px; color:#8e8e93;">Giờ Vào:</label>' +
+                    '<input type="time" id="editIn" value="' + currentIn + '" style="padding:10px; border:1px solid #c6c6c8; border-radius:8px; font-size:16px; width:100%; box-sizing:border-box;">' +
+                '</div>' +
+                '<div style="margin-bottom:12px; display:flex; flex-direction:column; gap:4px;">' +
+                    '<label style="font-size:13px; color:#8e8e93;">Giờ Về:</label>' +
+                    '<input type="time" id="editOut" value="' + currentOut + '" style="padding:10px; border:1px solid #c6c6c8; border-radius:8px; font-size:16px; width:100%; box-sizing:border-box;">' +
+                '</div>' +
+                '<div style="margin-bottom:20px; display:flex; flex-direction:column; gap:4px;">' +
+                    '<label style="font-size:13px; color:#8e8e93;">Số công:</label>' +
+                    '<select id="editVal" style="padding:10px; border:1px solid #c6c6c8; border-radius:8px; font-size:16px; width:100%; box-sizing:border-box; background:#fff;">' +
+                        '<option value="1"' + (currentVal === 1 ? ' selected' : '') + '>1 công</option>' +
+                        '<option value="0.5"' + (currentVal === 0.5 ? ' selected' : '') + '>0.5 công</option>' +
+                        '<option value="0"' + (currentVal === 0 ? ' selected' : '') + '>0 công</option>' +
+                    </select>' +
+                '</div>' +
+                '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">' +
+                    '<button id="btnCancelEdit" style="padding:12px; background:#e5e5ea; color:#000; border:none; border-radius:8px; font-weight:600; font-size:14px;">Hủy</button>' +
+                    '<button id="btnSaveEdit" style="padding:12px; background:#007aff; color:#fff; border:none; border-radius:8px; font-weight:600; font-size:14px;">Lưu</button>' +
+                '</div>' +
+            '</div>';
+
+        document.body.appendChild(modalDiv);
+        document.getElementById('btnCancelEdit').onclick = function() { document.body.removeChild(modalDiv); };
+        document.getElementById('btnSaveEdit').onclick = function() {
+            const newIn = document.getElementById('editIn').value;
+            const newOut = document.getElementById('editOut').value;
+            const newVal = parseFloat(document.getElementById('editVal').value);
+            attendanceData[date] = { in: newIn || '--:--', out: newOut || '--:--', val: newVal };
+            document.body.removeChild(modalDiv);
+            saveAndRefresh();
         };
-
-        saveAndRefresh();
-        alert('Đã cập nhật ngày công thành công!');
-    }
-
-    function deleteLog(date) {
+            function deleteLog(date) {
         if (confirm('Xóa dữ liệu ngày ' + date + '?')) {
             delete attendanceData[date];
             saveAndRefresh();
@@ -305,8 +292,8 @@
     function renderLogs() {
         const tbody = document.getElementById('logTableBody');
         tbody.innerHTML = '';
-        let totalAll = 0;   // Tổng công tích lũy tất cả các ngày
-        let totalFilter = 0; // Tổng công riêng trong khoảng ngày được chọn
+        let totalAll = 0;   
+        let totalFilter = 0; 
 
         const fromVal = document.getElementById('filterFrom').value;
         const toVal = document.getElementById('filterTo').value;
@@ -314,10 +301,9 @@
         let dFrom = null; if (fromVal) { const pF = fromVal.split('-'); dFrom = new Date(pF[0], pF[1] - 1, pF[2]); }
         let dTo = null; if (toVal) { const pT = toVal.split('-'); dTo = new Date(pT[0], pT[1] - 1, pT[2]); }
 
-        // Hiển thị/Ẩn hộp thông báo tổng số công sau lọc ngày
         if (fromVal && toVal) {
             const pF = fromVal.split('-'); const pT = toVal.split('-');
-            document.getElementById('filterText').innerText = 'Tổng trong khoảng từ ' + pF[2]+'/'+pF[1] + ' đến ' + pT[2]+'/'+pT[1];
+            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF[2]+'/'+pF[1] + ' đến ' + pT[2]+'/'+pT[1];
             document.getElementById('filterResultBox').style.display = 'block';
         } else {
             document.getElementById('filterResultBox').style.display = 'none';
@@ -333,22 +319,21 @@
         dates.forEach(date => {
             const dayData = attendanceData[date];
             const currentVal = dayData.val !== undefined ? dayData.val : 1;
-            totalAll += currentVal; // Cộng dồn vào tổng tích lũy chung
+            totalAll += currentVal; 
 
             const p = date.split('/');
             const dCurrent = new Date(p[2], p[1] - 1, p[0]);
 
-            // Nếu đang bật bộ lọc mà ngày nằm ngoài khoảng thì ẩn dòng đó đi
             if (dFrom && dCurrent < dFrom) return;
             if (dTo && dCurrent > dTo) return;
 
             hasData = true;
-            totalFilter += currentVal; // Cộng dồn vào tổng riêng của bộ lọc
+            totalFilter += currentVal; 
 
             const dayOfWeek = getDayOfWeek(date);
 
             const row = document.createElement('tr');
-            row.innerHTML = '<td>' + dayOfWeek + '<br><span style="font-size:11px;color:#8e8e93;">' + date + '</span></td>' +
+            row.innerHTML = '<td><strong>' + dayOfWeek + '</strong><br><span style="font-size:11px;color:#8e8e93;">' + date + '</span></td>' +
                             '<td class="time-in">' + dayData.in + '</td>' +
                             '<td class="time-out">' + dayData.out + '</td>' +
                             '<td class="work-value">' + currentVal + '</td>' +
@@ -393,6 +378,9 @@
 </body>
 </html>
 
+    }
+
+        
     
     
 
