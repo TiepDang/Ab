@@ -40,7 +40,6 @@
             margin-bottom: 16px;
         }
 
-        /* ĐÃ SỬA: Ép font-weight: 700 (hoặc font-bold) để mọi chữ bạn nhập/chọn đều đậm lên rõ rệt */
         .input-field {
             width: 100%;
             background-color: #f1f5f9;
@@ -49,7 +48,7 @@
             padding: 12px;
             font-size: 14px;
             font-weight: 700; /* Làm đậm chữ trong ô nhập liệu */
-            color: #1e293b;   /* Đổi màu chữ tối hơn để tăng độ tương phản */
+            color: #1e293b;   
             outline: none;
             box-sizing: border-box;
             margin-top: 4px;
@@ -101,13 +100,12 @@
         }
         th:first-child { text-align: left; }
 
-        /* ĐÃ SỬA: Nâng độ đậm của toàn bộ chữ hiển thị kết quả trong bảng dữ liệu */
         td {
             padding: 12px 0;
             vertical-align: middle;
             border-bottom: 1px solid #f8fafc;
             text-align: center;
-            font-weight: 700; /* Ép toàn bộ chữ dữ liệu dưới bảng thành chữ đậm */
+            font-weight: 700; /* Ép toàn bộ chữ dưới bảng thành chữ đậm */
         }
         td:first-child { text-align: left; }
     </style>
@@ -120,11 +118,13 @@
         <div class="card-box text-center">
             <h1 class="text-xl font-bold text-slate-900 mt-2">Chấm Công Cá Nhân</h1>
             
-            <div id="clock" class="text-3xl font-extrabold tracking-wider text-slate-800 text-center my-3 block w-full">00:00:00</div>
+            <!-- ĐÃ SỬA: Ép chữ siêu đậm (font-black) và tăng cỡ chữ to cho Đồng hồ giống ảnh mẫu -->
+            <div id="clock" class="text-3xl font-black tracking-wider text-slate-900 text-center my-4 block w-full">00:00:00</div>
             
             <div class="blue-badge">
-                <div class="text-blue-600 font-semibold text-sm">Tổng công tích lũy (Tất cả)</div>
-                <div id="total-work" class="text-2xl font-black text-blue-600 mt-1">0 công</div>
+                <div class="text-blue-600 font-bold text-sm">Tổng công tích lũy (Tất cả)</div>
+                <!-- ĐÃ SỬA: Làm chữ số công to lên và cực kỳ đậm (font-black) giống ảnh mẫu của bạn -->
+                <div id="total-work" class="text-3xl font-black text-blue-600 mt-2 block">0 công</div>
             </div>
             
             <div class="text-left mb-4">
@@ -205,7 +205,6 @@
                             <th class="pb-2 font-semibold text-center" style="width: 18%;">Hành động</th>
                         </tr>
                     </thead>
-                    <!-- Toàn bộ font dữ liệu bảng công được đồng bộ đậm màu siêu nét -->
                     <tbody id="log-table-body" class="divide-y divide-slate-100 text-slate-800">
                         <!-- Dữ liệu chấm công hiển thị tại đây -->
                     </tbody>
