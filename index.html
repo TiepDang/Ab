@@ -195,7 +195,7 @@
     <button class="btn-export" onclick="exportCSV()">Xuất file Excel (CSV)</button>
 </div>
 
-        <script>
+       <script>
     function updateClock() {
         const now = new Date();
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('vi-VN');
@@ -204,7 +204,7 @@
     updateClock();
 
     const todayISO = new Date().toISOString().split('T');
-    document.getElementById('manualDate').value = todayISO;
+    document.getElementById('manualDate').value = todayISO[0];
 
     let attendanceData = JSON.parse(localStorage.getItem('dailyAttendance')) || {};
     renderLogs();
@@ -236,7 +236,7 @@
         if (!dateInput) return alert('Vui lòng chọn ngày!');
 
         const parts = dateInput.split('-');
-        const formattedDate = parts + '/' + parts + '/' + parts;
+        const formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0]; // Định dạng chuẩn DD/MM/YYYY
 
         attendanceData[formattedDate] = {
             in: timeIn || '--:--',
@@ -248,20 +248,16 @@
         alert('Đã lưu dữ liệu thành công!');
     }
 
-    // Hàm chỉnh sửa toàn bộ thông tin của một ngày bất kỳ
     function editLog(date) {
         const currentData = attendanceData[date];
         if (!currentData) return;
 
-        // Hỏi sửa giờ vào
         const newIn = prompt('Nhập Giờ Vào mới cho ngày ' + date + ' (Ví dụ: 08:00):', currentData.in);
-        if (newIn === null) return; // Người dùng ấn Hủy
+        if (newIn === null) return;
 
-        // Hỏi sửa giờ về
         const newOut = prompt('Nhập Giờ Về mới cho ngày ' + date + ' (Ví dụ: 17:30):', currentData.out);
         if (newOut === null) return;
 
-        // Hỏi sửa số công
         const newValStr = prompt('Nhập Số Công mới (Chỉ điền: 1 hoặc 0.5 hoặc 0):', currentData.val !== undefined ? currentData.val : 1);
         if (newValStr === null) return;
         
@@ -271,7 +267,6 @@
             return;
         }
 
-        // Cập nhật lại toàn bộ
         attendanceData[date] = {
             in: newIn || '--:--',
             out: newOut || '--:--',
@@ -301,26 +296,36 @@
 
         const fromVal = document.getElementById('filterFrom').value;
         const toVal = document.getElementById('filterTo').value;
-        const dFrom = fromVal ? new Date(fromVal) : null;
-        const dTo = toVal ? new Date(toVal) : null;
+        
+        let dFrom = null;
+        if (fromVal) {
+            const pF = fromVal.split('-');
+            dFrom = new Date(pF[0], pF[1] - 1, pF[2]);
+        }
+        
+        let dTo = null;
+        if (toVal) {
+            const pT = toVal.split('-');
+            dTo = new Date(pT[0], pT[1] - 1, pT[2]);
+        }
 
         if (fromVal && toVal) {
             const pF = fromVal.split('-'); const pT = toVal.split('-');
-            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF+'/'+pF + ' đến ' + pT+'/'+pT;
+            document.getElementById('filterText').innerText = 'Tổng công từ ' + pF[2]+'/'+pF[1] + ' đến ' + pT[2]+'/'+pT[1];
         } else {
             document.getElementById('filterText').innerText = 'Tổng công tích lũy';
         }
 
         const dates = Object.keys(attendanceData).sort((a, b) => {
             const pA = a.split('/'); const pB = b.split('/');
-            return new Date(pB, pB-1, pB) - new Date(pA, pA-1, pA);
+            return new Date(pB[2], pB[1]-1, pB[0]) - new Date(pA[2], pA[1]-1, pA[0]);
         });
 
         let hasData = false;
 
         dates.forEach(date => {
             const p = date.split('/');
-            const dCurrent = new Date(p, p - 1, p);
+            const dCurrent = new Date(p[2], p[1] - 1, p[0]);
 
             if (dFrom && dCurrent < dFrom) return;
             if (dTo && dCurrent > dTo) return;
@@ -331,7 +336,7 @@
             totalVal += currentVal;
 
             const row = document.createElement('tr');
-            row.innerHTML = '<td><strong>' + date.substring(0, 5) + '</strong></td>' +
+            row.innerHTML = '<td><strong>' + date + '</strong></td>' +
                             '<td class="time-in">' + dayData.in + '</td>' +
                             '<td class="time-out">' + dayData.out + '</td>' +
                             '<td class="work-value">' + currentVal + '</td>' +
@@ -371,6 +376,7 @@
         navigator.serviceWorker.register('sw.js');
     }
 </script>
+
 </body>
 </html>
 
