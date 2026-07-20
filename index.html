@@ -117,7 +117,7 @@
         </div>
 
         <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV)</button>
-        <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">121221</span> (Bấm để tải lại hoặc tự đặt mã mới)</button>
+        <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">......</span> (Bấm để tải lại hoặc tự đặt mã mới)</button>
         <div class="sync-status" id="syncStatus">Trạng thái Google Sheets: Sẵn sàng</div>
     </div>
 </div>
@@ -167,7 +167,18 @@
 
   // Biến toàn cục
   let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
-  let userCode = localStorage.getItem('my_user_code') || '121221';
+  
+  // KIỂM TRA & YÊU CẦU NHẬP MÃ KHI MỞ TRÊN MÁY MỚI
+  let userCode = localStorage.getItem('my_user_code');
+  if (!userCode) {
+    let inputCode = prompt("Vui lòng nhập Mã đồng bộ cá nhân của bạn (ví dụ: SĐT hoặc mã 6 số):");
+    // Nếu nhập thì lấy mã đó, nếu hủy/bỏ trống thì tạo mã ngẫu nhiên 6 số để không bị trùng
+    userCode = (inputCode && inputCode.trim() !== '') 
+      ? inputCode.trim() 
+      : Math.floor(100000 + Math.random() * 900000).toString();
+
+    localStorage.setItem('my_user_code', userCode);
+  }
 
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('displayUserCode').innerText = userCode;
