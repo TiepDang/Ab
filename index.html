@@ -48,10 +48,12 @@
         .modal-buttons { display: flex; gap: 10px; margin-top: 5px; }
         .btn-close { background-color: #94a3b8; flex: 1; }
         .btn-confirm { background-color: #10b981; flex: 1; }
+        .sync-status { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-style: italic; }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- CARD 1: Hôm nay -->
     <div class="card">
         <div id="networkStatus" class="network-badge online">Đang trực tuyến</div>
         <div class="title">Chấm Công Cá Nhân</div>
@@ -72,6 +74,7 @@
         </div>
     </div>
     
+    <!-- CARD 2: Chấm công ngày bất kỳ -->
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Chấm công ngày bất kỳ</div>
         <div class="grid-2">
@@ -88,6 +91,323 @@
         <button class="btn-save" onclick="chamCongNgayBatKyMee()">Lưu Ngày Đã Chọn</button>
     </div>
 
+    <!-- CARD 3: Bộ lọc & Bảng công chi tiết -->
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
         <div class="grid-2">
+            <div><label class="label-text">Từ ngày:</label><input type="date" id="filterFrom" onchange="renderTable()"></div>
+            <div><label class="label-text">Đến ngày:</label><input type="date" id="filterTo" onchange="renderTable()"></div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Vào</th>
+                <th>Về</th>
+                <th>Công</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTable">
+              <!-- Render động -->
+            </tbody>
+          </table>
+        </div>
+
+        <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV)</button>
+        <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">121221</span> (Bấm để tải lại hoặc tự đặt mã mới)</button>
+        <div class="sync-status" id="syncStatus">Trạng thái Google Sheets: Sẵn sàng</div>
+    </div>
+</div>
+
+<!-- Modal Sửa Công -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Sửa công ngày <span id="editDateLabel"></span></div>
+    <input type="hidden" id="editDateKey">
+    
+    <label class="label-text">Tính Công:</label>
+    <select id="editWorkType">
+      <option value="1">1 công</option>
+      <option value="0.5">0.5 công</option>
+      <option value="0">0 công</option>
+    </select>
+
+    <div class="grid-2">
+      <div><label class="label-text">Giờ Vào:</label><input type="time" id="editCheckIn"></div>
+      <div><label class="label-text">Giờ Về:</label><input type="time" id="editCheckOut"></div>
+    </div>
+
+    <div class="modal-buttons">
+      <button class="btn-close" onclick="closeModal('editModal')">Hủy</button>
+      <button class="btn-confirm" onclick="saveEdit()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Đổi Mã Sync -->
+<div id="codeModal" class="modal">
+  <div class="modal-content">
+    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Đổi Mã Đồng Bộ</div>
+    <label class="label-text">Nhập mã mới của bạn:</label>
+    <input type="text" id="newCodeInput" placeholder="Ví dụ: 121221">
+    
+    <div class="modal-buttons">
+      <button class="btn-close" onclick="closeModal('codeModal')">Hủy</button>
+      <button class="btn-confirm" onclick="confirmChangeCode()">Đồng ý</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Link Apps Script của bạn
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhz9CAqJPI6A8NO2y3hCEBehKrGifP5K6bSTuq9bhsnNQGRkSL0cEAUoaA3nQQJb4Qeg/exec";
+
+  // Biến toàn cục
+  let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
+  let userCode = localStorage.getItem('my_user_code') || '121221';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('displayUserCode').innerText = userCode;
+    document.getElementById('txtBatKyNgay').value = getTodayStr();
+    
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+    updateNetworkStatus();
+
+    renderTable();
+    // Tự động tải từ Google Sheet khi mở Web / đổi thiết bị
+    loadFromGoogleSheet();
+  });
+
+  // 1. GỬI DỮ LIỆU LÊN GOOGLE SHEET
+  async function syncToGoogleSheet() {
+    const statusText = document.getElementById('syncStatus');
+    statusText.innerText = "Trạng thái Google Sheets: Đang đồng bộ...";
+
+    try {
+      let response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          action: "sync",
+          userCode: userCode,
+          records: records
+        })
+      });
+
+      let result = await response.json();
+      if(result.status === "success") {
+        statusText.innerText = "Trạng thái Google Sheets: Đã đồng bộ xong ✓";
+      } else {
+        statusText.innerText = "Trạng thái Google Sheets: Lỗi đồng bộ";
+      }
+    } catch (err) {
+      console.error(err);
+      statusText.innerText = "Trạng thái Google Sheets: Lỗi kết nối";
+    }
+  }
+
+  // 2. TẢI DỮ LIỆU TỪ GOOGLE SHEET
+  async function loadFromGoogleSheet() {
+    const statusText = document.getElementById('syncStatus');
+    statusText.innerText = "Trạng thái Google Sheets: Đang tải dữ liệu...";
+
+    try {
+      let response = await fetch(`${SCRIPT_URL}?userCode=${userCode}`);
+      let cloudData = await response.json();
+
+      if (cloudData && Object.keys(cloudData).length > 0) {
+        records = cloudData;
+        localStorage.setItem('my_attendance_data', JSON.stringify(records));
+        renderTable();
+        statusText.innerText = "Trạng thái Google Sheets: Đã cập nhật từ Cloud ✓";
+      } else {
+        statusText.innerText = "Trạng thái Google Sheets: Chưa có dữ liệu trên Cloud";
+      }
+    } catch (err) {
+      console.error(err);
+      statusText.innerText = "Trạng thái Google Sheets: Không thể tải từ Cloud";
+    }
+  }
+
+  function saveAndSync() {
+    localStorage.setItem('my_attendance_data', JSON.stringify(records));
+    renderTable();
+    syncToGoogleSheet(); // Đồng bộ lên Google Sheet mỗi khi sửa đổi
+  }
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('liveClock').innerText = now.toTimeString().split(' ')[0];
+  }
+
+  function updateNetworkStatus() {
+    const badge = document.getElementById('networkStatus');
+    if (navigator.onLine) {
+      badge.className = 'network-badge online';
+      badge.innerText = 'Đang trực tuyến';
+    } else {
+      badge.className = 'network-badge offline';
+      badge.innerText = 'Đang ngoại tuyến (Offline)';
+    }
+  }
+
+  function getTodayStr() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function chamCongMee(type, workType) {
+    const today = getTodayStr();
+    const timeNow = new Date().toTimeString().substring(0, 5);
+
+    if (!records[today]) {
+      records[today] = { checkIn: '', checkOut: '', workType: workType };
+    }
+
+    if (type === 'Vào') {
+      records[today].checkIn = timeNow;
+      records[today].workType = workType;
+      alert(`Đã ghi nhận VÀO LÀM lúc ${timeNow}`);
+    } else if (type === 'Về') {
+      records[today].checkOut = timeNow;
+      records[today].workType = workType;
+      alert(`Đã ghi nhận TAN LÀM lúc ${timeNow}`);
+    }
+
+    saveAndSync();
+  }
+
+  function chamCongNgayBatKyMee() {
+    const date = document.getElementById('txtBatKyNgay').value;
+    if (!date) return alert('Vui lòng chọn ngày!');
+
+    const workType = document.getElementById('selBatKyCong').value;
+    const checkIn = document.getElementById('txtBatKyGioVao').value;
+    const checkOut = document.getElementById('txtBatKyGioVe').value;
+
+    records[date] = { checkIn, checkOut, workType };
+    saveAndSync();
+    alert(`Đã lưu công ngày ${formatDateVi(date)}!`);
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('attendanceTable');
+    tbody.innerHTML = '';
+
+    const from = document.getElementById('filterFrom').value;
+    const to = document.getElementById('filterTo').value;
+
+    let totalCong = 0;
+    const sortedDates = Object.keys(records).sort().reverse();
+
+    sortedDates.forEach(date => {
+      const item = records[date];
+      totalCong += parseFloat(item.workType || 0);
+
+      if (from && date < from) return;
+      if (to && date > to) return;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${formatDateVi(date)}</td>
+        <td>${item.checkIn || '--:--'}</td>
+        <td>${item.checkOut || '--:--'}</td>
+        <td><b>${item.workType}</b></td>
+        <td>
+          <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
+          <button class="action-btn btn-delete" onclick="deleteRecord('${date}')">Xóa</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('txtTotalCong').innerText = totalCong;
+  }
+
+  function formatDateVi(dateStr) {
+    const [y, m, d] = dateStr.split('-');
+    const dateObj = new Date(y, m - 1, d);
+    const days = ['CN', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    return `${days[dateObj.getDay()]} ${d}/${m}/${y}`;
+  }
+
+  function deleteRecord(date) {
+    if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu ngày ${formatDateVi(date)}?`)) {
+      delete records[date];
+      saveAndSync();
+    }
+  }
+
+  function openEditModal(date) {
+    const item = records[date];
+    document.getElementById('editDateKey').value = date;
+    document.getElementById('editDateLabel').innerText = formatDateVi(date);
+    document.getElementById('editWorkType').value = item.workType || '1';
+    document.getElementById('editCheckIn').value = item.checkIn || '08:00';
+    document.getElementById('editCheckOut').value = item.checkOut || '17:00';
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function saveEdit() {
+    const date = document.getElementById('editDateKey').value;
+    records[date] = {
+      workType: document.getElementById('editWorkType').value,
+      checkIn: document.getElementById('editCheckIn').value,
+      checkOut: document.getElementById('editCheckOut').value
+    };
+    closeModal('editModal');
+    saveAndSync();
+  }
+
+  function openChangeCodeModal() {
+    document.getElementById('newCodeInput').value = userCode;
+    document.getElementById('codeModal').style.display = 'flex';
+  }
+
+  function confirmChangeCode() {
+    const val = document.getElementById('newCodeInput').value.trim();
+    if (val) {
+      userCode = val;
+      localStorage.setItem('my_user_code', userCode);
+      document.getElementById('displayUserCode').innerText = userCode;
+      closeModal('codeModal');
+      // Tải lại dữ liệu tương ứng mã mới
+      loadFromGoogleSheet();
+    }
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+  }
+
+  function exportToCSV() {
+    let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Công\n";
+    const sortedDates = Object.keys(records).sort();
+
+    sortedDates.forEach(date => {
+      const item = records[date];
+      csv += `"${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${item.workType || 0}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", `Bang_Cong_${getTodayStr()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+</body>
+</html>
