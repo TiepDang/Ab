@@ -2,50 +2,52 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chấm Công Cá Nhân</title>
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; color: #1a1a1a; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; }
-        .card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; box-sizing: border-box; }
-        .title { font-size: 1.5rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
-        .clock { font-size: 2.8rem; font-weight: 800; text-align: center; color: #0f172a; margin: 15px 0; }
-        .stats-box { background-color: #edf5ff; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 25px; }
-        .stats-title { font-size: 0.85rem; font-weight: 700; color: #2563eb; margin-bottom: 8px; }
-        .stats-count { font-size: 2rem; font-weight: 800; color: #2563eb; }
-        .label-text { font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-align: left; display: block; }
-        select, input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0; background-color: #f8fafc; font-size: 1rem; font-weight: 700; color: #334155; box-sizing: border-box; margin-bottom: 20px; outline: none; }
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
-        button { border: none; padding: 16px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; margin: 0; padding: 12px; color: #1a1a1a; }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; width: 100%; }
+        .title { font-size: 1.4rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
+        .clock { font-size: 2.6rem; font-weight: 800; text-align: center; color: #0f172a; margin: 12px 0; }
+        .stats-box { background-color: #edf5ff; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 20px; }
+        .stats-title { font-size: 0.85rem; font-weight: 700; color: #2563eb; margin-bottom: 6px; }
+        .stats-count { font-size: 1.8rem; font-weight: 800; color: #2563eb; }
+        .label-text { font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 6px; text-align: left; display: block; }
+        select, input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; background-color: #f8fafc; font-size: 0.95rem; font-weight: 700; color: #334155; margin-bottom: 16px; outline: none; display: block; }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
+        button { border: none; padding: 14px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
         button:active { transform: scale(0.98); opacity: 0.9; }
         .btn-in { background-color: #10b981; }
         .btn-out { background-color: #ff4b55; }
-        .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 10px; }
-        .btn-excel { background-color: #0084ff; width: 100%; margin-top: 15px; font-size: 1rem; padding: 14px;}
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 10px; font-size: 0.95rem; padding: 14px; color: white; width: 100%; border: none; border-radius: 12px; }
-        .table-container { overflow-x: auto; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; }
+        .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 5px; }
+        .btn-excel { background-color: #0084ff; width: 100%; margin-top: 15px; font-size: 0.95rem; padding: 14px;}
+        .grid-2 { display: flex; gap: 12px; margin-bottom: 0; width: 100%; }
+        .grid-2 > div { flex: 1; min-width: 0; }
+        .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
+        .table-container { overflow-x: auto; margin-top: 15px; background: #fff; border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 340px; }
+        th, td { padding: 10px 6px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; }
         th { color: #64748b; background: #f8fafc; font-weight: 700;}
-        .action-btn { padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; margin: 2px; font-weight: bold; border: none; cursor: pointer; }
+        .action-btn { padding: 4px 6px; font-size: 0.7rem; border-radius: 6px; margin: 1px; font-weight: bold; border: none; cursor: pointer; }
         .btn-edit { background-color: #ff9800; color: white; }
         .btn-delete { background-color: #e53935; color: white; }
-        .network-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; }
+        .network-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; }
         .online { background: #d1fae5; color: #065f46; }
         .offline { background: #fee2e2; color: #991b1b; }
 
-        /* Sửa lỗi đè chồng bộ lọc bằng cách ép kích thước rộng tự động */
-        .filter-group { display: flex; gap: 12px; margin-bottom: 15px; }
+        /* Giải quyết triệt để lỗi tràn ô lọc ngày */
+        .filter-group { display: flex; gap: 10px; width: 100%; margin-bottom: 5px; }
         .filter-item { flex: 1; min-width: 0; }
-        .filter-item input { margin-bottom: 0; }
+        .filter-item input { margin-bottom: 0; width: 100%; }
 
-        /* Khung cửa sổ Pop-up chọn thông tin để sửa công */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; padding: 15px; box-sizing: border-box; }
-        .modal-content { background: white; padding: 24px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        /* Cửa sổ Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; padding: 15px; }
+        .modal-content { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 5px; }
         .btn-close { background-color: #94a3b8; flex: 1; }
         .btn-confirm { background-color: #10b981; flex: 1; }
     </style>
@@ -72,7 +74,7 @@
         </div>
     </div>
     <div class="card">
-        <div class="title" style="font-size: 1.25rem; text-align: left; margin-bottom: 15px;">Chấm công ngày bất kỳ</div>
+        <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Chấm công ngày bất kỳ</div>
         <div class="grid-2">
             <div><label class="label-text">Chọn Ngày:</label><input type="date" id="txtBatKyNgay"></div>
             <div>
@@ -87,7 +89,7 @@
         <button class="btn-save" onclick="chamCongNgayBatKyMee()">Lưu Ngày Đã Chọn</button>
     </div>
     <div class="card">
-        <div class="title" style="font-size: 1.25rem; text-align: left; margin-bottom: 15px;">Bộ lọc & Bảng công chi tiết</div>
+        <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
         <div class="filter-group">
             <div class="filter-item"><label class="label-text">Từ ngày:</label><input type="date" id="filterTuNgay" onchange="hienThiGiaoDien()"></div>
             <div class="filter-item"><label class="label-text">Đến ngày:</label><input type="date" id="filterDenNgay" onchange="hienThiGiaoDien()"></div>
@@ -103,16 +105,13 @@
     </div>
 </div>
 
-<!-- KHUNG CỬA SỔ POP-UP SỬA THÔNG TIN ĐỂ CHỌN CHỨ KHÔNG CẦN GÕ -->
 <div class="modal" id="editModal">
     <div class="modal-content">
-        <div class="title" style="font-size: 1.2rem; text-align: left;" id="editModalTitle">Sửa công ngày...</div>
+        <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom:12px;" id="editModalTitle">Sửa công ngày...</div>
         <label class="label-text">Tính Công:</label>
         <select id="modalEditCong"><option value="1">1 công</option><option value="0.5">0.5 công</option><option value="0">0 công</option></select>
-        <label class="label-text">Giờ Vào:</label>
-        <input type="time" id="modalEditGioVao">
-        <label class="label-text">Giờ Về:</label>
-        <input type="time" id="modalEditGioVe">
+        <label class="label-text">Giờ Vào:</label><input type="time" id="modalEditGioVao">
+        <label class="label-text">Giờ Về:</label><input type="time" id="modalEditGioVe">
         <div class="modal-buttons">
             <button class="btn-close" onclick="dongKhungSua()">Hủy bỏ</button>
             <button class="btn-confirm" onclick="luuThongTinDaSua()">Lưu lại</button>
@@ -121,12 +120,12 @@
 </div>
 
 
-    <script>
+<script>
     const GOOGLE_FORM_URL = "https://google.com";
     let userId = localStorage.getItem('app_user_id');
     let localLogs = JSON.parse(localStorage.getItem('saved_logs_backup_v2')) || [];
     let pendingSyncQueue = JSON.parse(localStorage.getItem('pending_sync_queue_v2')) || [];
-    let currentEditingDate = ""; // Biến lưu tạm ngày đang sửa
+    let currentEditingDate = "";
 
     if (!userId) {
         userId = Math.floor(100000 + Math.random() * 900000).toString();
@@ -136,7 +135,7 @@
     document.getElementById('txtBatKyNgay').valueAsDate = new Date();
 
     function capNhatChuoiNutFooter() {
-        document.getElementById('btnIdFooter').textContent = `Mã của bạn: ${userId} (Bấm để tải lại hoặc tự đặt mã mới)`;
+        document.getElementById('btnIdFooter').textContent = "Mã của bạn: " + userId + " (Bấm để tải lại hoặc tự đặt mã mới)";
     }
 
     function updateNetworkStatus() {
@@ -156,7 +155,7 @@
         const now = new Date();
         var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
         if(h < 10) h = "0" + h; if(m < 10) m = "0" + m; if(s < 10) s = "0" + s;
-        document.getElementById('liveClock').textContent = `${h}:${m}:${s}`;
+        document.getElementById('liveClock').textContent = h + ":" + m + ":" + s;
     }, 1000);
 
     function hienThiGiaoDien() {
@@ -183,12 +182,13 @@
         });
         document.getElementById('txtTotalCong').textContent = tongCong.toFixed(1).replace('.0', '');
     }
-    function chamCongMee(kieu, giaTriCong) {
+
+        function chamCongMee(kieu, giaTriCong) {
         const now = new Date();
         const ngayString = now.toLocaleDateString('vi-VN');
         var hh = now.getHours(), mm = now.getMinutes();
         if(hh < 10) hh = "0" + hh; if(mm < 10) mm = "0" + mm;
-        const gioString = `${hh}:${mm}`;
+        const gioString = h + ":" + mm;
         let trungNgayIndex = localLogs.findIndex(l => l.date === ngayString);
         
         if (trungNgayIndex !== -1) {
@@ -199,7 +199,7 @@
             localLogs.unshift({ date: ngayString, gioVao: kieu === 'Vào' ? gioString : '', gioVe: kieu === 'Về' ? gioString : '', công: giaTriCong });
         }
         luuVaDongBo();
-        alert(`Đã ghi nhận thành công giờ ${kieu}!`);
+        alert("Đã ghi nhận thành công giờ " + kieu + "!");
     }
 
     function chamCongNgayBatKyMee() {
@@ -209,7 +209,7 @@
         let trungNgayIndex = localLogs.findIndex(l => l.date === ngayFormat);
 
         if(trungNgayIndex !== -1) {
-            if(!confirm(`Ngày ${ngayFormat} đã có dữ liệu. Bạn có muốn ghi đè không?`)) return;
+            if(!confirm("Ngày " + ngayFormat + " đã có dữ liệu. Ghi đè không?")) return;
             localLogs[trungNgayIndex] = { date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value };
         } else {
             localLogs.unshift({ date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value });
@@ -218,14 +218,13 @@
         alert("Đã lưu ngày công bất kỳ thành công!");
     }
 
-    // TÍNH NĂNG MỚI: Mở khung pop-up chọn thông tin để sửa công
     function moKhungSua(ngayKhoa) {
         currentEditingDate = ngayKhoa;
         let index = localLogs.findIndex(l => l.date === ngayKhoa);
         if (index === -1) return;
         let item = localLogs[index];
 
-        document.getElementById('editModalTitle').textContent = `Sửa công ngày ${ngayKhoa}`;
+        document.getElementById('editModalTitle').textContent = "Sửa công ngày " + ngayKhoa;
         document.getElementById('modalEditCong').value = item.công;
         document.getElementById('modalEditGioVao').value = item.gioVao || "08:00";
         document.getElementById('modalEditGioVe').value = item.gioVe || "17:00";
@@ -251,7 +250,7 @@
     function xoaGhiNhan(ngayKhoa) {
         let index = localLogs.findIndex(l => l.date === ngayKhoa);
         if (index === -1) return;
-        if (confirm(`Bạn có chắc chắn muốn xóa bản ghi ngày ${ngayKhoa} không?`)) {
+        if (confirm("Bạn có chắc chắn muốn xóa bản ghi ngày " + ngayKhoa + " không?")) {
             localLogs.splice(index, 1);
             luuVaDongBo();
         }
@@ -297,7 +296,7 @@
         localLogs.forEach(i => { csv += `${i.date},${i.gioVao || '--'},${i.gioVe || '--'},${i.công}\n`; });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob); link.download = `Bang_Cong_${userId}.csv`; link.click();
+        link.href = URL.createObjectURL(blob); link.download = "Bang_Cong_" + userId + ".csv"; link.click();
     }
 
     if ('serviceWorker' in navigator) {
@@ -308,5 +307,3 @@
 </script>
 </body>
 </html>
-
-        
