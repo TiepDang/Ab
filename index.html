@@ -7,44 +7,42 @@
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; margin: 0; padding: 12px; color: #1a1a1a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; padding: 12px; color: #1a1a1a; }
         .container { width: 100%; max-width: 480px; margin: 0 auto; }
-        .card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; width: 100%; }
-        .title { font-size: 1.4rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
-        .clock { font-size: 2.6rem; font-weight: 800; text-align: center; color: #0f172a; margin: 12px 0; }
-        .stats-box { background-color: #edf5ff; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 20px; }
-        .stats-title { font-size: 0.85rem; font-weight: 700; color: #2563eb; margin-bottom: 6px; }
-        .stats-count { font-size: 1.8rem; font-weight: 800; color: #2563eb; }
-        .label-text { font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 6px; text-align: left; display: block; }
-        select, input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; background-color: #f8fafc; font-size: 0.95rem; font-weight: 700; color: #334155; margin-bottom: 16px; outline: none; display: block; }
+        .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; width: 100%; }
+        .title { font-size: 1.3rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
+        .clock { font-size: 2.4rem; font-weight: 800; text-align: center; color: #0f172a; margin: 10px 0; }
+        .stats-box { background-color: #edf5ff; border-radius: 12px; padding: 12px; text-align: center; margin-bottom: 16px; }
+        .stats-title { font-size: 0.8rem; font-weight: 700; color: #2563eb; margin-bottom: 4px; }
+        .stats-count { font-size: 1.6rem; font-weight: 800; color: #2563eb; }
+        .label-text { font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; text-align: left; display: block; }
+        select, input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; background-color: #f8fafc; font-size: 0.9rem; font-weight: 700; color: #334155; margin-bottom: 14px; outline: none; display: block; }
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
-        button { border: none; padding: 14px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        button { border: none; padding: 16px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
         button:active { transform: scale(0.98); opacity: 0.9; }
         .btn-in { background-color: #10b981; }
         .btn-out { background-color: #ff4b55; }
         .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 5px; }
-        .btn-excel { background-color: #0084ff; width: 100%; margin-top: 15px; font-size: 0.95rem; padding: 14px;}
-        .grid-2 { display: flex; gap: 12px; margin-bottom: 0; width: 100%; }
-        .grid-2 > div { flex: 1; min-width: 0; }
+        .btn-excel { background-color: #0084ff; width: 100%; margin-top: 5px; font-size: 0.95rem; padding: 14px;}
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 12px; }
         .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
-        .table-container { overflow-x: auto; margin-top: 15px; background: #fff; border-radius: 12px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 340px; }
-        th, td { padding: 10px 6px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; }
-        th { color: #64748b; background: #f8fafc; font-weight: 700;}
-        .action-btn { padding: 4px 6px; font-size: 0.7rem; border-radius: 6px; margin: 1px; font-weight: bold; border: none; cursor: pointer; }
+        .table-container { overflow-x: auto; margin-top: 15px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 440px; table-layout: fixed; }
+        th, td { padding: 10px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        th { color: #64748b; background: #f8fafc; font-weight: 700; }
+        th:nth-child(1), td:nth-child(1) { width: 130px; text-align: left; padding-left: 8px; }
+        th:nth-child(2), td:nth-child(2) { width: 65px; }
+        th:nth-child(3), td:nth-child(3) { width: 65px; }
+        th:nth-child(4), td:nth-child(4) { width: 55px; }
+        th:nth-child(5), td:nth-child(5) { width: 125px; }
+        .action-btn { padding: 6px 10px; font-size: 0.75rem; border-radius: 8px; margin: 0 2px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
         .btn-edit { background-color: #ff9800; color: white; }
         .btn-delete { background-color: #e53935; color: white; }
         .network-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; }
         .online { background: #d1fae5; color: #065f46; }
         .offline { background: #fee2e2; color: #991b1b; }
-
-        /* Giải quyết triệt để lỗi tràn ô lọc ngày */
-        .filter-group { display: flex; gap: 10px; width: 100%; margin-bottom: 5px; }
-        .filter-item { flex: 1; min-width: 0; }
-        .filter-item input { margin-bottom: 0; width: 100%; }
-
-        /* Cửa sổ Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; padding: 15px; }
         .modal-content { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-buttons { display: flex; gap: 10px; margin-top: 5px; }
@@ -90,9 +88,9 @@
     </div>
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
-        <div class="filter-group">
-            <div class="filter-item"><label class="label-text">Từ ngày:</label><input type="date" id="filterTuNgay" onchange="hienThiGiaoDien()"></div>
-            <div class="filter-item"><label class="label-text">Đến ngày:</label><input type="date" id="filterDenNgay" onchange="hienThiGiaoDien()"></div>
+        <div class="grid-2">
+            <div><label class="label-text">Từ ngày:</label><input type="date" id="filterTuNgay" onchange="hienThiGiaoDien()"></div>
+            <div><label class="label-text">Đến ngày:</label><input type="date" id="filterDenNgay" onchange="hienThiGiaoDien()"></div>
         </div>
         <div class="table-container">
             <table>
@@ -101,7 +99,7 @@
             </table>
         </div>
         <button class="btn-excel" onclick="xuatFileExcel()">Xuất file Excel (CSV)</button>
-        <button class="footer-id-btn" id="btnIdFooter" onclick="kichHoatDoiMa()">Mã của bạn: ...... (Bấm để tải lại hoặc tự đặt mã mới)</button>
+        <button class="footer-id-btn" id="btnIdFooter" onclick="xuLyGiaoDienDongBo()">Mã của bạn: ...... (Bấm để quản lý mã hoặc đổi máy)</button>
     </div>
 </div>
 
@@ -119,7 +117,6 @@
     </div>
 </div>
 
-
 <script>
     const GOOGLE_FORM_URL = "https://google.com";
     let userId = localStorage.getItem('app_user_id');
@@ -127,15 +124,36 @@
     let pendingSyncQueue = JSON.parse(localStorage.getItem('pending_sync_queue_v2')) || [];
     let currentEditingDate = "";
 
-    if (!userId) {
-        userId = Math.floor(100000 + Math.random() * 900000).toString();
-        localStorage.setItem('app_user_id', userId);
+    // CẢI TIẾN: Nếu chưa có mã, ép người dùng tự đặt mã dễ nhớ thay vì hệ thống tự sinh số ngẫu nhiên
+    while (!userId || userId.trim() === "") {
+        userId = prompt("HỆ THỐNG MỚI: Vui lòng tự nhập Mã định danh dễ nhớ của bạn\n(Ví dụ: tên bạn, số điện thoại, hoặc mã nhân viên):");
+        if(userId) {
+            userId = userId.trim();
+            localStorage.setItem('app_user_id', userId);
+        }
     }
     capNhatChuoiNutFooter();
     document.getElementById('txtBatKyNgay').valueAsDate = new Date();
 
     function capNhatChuoiNutFooter() {
-        document.getElementById('btnIdFooter').textContent = "Mã của bạn: " + userId + " (Bấm để tải lại hoặc tự đặt mã mới)";
+        document.getElementById('btnIdFooter').textContent = `Mã của bạn: ${userId} (Bấm để lấy mã sao lưu hoặc đổi máy)`;
+    }
+
+    function dinhDangNgayCoThu(doiTuongNgay) {
+        var ngay = doiTuongNgay.getDate();
+        var thang = doiTuongNgay.getMonth() + 1;
+        var nam = doiTuongNgay.getFullYear();
+        var dsThu = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+        return dsThu[doiTuongNgay.getDay()] + " - " + ngay + "/" + thang + "/" + nam;
+    }
+
+    function LayNgayDeSoSanh(chuoiNgayCoThu) {
+        if(!chuoiNgayCoThu.includes(" - ")) return chuoiNgayCoThu;
+        var phanNgay = chuoiNgayCoThu.split(" - ");
+        var parts = phanNgay.split('/');
+        var d = parseInt(parts, 10) < 10 ? "0" + parseInt(parts, 10) : parts;
+        var m = parseInt(parts, 10) < 10 ? "0" + parseInt(parts, 10) : parts;
+        return parts + "-" + m + "-" + d;
     }
 
     function updateNetworkStatus() {
@@ -166,10 +184,10 @@
         let tongCong = 0, filteredLogs = [...localLogs];
 
         if (filterTu) {
-            filteredLogs = filteredLogs.filter(item => new Date(item.date.split('/').reverse().join('-')) >= new Date(filterTu));
+            filteredLogs = filteredLogs.filter(item => LayNgayDeSoSanh(item.date) >= filterTu);
         }
         if (filterDen) {
-            filteredLogs = filteredLogs.filter(item => new Date(item.date.split('/').reverse().join('-')) <= new Date(filterDen));
+            filteredLogs = filteredLogs.filter(item => LayNgayDeSoSanh(item.date) <= filterDen);
         }
         if(filteredLogs.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5">Chưa có dữ liệu chấm công.</td></tr>';
@@ -183,127 +201,6 @@
         document.getElementById('txtTotalCong').textContent = tongCong.toFixed(1).replace('.0', '');
     }
 
-        function chamCongMee(kieu, giaTriCong) {
-        const now = new Date();
-        const ngayString = now.toLocaleDateString('vi-VN');
-        var hh = now.getHours(), mm = now.getMinutes();
-        if(hh < 10) hh = "0" + hh; if(mm < 10) mm = "0" + mm;
-        const gioString = h + ":" + mm;
-        let trungNgayIndex = localLogs.findIndex(l => l.date === ngayString);
-        
-        if (trungNgayIndex !== -1) {
-            if (kieu === 'Vào') localLogs[trungNgayIndex].gioVao = gioString;
-            else localLogs[trungNgayIndex].gioVe = gioString;
-            localLogs[trungNgayIndex].công = giaTriCong;
-        } else {
-            localLogs.unshift({ date: ngayString, gioVao: kieu === 'Vào' ? gioString : '', gioVe: kieu === 'Về' ? gioString : '', công: giaTriCong });
-        }
-        luuVaDongBo();
-        alert("Đã ghi nhận thành công giờ " + kieu + "!");
-    }
 
-    function chamCongNgayBatKyMee() {
-        const ngayChon = new Date(document.getElementById('txtBatKyNgay').value);
-        if (isNaN(ngayChon)) return alert("Vui lòng chọn ngày hợp lệ!");
-        const ngayFormat = ngayChon.toLocaleDateString('vi-VN');
-        let trungNgayIndex = localLogs.findIndex(l => l.date === ngayFormat);
-
-        if(trungNgayIndex !== -1) {
-            if(!confirm("Ngày " + ngayFormat + " đã có dữ liệu. Ghi đè không?")) return;
-            localLogs[trungNgayIndex] = { date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value };
-        } else {
-            localLogs.unshift({ date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value });
-        }
-        luuVaDongBo();
-        alert("Đã lưu ngày công bất kỳ thành công!");
-    }
-
-    function moKhungSua(ngayKhoa) {
-        currentEditingDate = ngayKhoa;
-        let index = localLogs.findIndex(l => l.date === ngayKhoa);
-        if (index === -1) return;
-        let item = localLogs[index];
-
-        document.getElementById('editModalTitle').textContent = "Sửa công ngày " + ngayKhoa;
-        document.getElementById('modalEditCong').value = item.công;
-        document.getElementById('modalEditGioVao').value = item.gioVao || "08:00";
-        document.getElementById('modalEditGioVe').value = item.gioVe || "17:00";
-        document.getElementById('editModal').style.display = "flex";
-    }
-
-    function dongKhungSua() {
-        document.getElementById('editModal').style.display = "none";
-    }
-
-    function luuThongTinDaSua() {
-        let index = localLogs.findIndex(l => l.date === currentEditingDate);
-        if (index !== -1) {
-            localLogs[index].công = document.getElementById('modalEditCong').value;
-            localLogs[index].gioVao = document.getElementById('modalEditGioVao').value;
-            localLogs[index].gioVe = document.getElementById('modalEditGioVe').value;
-            luuVaDongBo();
-            dongKhungSua();
-            alert("Đã cập nhật thay đổi thành công!");
-        }
-    }
-
-    function xoaGhiNhan(ngayKhoa) {
-        let index = localLogs.findIndex(l => l.date === ngayKhoa);
-        if (index === -1) return;
-        if (confirm("Bạn có chắc chắn muốn xóa bản ghi ngày " + ngayKhoa + " không?")) {
-            localLogs.splice(index, 1);
-            luuVaDongBo();
-        }
-    }
-
-    function luuVaDongBo() {
-        localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs));
-        hienThiGiaoDien();
-        pendingSyncQueue = [{ userId: userId, data: JSON.stringify(localLogs) }];
-        localStorage.setItem('pending_sync_queue_v2', JSON.stringify(pendingSyncQueue));
-        xuLyDongBoNgam();
-    }
-
-    function xuLyDongBoNgam() {
-        if (!navigator.onLine || pendingSyncQueue.length === 0) return;
-        const syncItem = pendingSyncQueue;
-        const formData = new FormData();
-        formData.append('entry.1000001', syncItem.userId);
-        formData.append('entry.1000002', syncItem.data);
-        fetch(GOOGLE_FORM_URL, { method: 'POST', body: formData, mode: 'no-cors' }).then(function() {
-            pendingSyncQueue.shift();
-            localStorage.setItem('pending_sync_queue_v2', JSON.stringify(pendingSyncQueue));
-        });
-    }
-
-    function kichHoatDoiMa() {
-        let nhapMa = prompt("Nhập mã số thiết bị cũ để đồng bộ:", userId);
-        if (nhapMa && nhapMa.trim() !== "") {
-            userId = nhapMa.trim(); localStorage.setItem('app_user_id', userId); capNhatChuoiNutFooter();
-            let chuoiSaoLuuCu = prompt("Dán chuỗi sao lưu công từ máy cũ vào đây (nếu có):");
-            if (chuoiSaoLuuCu) {
-                try { localLogs = JSON.parse(chuoiSaoLuuCu); localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs)); } catch(e) { alert("Chuỗi lỗi!"); }
-            }
-            hienThiGiaoDien();
-        }
-    }
-
-    function xuatFileExcel() {
-        if(localLogs.length === 0) return alert("Không có dữ liệu!");
-        let chuoiSaoLuu = JSON.stringify(localLogs);
-        prompt("Hãy sao chép (Copy) chuỗi dự phòng này để nhập khi đổi thiết bị máy mới:", chuoiSaoLuu);
-        let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Số Công\n";
-        localLogs.forEach(i => { csv += `${i.date},${i.gioVao || '--'},${i.gioVe || '--'},${i.công}\n`; });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob); link.download = "Bang_Cong_" + userId + ".csv"; link.click();
-    }
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
-    }
-
-    hienThiGiaoDien();
-</script>
-</body>
-</html>
+    
+    
