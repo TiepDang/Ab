@@ -28,7 +28,7 @@
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
         .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 12px; }
         .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
-        .table-container { overflow-x: auto; margin-top: 15px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
+        .table-container { overflow-x: auto; margin-top: 10px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 440px; table-layout: fixed; }
         th, td { padding: 10px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { color: #64748b; background: #f8fafc; font-weight: 700; }
@@ -49,6 +49,11 @@
         .btn-close { background-color: #94a3b8; flex: 1; }
         .btn-confirm { background-color: #10b981; flex: 1; }
         .sync-status { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-style: italic; text-align: center; }
+
+        /* Style mới cho tổng quan bộ lọc */
+        .filter-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .filter-summary-title { font-size: 0.85rem; font-weight: 700; color: #166534; }
+        .filter-summary-value { font-size: 1.1rem; font-weight: 800; color: #15803d; }
     </style>
 </head>
 <body>
@@ -97,6 +102,12 @@
         <div class="grid-2">
             <div><label class="label-text">Từ ngày:</label><input type="date" id="filterFrom" onchange="renderTable()"></div>
             <div><label class="label-text">Đến ngày:</label><input type="date" id="filterTo" onchange="renderTable()"></div>
+        </div>
+
+        <!-- Khối Tổng quan theo Bộ Lọc -->
+        <div class="filter-summary">
+            <span class="filter-summary-title" id="filterSummaryTitle">Tổng công giai đoạn lọc:</span>
+            <span class="filter-summary-value"><span id="txtFilterCong">0</span> công</span>
         </div>
 
         <div class="table-container">
@@ -162,7 +173,7 @@
 </div>
 
 <script>
-  // URL Web App Apps Script mới của bạn
+  // URL Web App Apps Script của bạn
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxt6daMxIwAdXyFFzznpJRtI6zc2pFh3BU_-A8LkhSHGIVWgb2tq_DQ77-dyuGXuEY0FQ/exec";
 
   // Biến toàn cục
@@ -172,7 +183,6 @@
   let userCode = localStorage.getItem('my_user_code');
   if (!userCode) {
     let inputCode = prompt("Vui lòng nhập Mã đồng bộ cá nhân của bạn (ví dụ: SĐT hoặc mã 6 số):");
-    // Nếu nhập thì lấy mã đó, nếu hủy/bỏ trống thì tạo mã ngẫu nhiên 6 số để không bị trùng
     userCode = (inputCode && inputCode.trim() !== '') 
       ? inputCode.trim() 
       : Math.floor(100000 + Math.random() * 900000).toString();
@@ -319,15 +329,26 @@
     const from = document.getElementById('filterFrom').value;
     const to = document.getElementById('filterTo').value;
 
-    let totalCong = 0;
+    let totalCongTatCa = 0;
+    let totalCongBoLoc = 0;
+    let countNgayBoLoc = 0;
+
     const sortedDates = Object.keys(records).sort().reverse();
 
     sortedDates.forEach(date => {
       const item = records[date];
-      totalCong += parseFloat(item.workType || 0);
+      const congVal = parseFloat(item.workType || 0);
+      
+      // Tính tổng công tích lũy toàn thời gian
+      totalCongTatCa += congVal;
 
+      // Lọc ngày
       if (from && date < from) return;
       if (to && date > to) return;
+
+      // Tính tổng công & số ngày trong giai đoạn đang lọc
+      totalCongBoLoc += congVal;
+      countNgayBoLoc++;
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
@@ -343,7 +364,19 @@
       tbody.appendChild(tr);
     });
 
-    document.getElementById('txtTotalCong').innerText = totalCong;
+    // Cập nhật thẻ Tổng công tích lũy (Card 1)
+    document.getElementById('txtTotalCong').innerText = totalCongTatCa;
+
+    // Cập nhật khối Tổng quan bộ lọc
+    document.getElementById('txtFilterCong').innerText = totalCongBoLoc;
+
+    // Đổi tiêu đề khối lọc cho sinh động tùy theo trạng thái chọn ngày
+    const summaryTitle = document.getElementById('filterSummaryTitle');
+    if (from || to) {
+      summaryTitle.innerText = `Tổng công lọc (${countNgayBoLoc} ngày hiển thị):`;
+    } else {
+      summaryTitle.innerText = "Tổng công hiển thị:";
+    }
   }
 
   function formatDateVi(dateStr) {
