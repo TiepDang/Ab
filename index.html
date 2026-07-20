@@ -10,14 +10,32 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; padding: 12px; color: #1a1a1a; }
         .container { width: 100%; max-width: 480px; margin: 0 auto; }
-        .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; width: 100%; }
+        .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; width: 100%; overflow: hidden; }
         .title { font-size: 1.3rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
         .clock { font-size: 2.4rem; font-weight: 800; text-align: center; color: #0f172a; margin: 10px 0; }
         .stats-box { background-color: #edf5ff; border-radius: 12px; padding: 12px; text-align: center; margin-bottom: 16px; }
         .stats-title { font-size: 0.8rem; font-weight: 700; color: #2563eb; margin-bottom: 4px; }
         .stats-count { font-size: 1.6rem; font-weight: 800; color: #2563eb; }
         .label-text { font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; text-align: left; display: block; }
-        select, input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; background-color: #f8fafc; font-size: 0.9rem; font-weight: 700; color: #334155; margin-bottom: 14px; outline: none; display: block; }
+        
+        /* Cấu hình tối ưu cho các ô nhập liệu tránh tràn viền */
+        select, input { 
+            width: 100%; 
+            min-width: 0; 
+            max-width: 100%;
+            padding: 10px 8px; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            background-color: #f8fafc; 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: #334155; 
+            margin-bottom: 14px; 
+            outline: none; 
+            display: block; 
+            -webkit-appearance: none;
+        }
+
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
         button { border: none; padding: 16px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
         button:active { transform: scale(0.98); opacity: 0.9; }
@@ -25,8 +43,17 @@
         .btn-out { background-color: #ff4b55; }
         .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 5px; }
         .btn-excel { background-color: #0084ff; width: 100%; margin-top: 5px; font-size: 0.95rem; padding: 14px;}
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        
+        /* Sửa lỗi Grid đè lên nhau trên iOS */
+        .grid-2 { 
+            display: grid; 
+            grid-template-columns: repeat(2, minmax(0, 1fr)); 
+            gap: 10px; 
+            width: 100%; 
+        }
+        .grid-2 > div { min-width: 0; }
         .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 12px; }
+
         .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
         .table-container { overflow-x: auto; margin-top: 10px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 440px; table-layout: fixed; }
@@ -50,7 +77,6 @@
         .btn-confirm { background-color: #10b981; flex: 1; }
         .sync-status { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-style: italic; text-align: center; }
 
-        /* Style mới cho tổng quan bộ lọc */
         .filter-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .filter-summary-title { font-size: 0.85rem; font-weight: 700; color: #166534; }
         .filter-summary-value { font-size: 1.1rem; font-weight: 800; color: #15803d; }
@@ -106,7 +132,7 @@
 
         <!-- Khối Tổng quan theo Bộ Lọc -->
         <div class="filter-summary">
-            <span class="filter-summary-title" id="filterSummaryTitle">Tổng công giai đoạn lọc:</span>
+            <span class="filter-summary-title" id="filterSummaryTitle">Tổng công hiển thị:</span>
             <span class="filter-summary-value"><span id="txtFilterCong">0</span> công</span>
         </div>
 
@@ -173,13 +199,10 @@
 </div>
 
 <script>
-  // URL Web App Apps Script của bạn
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxt6daMxIwAdXyFFzznpJRtI6zc2pFh3BU_-A8LkhSHGIVWgb2tq_DQ77-dyuGXuEY0FQ/exec";
 
-  // Biến toàn cục
   let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
   
-  // KIỂM TRA & YÊU CẦU NHẬP MÃ KHI MỞ TRÊN MÁY MỚI
   let userCode = localStorage.getItem('my_user_code');
   if (!userCode) {
     let inputCode = prompt("Vui lòng nhập Mã đồng bộ cá nhân của bạn (ví dụ: SĐT hoặc mã 6 số):");
@@ -202,11 +225,9 @@
     updateNetworkStatus();
 
     renderTable();
-    // Tự động tải từ Google Sheet khi mở Web / đổi thiết bị
     loadFromGoogleSheet();
   });
 
-  // 1. GỬI DỮ LIỆU LÊN GOOGLE SHEET
   async function syncToGoogleSheet() {
     const statusText = document.getElementById('syncStatus');
     statusText.innerText = "Trạng thái Google Sheets: Đang đồng bộ...";
@@ -235,7 +256,6 @@
     }
   }
 
-  // 2. TẢI DỮ LIỆU TỪ GOOGLE SHEET
   async function loadFromGoogleSheet() {
     const statusText = document.getElementById('syncStatus');
     statusText.innerText = "Trạng thái Google Sheets: Đang tải dữ liệu...";
@@ -339,14 +359,11 @@
       const item = records[date];
       const congVal = parseFloat(item.workType || 0);
       
-      // Tính tổng công tích lũy toàn thời gian
       totalCongTatCa += congVal;
 
-      // Lọc ngày
       if (from && date < from) return;
       if (to && date > to) return;
 
-      // Tính tổng công & số ngày trong giai đoạn đang lọc
       totalCongBoLoc += congVal;
       countNgayBoLoc++;
 
@@ -364,13 +381,9 @@
       tbody.appendChild(tr);
     });
 
-    // Cập nhật thẻ Tổng công tích lũy (Card 1)
     document.getElementById('txtTotalCong').innerText = totalCongTatCa;
-
-    // Cập nhật khối Tổng quan bộ lọc
     document.getElementById('txtFilterCong').innerText = totalCongBoLoc;
 
-    // Đổi tiêu đề khối lọc cho sinh động tùy theo trạng thái chọn ngày
     const summaryTitle = document.getElementById('filterSummaryTitle');
     if (from || to) {
       summaryTitle.innerText = `Tổng công lọc (${countNgayBoLoc} ngày hiển thị):`;
