@@ -25,7 +25,7 @@
         .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 10px; }
         .btn-excel { background-color: #0084ff; width: 100%; margin-top: 15px; font-size: 1rem; padding: 14px;}
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 10px; font-size: 0.95rem; padding: 14px; color: white; width: 100%; }
+        .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 10px; font-size: 0.95rem; padding: 14px; color: white; width: 100%; border: none; border-radius: 12px; }
         .table-container { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; }
@@ -145,12 +145,14 @@
             document.getElementById('txtTotalCong').textContent = 0;
             return;
         }
-        filteredLogs.forEach((item, index) => {
+        filteredLogs.forEach((item) => {
             tongCong += parseFloat(item.công || 0);
-            tbody.innerHTML += `<tr><td>${item.date}</td><td style="color:#10b981">${item.gioVao || '--:--'}</td><td style="color:#ff4b55">${item.gioVe || '--:--'}</td><td style="color:#2563eb">${item.công}</td><td><button class="action-btn btn-edit" onclick="suaGhiNhan(${index})">Sửa</button><button class="action-btn btn-delete" onclick="xoaGhiNhan(${index})">Xóa</button></td></tr>`;
+            tbody.innerHTML += `<tr><td>${item.date}</td><td style="color:#10b981">${item.gioVao || '--:--'}</td><td style="color:#ff4b55">${item.gioVe || '--:--'}</td><td style="color:#2563eb">${item.công}</td><td><button class="action-btn btn-edit" onclick="suaGhiNhan('${item.date}')">Sửa</button><button class="action-btn btn-delete" onclick="xoaGhiNhan('${item.date}')">Xóa</button></td></tr>`;
         });
         document.getElementById('txtTotalCong').textContent = tongCong.toFixed(1).replace('.0', '');
-    }    function chamCongMee(kieu, giaTriCong) {
+    }
+
+        function chamCongMee(kieu, giaTriCong) {
         const now = new Date();
         const ngayString = now.toLocaleDateString('vi-VN');
         var hh = now.getHours(), mm = now.getMinutes();
@@ -172,24 +174,40 @@
     function chamCongNgayBatKyMee() {
         const ngayChon = new Date(document.getElementById('txtBatKyNgay').value);
         if (isNaN(ngayChon)) return alert("Vui lòng chọn ngày hợp lệ!");
-        localLogs.unshift({ date: ngayChon.toLocaleDateString('vi-VN'), gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value });
+        const ngayFormat = ngayChon.toLocaleDateString('vi-VN');
+        let trungNgayIndex = localLogs.findIndex(l => l.date === ngayFormat);
+
+        if(trungNgayIndex !== -1) {
+            if(!confirm(`Ngày ${ngayFormat} đã có dữ liệu. Bạn có muốn ghi đè không?`)) return;
+            localLogs[trungNgayIndex] = { date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value };
+        } else {
+            localLogs.unshift({ date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value });
+        }
         luuVaDongBo();
         alert("Đã lưu ngày công bất kỳ thành công!");
     }
 
-    function suaGhiNhan(index) {
+    function suaGhiNhan(ngayKhoa) {
+        let index = localLogs.findIndex(l => l.date === ngayKhoa);
+        if (index === -1) return;
         let item = localLogs[index];
+        
         let congMoi = prompt(`Sửa số công cho ngày ${item.date}:`, item.công);
         let gioVaoMoi = prompt(`Sửa giờ VÀO (hh:mm):`, item.gioVao);
         let gioVeMoi = prompt(`Sửa giờ VỀ (hh:mm):`, item.gioVe);
+        
         if (congMoi !== null && gioVaoMoi !== null && gioVeMoi !== null) {
-            item.công = congMoi; item.gioVao = gioVaoMoi; item.gioVe = gioVeMoi;
+            localLogs[index].công = congMoi;
+            localLogs[index].gioVao = gioVaoMoi;
+            localLogs[index].gioVe = gioVeMoi;
             luuVaDongBo();
         }
     }
 
-    function xoaGhiNhan(index) {
-        if (confirm("Bạn có chắc chắn muốn xóa bản ghi ngày này không?")) {
+    function xoaGhiNhan(ngayKhoa) {
+        let index = localLogs.findIndex(l => l.date === ngayKhoa);
+        if (index === -1) return;
+        if (confirm(`Bạn có chắc chắn muốn xóa bản ghi ngày ${ngayKhoa} không?`)) {
             localLogs.splice(index, 1);
             luuVaDongBo();
         }
@@ -205,7 +223,7 @@
 
     function xuLyDongBoNgam() {
         if (!navigator.onLine || pendingSyncQueue.length === 0) return;
-        const syncItem = pendingSyncQueue;
+        const syncItem = pendingSyncQueue[0];
         const formData = new FormData();
         formData.append('entry.1000001', syncItem.userId);
         formData.append('entry.1000002', syncItem.data);
@@ -230,7 +248,7 @@
     function xuatFileExcel() {
         if(localLogs.length === 0) return alert("Không có dữ liệu!");
         let chuoiSaoLuu = JSON.stringify(localLogs);
-        prompt("Hãy sao chép chuỗi dự phòng này để nhập khi đổi thiết bị máy mới:", chuoiSaoLuu);
+        prompt("Hãy sao chép (Copy) chuỗi dự phòng này để nhập khi đổi thiết bị máy mới:", chuoiSaoLuu);
         let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Số Công\n";
         localLogs.forEach(i => { csv += `${i.date},${i.gioVao || '--'},${i.gioVe || '--'},${i.công}\n`; });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -238,11 +256,13 @@
         link.href = URL.createObjectURL(blob); link.download = `Bang_Cong_${userId}.csv`; link.click();
     }
 
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+    }
+
     hienThiGiaoDien();
 </script>
 </body>
 </html>
 
-
-    
     
