@@ -71,6 +71,7 @@
             <button class="btn-out" onclick="chamCongMee('Về', document.getElementById('selCongHomNay').value)">Tan Làm (Hôm Nay)</button>
         </div>
     </div>
+    
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Chấm công ngày bất kỳ</div>
         <div class="grid-2">
@@ -86,6 +87,7 @@
         </div>
         <button class="btn-save" onclick="chamCongNgayBatKyMee()">Lưu Ngày Đã Chọn</button>
     </div>
+
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
         <div class="grid-2">
@@ -118,16 +120,17 @@
 </div>
 
 <script>
-    const GOOGLE_FORM_URL = "https://google.com";
+    // ĐÃ CẬP NHẬT: URL Apps Script Google Sheet của bạn
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwb8v9BsMBjnYQqotPVKUAoIXCIB_UfZZM2vLHDDkZQT-91m4LfUq5Kxzx21Zl3Yr7wUg/exec";
+    
     let userId = localStorage.getItem('app_user_id');
     let localLogs = JSON.parse(localStorage.getItem('saved_logs_backup_v2')) || [];
     let pendingSyncQueue = JSON.parse(localStorage.getItem('pending_sync_queue_v2')) || [];
     let currentEditingDate = "";
 
-    // CẢI TIẾN: Nếu chưa có mã, ép người dùng tự đặt mã dễ nhớ thay vì hệ thống tự sinh số ngẫu nhiên
     while (!userId || userId.trim() === "") {
         userId = prompt("HỆ THỐNG MỚI: Vui lòng tự nhập Mã định danh dễ nhớ của bạn\n(Ví dụ: tên bạn, số điện thoại, hoặc mã nhân viên):");
-        if(userId) {
+        if (userId) {
             userId = userId.trim();
             localStorage.setItem('app_user_id', userId);
         }
@@ -144,25 +147,25 @@
         var thang = doiTuongNgay.getMonth() + 1;
         var nam = doiTuongNgay.getFullYear();
         var dsThu = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
-        return dsThu[doiTuongNgay.getDay()] + " - " + ngay + "/" + thang + "/" + nam;
+        return dsThu[doiTuongNgay.getDay()] + " - " + (ngay < 10 ? "0" + ngay : ngay) + "/" + (thang < 10 ? "0" + thang : thang) + "/" + nam;
     }
 
     function LayNgayDeSoSanh(chuoiNgayCoThu) {
-        if(!chuoiNgayCoThu.includes(" - ")) return chuoiNgayCoThu;
-        var phanNgay = chuoiNgayCoThu.split(" - ");
+        if (!chuoiNgayCoThu.includes(" - ")) return chuoiNgayCoThu;
+        var phanNgay = chuoiNgayCoThu.split(" - ")[1];
         var parts = phanNgay.split('/');
-        var d = parseInt(parts, 10) < 10 ? "0" + parseInt(parts, 10) : parts;
-        var m = parseInt(parts, 10) < 10 ? "0" + parseInt(parts, 10) : parts;
-        return parts + "-" + m + "-" + d;
+        return parts[2] + "-" + parts[1] + "-" + parts[0];
     }
 
     function updateNetworkStatus() {
         const badge = document.getElementById('networkStatus');
         if (navigator.onLine) {
-            badge.textContent = "Đang trực tuyến"; badge.className = "network-badge online";
+            badge.textContent = "Đang trực tuyến"; 
+            badge.className = "network-badge online";
             xuLyDongBoNgam();
         } else {
-            badge.textContent = "Đang ngoại tuyến (Offline)"; badge.className = "network-badge offline";
+            badge.textContent = "Đang ngoại tuyến (Offline)"; 
+            badge.className = "network-badge offline";
         }
     }
     window.addEventListener('online', updateNetworkStatus);
@@ -172,7 +175,9 @@
     setInterval(function() {
         const now = new Date();
         var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-        if(h < 10) h = "0" + h; if(m < 10) m = "0" + m; if(s < 10) s = "0" + s;
+        if (h < 10) h = "0" + h; 
+        if (m < 10) m = "0" + m; 
+        if (s < 10) s = "0" + s;
         document.getElementById('liveClock').textContent = h + ":" + m + ":" + s;
     }, 1000);
 
@@ -189,11 +194,13 @@
         if (filterDen) {
             filteredLogs = filteredLogs.filter(item => LayNgayDeSoSanh(item.date) <= filterDen);
         }
-        if(filteredLogs.length === 0) {
+
+        if (filteredLogs.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5">Chưa có dữ liệu chấm công.</td></tr>';
             document.getElementById('txtTotalCong').textContent = 0;
             return;
         }
+
         filteredLogs.forEach((item) => {
             tongCong += parseFloat(item.công || 0);
             tbody.innerHTML += `<tr><td>${item.date}</td><td style="color:#10b981">${item.gioVao || '--:--'}</td><td style="color:#ff4b55">${item.gioVe || '--:--'}</td><td style="color:#2563eb">${item.công}</td><td><button class="action-btn btn-edit" onclick="moKhungSua('${item.date}')">Sửa</button><button class="action-btn btn-delete" onclick="xoaGhiNhan('${item.date}')">Xóa</button></td></tr>`;
@@ -201,12 +208,13 @@
         document.getElementById('txtTotalCong').textContent = tongCong.toFixed(1).replace('.0', '');
     }
 
-        function chamCongMee(kieu, giaTriCong) {
+    function chamCongMee(kieu, giaTriCong) {
         const now = new Date();
         const ngayString = dinhDangNgayCoThu(now);
         var hh = now.getHours(), mm = now.getMinutes();
-        if(hh < 10) hh = "0" + hh; if(mm < 10) mm = "0" + mm;
-        const gioString = hh + ":" + mm; // ĐÃ SỬA: Thay h bằng hh để hết lỗi đơ nút
+        if (hh < 10) hh = "0" + hh; 
+        if (mm < 10) mm = "0" + mm;
+        const gioString = hh + ":" + mm;
         let trungNgayIndex = localLogs.findIndex(l => l.date === ngayString);
         
         if (trungNgayIndex !== -1) {
@@ -220,7 +228,6 @@
         alert("Đã ghi nhận thành công giờ " + kieu + "!");
     }
 
-
     function chamCongNgayBatKyMee() {
         const ngayInput = document.getElementById('txtBatKyNgay').value;
         if (!ngayInput) return alert("Vui lòng chọn ngày hợp lệ!");
@@ -229,8 +236,8 @@
         const ngayFormat = dinhDangNgayCoThu(ngayChon);
         let trungNgayIndex = localLogs.findIndex(l => l.date === ngayFormat);
 
-        if(trungNgayIndex !== -1) {
-            if(!confirm("Ngày " + ngayFormat + " đã có dữ liệu. Ghi đè không?")) return;
+        if (trungNgayIndex !== -1) {
+            if (!confirm("Ngày " + ngayFormat + " đã có dữ liệu. Ghi đè không?")) return;
             localLogs[trungNgayIndex] = { date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value };
         } else {
             localLogs.unshift({ date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value });
@@ -283,23 +290,26 @@
         xuLyDongBoNgam();
     }
 
+    // ĐÃ CẬP NHẬT: Gửi trực tiếp dữ liệu JSON sang Google Sheet
     function xuLyDongBoNgam() {
         if (!navigator.onLine || pendingSyncQueue.length === 0) return;
-        const syncItem = pendingSyncQueue;
-        const formData = new FormData();
-        formData.append('entry.1000001', syncItem.userId);
-        formData.append('entry.1000002', syncItem.data);
-        fetch(GOOGLE_FORM_URL, { method: 'POST', body: formData, mode: 'no-cors' }).then(function() {
+        const syncItem = pendingSyncQueue[0];
+        
+        fetch(GOOGLE_SHEET_URL, { 
+            method: 'POST', 
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(syncItem) 
+        }).then(function() {
             pendingSyncQueue.shift();
             localStorage.setItem('pending_sync_queue_v2', JSON.stringify(pendingSyncQueue));
-        });
+        }).catch(err => console.log("Lỗi đồng bộ ngầm:", err));
     }
 
-        function xuLyGiaoDienDongBo() {
+    function xuLyGiaoDienDongBo() {
         let luaChon = prompt("Bấm số 1 để LẤY CHUỖI SAO LƯU mang đi.\nBấm số 2 để ĐỒNG BỘ MÁY CŨ (Dán chuỗi từ máy khác).\nBấm số 3 để TỰ ĐỔI MÃ ĐỊNH DANH MỚI (Dữ liệu máy này giữ nguyên).");
         if (luaChon === "1") {
-            if(localLogs.length === 0) return alert("Chưa có dữ liệu!");
-            // ĐS SỬA: Chuyển đổi mã hóa an toàn để không bị lỗi khi copy chuỗi có dấu tiếng Việt
+            if (localLogs.length === 0) return alert("Chưa có dữ liệu!");
             prompt("HÃY SAO CHÉP CHUỖI NÀY mang sang máy mới:", JSON.stringify(localLogs));
         } else if (luaChon === "2") {
             let nhapMa = prompt("Nhập mã định danh cũ dễ nhớ:", userId);
@@ -307,26 +317,37 @@
                 let chuoiLuu = prompt("Hãy dán (Paste) chuỗi sao lưu lấy từ máy cũ vào đây:");
                 if (chuoiLuu) {
                     try {
-                        localLogs = JSON.parse(chuoiLuu.trim()); userId = nhapMa.trim();
-                        localStorage.setItem('app_user_id', userId); localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs));
-                        capNhatChuoiNutFooter(); hienThiGiaoDien(); alert("Đồng bộ dữ liệu thành công!");
+                        localLogs = JSON.parse(chuoiLuu.trim()); 
+                        userId = nhapMa.trim();
+                        localStorage.setItem('app_user_id', userId); 
+                        localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs));
+                        capNhatChuoiNutFooter(); 
+                        hienThiGiaoDien(); 
+                        alert("Đồng bộ dữ liệu thành công!");
                     } catch(e) { alert("Lỗi: Chuỗi dán vào sai cấu trúc!"); }
                 }
             }
         } else if (luaChon === "3") {
             let maMoi = prompt("Mời bạn tự gõ Mã định danh mới dễ nhớ:", userId);
-            if(maMoi && maMoi.trim() !== "") { userId = maMoi.trim(); localStorage.setItem('app_user_id', userId); capNhatChuoiNutFooter(); luuVaDongBo(); alert(`Đã đổi mã thành: ${userId}`); }
+            if (maMoi && maMoi.trim() !== "") { 
+                userId = maMoi.trim(); 
+                localStorage.setItem('app_user_id', userId); 
+                capNhatChuoiNutFooter(); 
+                luuVaDongBo(); 
+                alert(`Đã đổi mã thành: ${userId}`); 
+            }
         }
     }
 
-
     function xuatFileExcel() {
-        if(localLogs.length === 0) return alert("Không có dữ liệu!");
+        if (localLogs.length === 0) return alert("Không có dữ liệu!");
         let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Số Công\n";
         localLogs.forEach(i => { csv += `${i.date},${i.gioVao || '--'},${i.gioVe || '--'},${i.công}\n`; });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob); link.download = "Bang_Cong_" + userId + ".csv"; link.click();
+        link.href = URL.createObjectURL(blob); 
+        link.download = "Bang_Cong_" + userId + ".csv"; 
+        link.click();
     }
 
     if ('serviceWorker' in navigator) {
@@ -336,6 +357,3 @@
 </script>
 </body>
 </html>
-
-    
-    
