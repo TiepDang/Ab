@@ -9,7 +9,7 @@
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; margin: 0; padding: 15px; color: #1a1a1a; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 480px; }
-        .card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; }
+        .card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; box-sizing: border-box; }
         .title { font-size: 1.5rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
         .clock { font-size: 2.8rem; font-weight: 800; text-align: center; color: #0f172a; margin: 15px 0; }
         .stats-box { background-color: #edf5ff; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 25px; }
@@ -36,6 +36,18 @@
         .network-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; }
         .online { background: #d1fae5; color: #065f46; }
         .offline { background: #fee2e2; color: #991b1b; }
+
+        /* Sửa lỗi đè chồng bộ lọc bằng cách ép kích thước rộng tự động */
+        .filter-group { display: flex; gap: 12px; margin-bottom: 15px; }
+        .filter-item { flex: 1; min-width: 0; }
+        .filter-item input { margin-bottom: 0; }
+
+        /* Khung cửa sổ Pop-up chọn thông tin để sửa công */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; padding: 15px; box-sizing: border-box; }
+        .modal-content { background: white; padding: 24px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-close { background-color: #94a3b8; flex: 1; }
+        .btn-confirm { background-color: #10b981; flex: 1; }
     </style>
 </head>
 <body>
@@ -76,9 +88,9 @@
     </div>
     <div class="card">
         <div class="title" style="font-size: 1.25rem; text-align: left; margin-bottom: 15px;">Bộ lọc & Bảng công chi tiết</div>
-        <div class="grid-2">
-            <div><label class="label-text">Từ ngày:</label><input type="date" id="filterTuNgay" onchange="hienThiGiaoDien()"></div>
-            <div><label class="label-text">Đến ngày:</label><input type="date" id="filterDenNgay" onchange="hienThiGiaoDien()"></div>
+        <div class="filter-group">
+            <div class="filter-item"><label class="label-text">Từ ngày:</label><input type="date" id="filterTuNgay" onchange="hienThiGiaoDien()"></div>
+            <div class="filter-item"><label class="label-text">Đến ngày:</label><input type="date" id="filterDenNgay" onchange="hienThiGiaoDien()"></div>
         </div>
         <div class="table-container">
             <table>
@@ -90,11 +102,31 @@
         <button class="footer-id-btn" id="btnIdFooter" onclick="kichHoatDoiMa()">Mã của bạn: ...... (Bấm để tải lại hoặc tự đặt mã mới)</button>
     </div>
 </div>
-<script>
+
+<!-- KHUNG CỬA SỔ POP-UP SỬA THÔNG TIN ĐỂ CHỌN CHỨ KHÔNG CẦN GÕ -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="title" style="font-size: 1.2rem; text-align: left;" id="editModalTitle">Sửa công ngày...</div>
+        <label class="label-text">Tính Công:</label>
+        <select id="modalEditCong"><option value="1">1 công</option><option value="0.5">0.5 công</option><option value="0">0 công</option></select>
+        <label class="label-text">Giờ Vào:</label>
+        <input type="time" id="modalEditGioVao">
+        <label class="label-text">Giờ Về:</label>
+        <input type="time" id="modalEditGioVe">
+        <div class="modal-buttons">
+            <button class="btn-close" onclick="dongKhungSua()">Hủy bỏ</button>
+            <button class="btn-confirm" onclick="luuThongTinDaSua()">Lưu lại</button>
+        </div>
+    </div>
+</div>
+
+
+    <script>
     const GOOGLE_FORM_URL = "https://google.com";
     let userId = localStorage.getItem('app_user_id');
     let localLogs = JSON.parse(localStorage.getItem('saved_logs_backup_v2')) || [];
     let pendingSyncQueue = JSON.parse(localStorage.getItem('pending_sync_queue_v2')) || [];
+    let currentEditingDate = ""; // Biến lưu tạm ngày đang sửa
 
     if (!userId) {
         userId = Math.floor(100000 + Math.random() * 900000).toString();
@@ -147,12 +179,11 @@
         }
         filteredLogs.forEach((item) => {
             tongCong += parseFloat(item.công || 0);
-            tbody.innerHTML += `<tr><td>${item.date}</td><td style="color:#10b981">${item.gioVao || '--:--'}</td><td style="color:#ff4b55">${item.gioVe || '--:--'}</td><td style="color:#2563eb">${item.công}</td><td><button class="action-btn btn-edit" onclick="suaGhiNhan('${item.date}')">Sửa</button><button class="action-btn btn-delete" onclick="xoaGhiNhan('${item.date}')">Xóa</button></td></tr>`;
+            tbody.innerHTML += `<tr><td>${item.date}</td><td style="color:#10b981">${item.gioVao || '--:--'}</td><td style="color:#ff4b55">${item.gioVe || '--:--'}</td><td style="color:#2563eb">${item.công}</td><td><button class="action-btn btn-edit" onclick="moKhungSua('${item.date}')">Sửa</button><button class="action-btn btn-delete" onclick="xoaGhiNhan('${item.date}')">Xóa</button></td></tr>`;
         });
         document.getElementById('txtTotalCong').textContent = tongCong.toFixed(1).replace('.0', '');
     }
-
-        function chamCongMee(kieu, giaTriCong) {
+    function chamCongMee(kieu, giaTriCong) {
         const now = new Date();
         const ngayString = now.toLocaleDateString('vi-VN');
         var hh = now.getHours(), mm = now.getMinutes();
@@ -187,20 +218,33 @@
         alert("Đã lưu ngày công bất kỳ thành công!");
     }
 
-    function suaGhiNhan(ngayKhoa) {
+    // TÍNH NĂNG MỚI: Mở khung pop-up chọn thông tin để sửa công
+    function moKhungSua(ngayKhoa) {
+        currentEditingDate = ngayKhoa;
         let index = localLogs.findIndex(l => l.date === ngayKhoa);
         if (index === -1) return;
         let item = localLogs[index];
-        
-        let congMoi = prompt(`Sửa số công cho ngày ${item.date}:`, item.công);
-        let gioVaoMoi = prompt(`Sửa giờ VÀO (hh:mm):`, item.gioVao);
-        let gioVeMoi = prompt(`Sửa giờ VỀ (hh:mm):`, item.gioVe);
-        
-        if (congMoi !== null && gioVaoMoi !== null && gioVeMoi !== null) {
-            localLogs[index].công = congMoi;
-            localLogs[index].gioVao = gioVaoMoi;
-            localLogs[index].gioVe = gioVeMoi;
+
+        document.getElementById('editModalTitle').textContent = `Sửa công ngày ${ngayKhoa}`;
+        document.getElementById('modalEditCong').value = item.công;
+        document.getElementById('modalEditGioVao').value = item.gioVao || "08:00";
+        document.getElementById('modalEditGioVe').value = item.gioVe || "17:00";
+        document.getElementById('editModal').style.display = "flex";
+    }
+
+    function dongKhungSua() {
+        document.getElementById('editModal').style.display = "none";
+    }
+
+    function luuThongTinDaSua() {
+        let index = localLogs.findIndex(l => l.date === currentEditingDate);
+        if (index !== -1) {
+            localLogs[index].công = document.getElementById('modalEditCong').value;
+            localLogs[index].gioVao = document.getElementById('modalEditGioVao').value;
+            localLogs[index].gioVe = document.getElementById('modalEditGioVe').value;
             luuVaDongBo();
+            dongKhungSua();
+            alert("Đã cập nhật thay đổi thành công!");
         }
     }
 
@@ -223,7 +267,7 @@
 
     function xuLyDongBoNgam() {
         if (!navigator.onLine || pendingSyncQueue.length === 0) return;
-        const syncItem = pendingSyncQueue[0];
+        const syncItem = pendingSyncQueue;
         const formData = new FormData();
         formData.append('entry.1000001', syncItem.userId);
         formData.append('entry.1000002', syncItem.data);
@@ -265,4 +309,4 @@
 </body>
 </html>
 
-    
+        
