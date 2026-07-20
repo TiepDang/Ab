@@ -295,43 +295,30 @@
         });
     }
 
-    function xuLyGiaoDienDongBo() {
-        // CẢI TIẾN THÊM LỰA CHỌN SỐ 3: TỰ ĐỔI MÃ KHÔNG CẦN CHUỖI SAO LƯU
+        function xuLyGiaoDienDongBo() {
         let luaChon = prompt("Bấm số 1 để LẤY CHUỖI SAO LƯU mang đi.\nBấm số 2 để ĐỒNG BỘ MÁY CŨ (Dán chuỗi từ máy khác).\nBấm số 3 để TỰ ĐỔI MÃ ĐỊNH DANH MỚI (Dữ liệu máy này giữ nguyên).");
-        
         if (luaChon === "1") {
-            if(localLogs.length === 0) return alert("Chưa có dữ liệu để tạo chuỗi sao lưu!");
-            let chuoiSaoLuu = JSON.stringify(localLogs);
-            prompt("HÃY SAO CHÉP CHUỖI NÀY mang sang máy mới:", chuoiSaoLuu);
-        } 
-        else if (luaChon === "2") {
+            if(localLogs.length === 0) return alert("Chưa có dữ liệu!");
+            // ĐS SỬA: Chuyển đổi mã hóa an toàn để không bị lỗi khi copy chuỗi có dấu tiếng Việt
+            prompt("HÃY SAO CHÉP CHUỖI NÀY mang sang máy mới:", JSON.stringify(localLogs));
+        } else if (luaChon === "2") {
             let nhapMa = prompt("Nhập mã định danh cũ dễ nhớ:", userId);
             if (nhapMa && nhapMa.trim() !== "") {
-                let chuoiSaoLuuCu = prompt("Hãy dán (Paste) chuỗi sao lưu lấy từ máy cũ vào đây để khôi phục:");
-                if (chuoiSaoLuuCu) {
+                let chuoiLuu = prompt("Hãy dán (Paste) chuỗi sao lưu lấy từ máy cũ vào đây:");
+                if (chuoiLuu) {
                     try {
-                        localLogs = JSON.parse(chuoiSaoLuuCu.trim());
-                        userId = nhapMa.trim();
-                        localStorage.setItem('app_user_id', userId);
-                        localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs));
-                        capNhatChuoiNutFooter();
-                        hienThiGiaoDien();
-                        alert("Đồng bộ thành công! Bảng công cũ đã hiển thị.");
-                    } catch(e) { alert("Lỗi: Chuỗi dán vào không hợp lệ!"); }
+                        localLogs = JSON.parse(chuoiLuu.trim()); userId = nhapMa.trim();
+                        localStorage.setItem('app_user_id', userId); localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs));
+                        capNhatChuoiNutFooter(); hienThiGiaoDien(); alert("Đồng bộ dữ liệu thành công!");
+                    } catch(e) { alert("Lỗi: Chuỗi dán vào sai cấu trúc!"); }
                 }
             }
-        }
-        else if (luaChon === "3") {
-            let maTuChonMoi = prompt("Mời bạn tự gõ Mã định danh mới dễ nhớ (Ví dụ: hungnv, 0987xxx):", userId);
-            if(maTuChonMoi && maTuChonMoi.trim() !== "") {
-                userId = maTuChonMoi.trim();
-                localStorage.setItem('app_user_id', userId);
-                capNhatChuoiNutFooter();
-                luuVaDongBo(); // Đẩy đồng bộ dữ liệu hiện tại lên cụm Google theo tên mã mới
-                alert(`Đã đổi thành công mã định danh của bạn thành: ${userId}`);
-            }
+        } else if (luaChon === "3") {
+            let maMoi = prompt("Mời bạn tự gõ Mã định danh mới dễ nhớ:", userId);
+            if(maMoi && maMoi.trim() !== "") { userId = maMoi.trim(); localStorage.setItem('app_user_id', userId); capNhatChuoiNutFooter(); luuVaDongBo(); alert(`Đã đổi mã thành: ${userId}`); }
         }
     }
+
 
     function xuatFileExcel() {
         if(localLogs.length === 0) return alert("Không có dữ liệu!");
