@@ -48,7 +48,7 @@
         .modal-buttons { display: flex; gap: 10px; margin-top: 5px; }
         .btn-close { background-color: #94a3b8; flex: 1; }
         .btn-confirm { background-color: #10b981; flex: 1; }
-        .sync-status { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-style: italic; }
+        .sync-status { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-style: italic; text-align: center; }
     </style>
 </head>
 <body>
@@ -162,8 +162,8 @@
 </div>
 
 <script>
-  // Link Apps Script của bạn
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhz9CAqJPI6A8NO2y3hCEBehKrGifP5K6bSTuq9bhsnNQGRkSL0cEAUoaA3nQQJb4Qeg/exec";
+  // URL Web App Apps Script mới của bạn
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxt6daMxIwAdXyFFzznpJRtI6zc2pFh3BU_-A8LkhSHGIVWgb2tq_DQ77-dyuGXuEY0FQ/exec";
 
   // Biến toàn cục
   let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
@@ -240,7 +240,7 @@
   function saveAndSync() {
     localStorage.setItem('my_attendance_data', JSON.stringify(records));
     renderTable();
-    syncToGoogleSheet(); // Đồng bộ lên Google Sheet mỗi khi sửa đổi
+    syncToGoogleSheet();
   }
 
   function updateClock() {
@@ -382,7 +382,6 @@
       localStorage.setItem('my_user_code', userCode);
       document.getElementById('displayUserCode').innerText = userCode;
       closeModal('codeModal');
-      // Tải lại dữ liệu tương ứng mã mới
       loadFromGoogleSheet();
     }
   }
