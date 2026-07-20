@@ -201,6 +201,153 @@
         document.getElementById('txtTotalCong').textContent = tongCong.toFixed(1).replace('.0', '');
     }
 
+    function chamCongMee(kieu, giaTriCong) {
+        const now = new Date();
+        const ngayString = dinhDangNgayCoThu(now);
+        var hh = now.getHours(), mm = now.getMinutes();
+        if(hh < 10) hh = "0" + hh; if(mm < 10) mm = "0" + mm;
+        const gioString = hh + ":" + mm;
+        let trungNgayIndex = localLogs.findIndex(l => l.date === ngayString);
+        
+        if (trungNgayIndex !== -1) {
+            if (kieu === 'Vào') localLogs[trungNgayIndex].gioVao = gioString;
+            else localLogs[trungNgayIndex].gioVe = gioString;
+            localLogs[trungNgayIndex].công = giaTriCong;
+        } else {
+            localLogs.unshift({ date: ngayString, gioVao: kieu === 'Vào' ? gioString : '', gioVe: kieu === 'Về' ? gioString : '', công: giaTriCong });
+        }
+        luuVaDongBo();
+        alert("Đã ghi nhận thành công giờ " + kieu + "!");
+    }
+
+    function chamCongNgayBatKyMee() {
+        const ngayInput = document.getElementById('txtBatKyNgay').value;
+        if (!ngayInput) return alert("Vui lòng chọn ngày hợp lệ!");
+        
+        const ngayChon = new Date(ngayInput + "T00:00:00");
+        const ngayFormat = dinhDangNgayCoThu(ngayChon);
+        let trungNgayIndex = localLogs.findIndex(l => l.date === ngayFormat);
+
+        if(trungNgayIndex !== -1) {
+            if(!confirm("Ngày " + ngayFormat + " đã có dữ liệu. Ghi đè không?")) return;
+            localLogs[trungNgayIndex] = { date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value };
+        } else {
+            localLogs.unshift({ date: ngayFormat, gioVao: document.getElementById('txtBatKyGioVao').value, gioVe: document.getElementById('txtBatKyGioVe').value, công: document.getElementById('selBatKyCong').value });
+        }
+        luuVaDongBo();
+        alert("Đã lưu ngày công bất kỳ thành công!");
+    }
+
+    function moKhungSua(ngayKhoa) {
+        currentEditingDate = ngayKhoa;
+        let index = localLogs.findIndex(l => l.date === ngayKhoa);
+        if (index === -1) return;
+        let item = localLogs[index];
+
+        document.getElementById('editModalTitle').textContent = "Sửa công: " + ngayKhoa;
+        document.getElementById('modalEditCong').value = item.công;
+        document.getElementById('modalEditGioVao').value = item.gioVao || "08:00";
+        document.getElementById('modalEditGioVe').value = item.gioVe || "17:00";
+        document.getElementById('editModal').style.display = "flex";
+    }
+
+    function dongKhungSua() { document.getElementById('editModal').style.display = "none"; }
+
+    function luuThongTinDaSua() {
+        let index = localLogs.findIndex(l => l.date === currentEditingDate);
+        if (index !== -1) {
+            localLogs[index].công = document.getElementById('modalEditCong').value;
+            localLogs[index].gioVao = document.getElementById('modalEditGioVao').value;
+            localLogs[index].gioVe = document.getElementById('modalEditGioVe').value;
+            luuVaDongBo();
+            dongKhungSua();
+            alert("Đã cập nhật thay đổi thành công!");
+        }
+    }
+
+    function xoaGhiNhan(ngayKhoa) {
+        let index = localLogs.findIndex(l => l.date === ngayKhoa);
+        if (index === -1) return;
+        if (confirm("Bạn có chắc chắn muốn xóa bản ghi ngày " + ngayKhoa + " không?")) {
+            localLogs.splice(index, 1);
+            luuVaDongBo();
+        }
+    }
+
+    function luuVaDongBo() {
+        localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs));
+        hienThiGiaoDien();
+        pendingSyncQueue = [{ userId: userId, data: JSON.stringify(localLogs) }];
+        localStorage.setItem('pending_sync_queue_v2', JSON.stringify(pendingSyncQueue));
+        xuLyDongBoNgam();
+    }
+
+    function xuLyDongBoNgam() {
+        if (!navigator.onLine || pendingSyncQueue.length === 0) return;
+        const syncItem = pendingSyncQueue;
+        const formData = new FormData();
+        formData.append('entry.1000001', syncItem.userId);
+        formData.append('entry.1000002', syncItem.data);
+        fetch(GOOGLE_FORM_URL, { method: 'POST', body: formData, mode: 'no-cors' }).then(function() {
+            pendingSyncQueue.shift();
+            localStorage.setItem('pending_sync_queue_v2', JSON.stringify(pendingSyncQueue));
+        });
+    }
+
+    function xuLyGiaoDienDongBo() {
+        // CẢI TIẾN THÊM LỰA CHỌN SỐ 3: TỰ ĐỔI MÃ KHÔNG CẦN CHUỖI SAO LƯU
+        let luaChon = prompt("Bấm số 1 để LẤY CHUỖI SAO LƯU mang đi.\nBấm số 2 để ĐỒNG BỘ MÁY CŨ (Dán chuỗi từ máy khác).\nBấm số 3 để TỰ ĐỔI MÃ ĐỊNH DANH MỚI (Dữ liệu máy này giữ nguyên).");
+        
+        if (luaChon === "1") {
+            if(localLogs.length === 0) return alert("Chưa có dữ liệu để tạo chuỗi sao lưu!");
+            let chuoiSaoLuu = JSON.stringify(localLogs);
+            prompt("HÃY SAO CHÉP CHUỖI NÀY mang sang máy mới:", chuoiSaoLuu);
+        } 
+        else if (luaChon === "2") {
+            let nhapMa = prompt("Nhập mã định danh cũ dễ nhớ:", userId);
+            if (nhapMa && nhapMa.trim() !== "") {
+                let chuoiSaoLuuCu = prompt("Hãy dán (Paste) chuỗi sao lưu lấy từ máy cũ vào đây để khôi phục:");
+                if (chuoiSaoLuuCu) {
+                    try {
+                        localLogs = JSON.parse(chuoiSaoLuuCu.trim());
+                        userId = nhapMa.trim();
+                        localStorage.setItem('app_user_id', userId);
+                        localStorage.setItem('saved_logs_backup_v2', JSON.stringify(localLogs));
+                        capNhatChuoiNutFooter();
+                        hienThiGiaoDien();
+                        alert("Đồng bộ thành công! Bảng công cũ đã hiển thị.");
+                    } catch(e) { alert("Lỗi: Chuỗi dán vào không hợp lệ!"); }
+                }
+            }
+        }
+        else if (luaChon === "3") {
+            let maTuChonMoi = prompt("Mời bạn tự gõ Mã định danh mới dễ nhớ (Ví dụ: hungnv, 0987xxx):", userId);
+            if(maTuChonMoi && maTuChonMoi.trim() !== "") {
+                userId = maTuChonMoi.trim();
+                localStorage.setItem('app_user_id', userId);
+                capNhatChuoiNutFooter();
+                luuVaDongBo(); // Đẩy đồng bộ dữ liệu hiện tại lên cụm Google theo tên mã mới
+                alert(`Đã đổi thành công mã định danh của bạn thành: ${userId}`);
+            }
+        }
+    }
+
+    function xuatFileExcel() {
+        if(localLogs.length === 0) return alert("Không có dữ liệu!");
+        let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Số Công\n";
+        localLogs.forEach(i => { csv += `${i.date},${i.gioVao || '--'},${i.gioVe || '--'},${i.công}\n`; });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob); link.download = "Bang_Cong_" + userId + ".csv"; link.click();
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+    }
+    hienThiGiaoDien();
+</script>
+</body>
+</html>
 
     
     
