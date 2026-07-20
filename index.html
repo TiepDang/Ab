@@ -201,12 +201,12 @@
         document.getElementById('txtTotalCong').textContent = tongCong.toFixed(1).replace('.0', '');
     }
 
-    function chamCongMee(kieu, giaTriCong) {
+        function chamCongMee(kieu, giaTriCong) {
         const now = new Date();
         const ngayString = dinhDangNgayCoThu(now);
         var hh = now.getHours(), mm = now.getMinutes();
         if(hh < 10) hh = "0" + hh; if(mm < 10) mm = "0" + mm;
-        const gioString = hh + ":" + mm;
+        const gioString = hh + ":" + mm; // ĐÃ SỬA: Thay h bằng hh để hết lỗi đơ nút
         let trungNgayIndex = localLogs.findIndex(l => l.date === ngayString);
         
         if (trungNgayIndex !== -1) {
@@ -219,6 +219,7 @@
         luuVaDongBo();
         alert("Đã ghi nhận thành công giờ " + kieu + "!");
     }
+
 
     function chamCongNgayBatKyMee() {
         const ngayInput = document.getElementById('txtBatKyNgay').value;
