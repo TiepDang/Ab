@@ -18,7 +18,6 @@
         .stats-count { font-size: 1.6rem; font-weight: 800; color: #2563eb; }
         .label-text { font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; text-align: left; display: block; }
         
-        /* Cấu hình tối ưu cho các ô nhập liệu tránh tràn viền */
         select, input { 
             width: 100%; 
             min-width: 0; 
@@ -44,7 +43,6 @@
         .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 5px; }
         .btn-excel { background-color: #0084ff; width: 100%; margin-top: 5px; font-size: 0.95rem; padding: 14px;}
         
-        /* Sửa lỗi Grid đè lên nhau trên iOS */
         .grid-2 { 
             display: grid; 
             grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -153,7 +151,7 @@
           </table>
         </div>
 
-        <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV)</button>
+        <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV có Tổng Công)</button>
         <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">......</span> (Bấm để tải lại hoặc tự đặt mã mới)</button>
         <div class="sync-status" id="syncStatus">Trạng thái Google Sheets: Sẵn sàng</div>
     </div>
@@ -447,19 +445,41 @@
     document.getElementById(modalId).style.display = 'none';
   }
 
+  // XUẤT FILE CSV CÓ TỔNG CÔNG (THEO BỘ LỌC HOẶC TẤT CẢ)
   function exportToCSV() {
+    const from = document.getElementById('filterFrom').value;
+    const to = document.getElementById('filterTo').value;
+
     let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Công\n";
     const sortedDates = Object.keys(records).sort();
 
+    let tongCongXuat = 0;
+
     sortedDates.forEach(date => {
+      // Nếu có chọn bộ lọc thì chỉ xuất các ngày trong khoảng
+      if (from && date < from) return;
+      if (to && date > to) return;
+
       const item = records[date];
-      csv += `"${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${item.workType || 0}"\n`;
+      const congVal = parseFloat(item.workType || 0);
+      tongCongXuat += congVal;
+
+      csv += `"${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}"\n`;
     });
+
+    // Thêm dòng TỔNG CÔNG ở cuối cùng của file CSV
+    csv += `"TỔNG CÔNG","","","${tongCongXuat}"\n`;
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", `Bang_Cong_${getTodayStr()}.csv`);
+    
+    let fileName = `Bang_Cong_${getTodayStr()}.csv`;
+    if (from || to) {
+      fileName = `Bang_Cong_Tu_${from || 'dau'}_den_${to || 'nay'}.csv`;
+    }
+
+    link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
