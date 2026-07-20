@@ -120,8 +120,8 @@
 </div>
 
 <script>
-    // ĐÃ CẬP NHẬT: URL Apps Script Google Sheet của bạn
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbxqsfht55yuqlEbQxCunbQHrsSzigV7whwHIjaDNguI089mIlk-J0OgcQQEXryJw0k6Cg/exec";
+    // Đã cập nhật URL Google Apps Script mới nhất của bạn
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzXPDT2UzkX0EyQChB1Rod3u9tprrAKcAQVugGx36M4U-GlljkdOdf5hFTjP2U26N38-A/exec";
     
     let userId = localStorage.getItem('app_user_id');
     let localLogs = JSON.parse(localStorage.getItem('saved_logs_backup_v2')) || [];
@@ -290,19 +290,22 @@
         xuLyDongBoNgam();
     }
 
-    // ĐÃ CẬP NHẬT: Gửi trực tiếp dữ liệu JSON sang Google Sheet
     function xuLyDongBoNgam() {
         if (!navigator.onLine || pendingSyncQueue.length === 0) return;
         const syncItem = pendingSyncQueue[0];
         
+        const formData = new FormData();
+        formData.append('userId', syncItem.userId);
+        formData.append('data', syncItem.data);
+
         fetch(GOOGLE_SHEET_URL, { 
             method: 'POST', 
             mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(syncItem) 
+            body: formData
         }).then(function() {
             pendingSyncQueue.shift();
             localStorage.setItem('pending_sync_queue_v2', JSON.stringify(pendingSyncQueue));
+            console.log("Đồng bộ Google Sheet thành công!");
         }).catch(err => console.log("Lỗi đồng bộ ngầm:", err));
     }
 
