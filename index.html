@@ -36,13 +36,18 @@
         }
 
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
-        button { border: none; padding: 16px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        button { border: none; padding: 16px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
         button:active { transform: scale(0.98); opacity: 0.9; }
         .btn-in { background-color: #10b981; }
         .btn-out { background-color: #ff4b55; }
         .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 5px; }
         .btn-excel { background-color: #0084ff; width: 100%; margin-top: 5px; font-size: 0.95rem; padding: 14px;}
         
+        /* Fast filter buttons */
+        .quick-filter-row { display: flex; gap: 6px; margin-bottom: 12px; }
+        .btn-quick { padding: 8px; font-size: 0.75rem; background-color: #e2e8f0; color: #334155; border-radius: 8px; flex: 1; text-align: center; font-weight: 700; }
+        .btn-quick:active { background-color: #cbd5e1; }
+
         .grid-2 { 
             display: grid; 
             grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -123,6 +128,14 @@
     <!-- CARD 3: Bộ lọc & Bảng công chi tiết -->
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
+        
+        <!-- Nút lọc nhanh -->
+        <div class="quick-filter-row">
+            <button class="btn-quick" onclick="setQuickFilter('thisMonth')">Tháng này</button>
+            <button class="btn-quick" onclick="setQuickFilter('lastMonth')">Tháng trước</button>
+            <button class="btn-quick" onclick="setQuickFilter('all')">Tất cả</button>
+        </div>
+
         <div class="grid-2">
             <div><label class="label-text">Từ ngày:</label><input type="date" id="filterFrom" onchange="renderTable()"></div>
             <div><label class="label-text">Đến ngày:</label><input type="date" id="filterTo" onchange="renderTable()"></div>
@@ -218,16 +231,32 @@
     updateClock();
     setInterval(updateClock, 1000);
     
-    window.addEventListener('online', updateNetworkStatus);
+    // Tự động kiểm tra mạng & đẩy dữ liệu lên Google Sheets khi vừa Online lại
+    window.addEventListener('online', () => {
+      updateNetworkStatus();
+      syncToGoogleSheet();
+    });
     window.addEventListener('offline', updateNetworkStatus);
     updateNetworkStatus();
 
     renderTable();
     loadFromGoogleSheet();
+
+    // Đóng Modal khi chạm ngoài khung
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
+    };
   });
 
   async function syncToGoogleSheet() {
     const statusText = document.getElementById('syncStatus');
+    if (!navigator.onLine) {
+      statusText.innerText = "Trạng thái Google Sheets: Đang ngoại tuyến (Đã lưu máy)";
+      return;
+    }
+
     statusText.innerText = "Trạng thái Google Sheets: Đang đồng bộ...";
 
     try {
@@ -250,12 +279,17 @@
       }
     } catch (err) {
       console.error(err);
-      statusText.innerText = "Trạng thái Google Sheets: Lỗi kết nối";
+      statusText.innerText = "Trạng thái Google Sheets: Lỗi kết nối (Đã lưu máy)";
     }
   }
 
   async function loadFromGoogleSheet() {
     const statusText = document.getElementById('syncStatus');
+    if (!navigator.onLine) {
+      statusText.innerText = "Trạng thái Google Sheets: Đang ngoại tuyến (Chế độ lưu máy)";
+      return;
+    }
+
     statusText.innerText = "Trạng thái Google Sheets: Đang tải dữ liệu...";
 
     try {
@@ -338,6 +372,29 @@
     records[date] = { checkIn, checkOut, workType };
     saveAndSync();
     alert(`Đã lưu công ngày ${formatDateVi(date)}!`);
+  }
+
+  function setQuickFilter(mode) {
+    const now = new Date();
+    const y = now.getFullYear();
+    
+    if (mode === 'thisMonth') {
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+      document.getElementById('filterFrom').value = `${y}-${m}-01`;
+      document.getElementById('filterTo').value = `${y}-${m}-${String(lastDay).padStart(2, '0')}`;
+    } else if (mode === 'lastMonth') {
+      const prevMonthDate = new Date(y, now.getMonth() - 1, 1);
+      const prevY = prevMonthDate.getFullYear();
+      const prevM = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+      const lastDay = new Date(prevY, prevMonthDate.getMonth() + 1, 0).getDate();
+      document.getElementById('filterFrom').value = `${prevY}-${prevM}-01`;
+      document.getElementById('filterTo').value = `${prevY}-${prevM}-${String(lastDay).padStart(2, '0')}`;
+    } else if (mode === 'all') {
+      document.getElementById('filterFrom').value = '';
+      document.getElementById('filterTo').value = '';
+    }
+    renderTable();
   }
 
   function renderTable() {
@@ -445,7 +502,6 @@
     document.getElementById(modalId).style.display = 'none';
   }
 
-  // XUẤT FILE CSV CÓ TỔNG CÔNG (THEO BỘ LỌC HOẶC TẤT CẢ)
   function exportToCSV() {
     const from = document.getElementById('filterFrom').value;
     const to = document.getElementById('filterTo').value;
@@ -456,7 +512,6 @@
     let tongCongXuat = 0;
 
     sortedDates.forEach(date => {
-      // Nếu có chọn bộ lọc thì chỉ xuất các ngày trong khoảng
       if (from && date < from) return;
       if (to && date > to) return;
 
@@ -467,7 +522,6 @@
       csv += `"${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}"\n`;
     });
 
-    // Thêm dòng TỔNG CÔNG ở cuối cùng của file CSV
     csv += `"TỔNG CÔNG","","","${tongCongXuat}"\n`;
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
