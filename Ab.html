@@ -1,376 +1,644 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hệ Thống Chấm Công Nhân Viên</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      background-color: #f4f6f9;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .card {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-    .table th {
-      background-color: #0d6efd;
-      color: white;
-      text-align: center;
-      vertical-align: middle;
-    }
-    .table td {
-      vertical-align: middle;
-    }
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chấm Công Cá Nhân</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; padding: 12px; color: #1a1a1a; }
+        .container { width: 100%; max-width: 560px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; width: 100%; overflow: hidden; }
+        .title { font-size: 1.3rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
+        .clock { font-size: 2.4rem; font-weight: 800; text-align: center; color: #0f172a; margin: 10px 0; }
+        .stats-box { background-color: #edf5ff; border-radius: 12px; padding: 12px; text-align: center; margin-bottom: 16px; }
+        .stats-title { font-size: 0.8rem; font-weight: 700; color: #2563eb; margin-bottom: 4px; }
+        .stats-count { font-size: 1.6rem; font-weight: 800; color: #2563eb; }
+        .label-text { font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; text-align: left; display: block; }
+        
+        select, input { 
+            width: 100%; 
+            min-width: 0; 
+            max-width: 100%;
+            padding: 10px 8px; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            background-color: #f8fafc; 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: #334155; 
+            margin-bottom: 14px; 
+            outline: none; 
+            display: block; 
+            -webkit-appearance: none;
+        }
+
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
+        button { border: none; padding: 16px; border-radius: 12px; color: white; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+        button:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-in { background-color: #10b981; }
+        .btn-out { background-color: #ff4b55; }
+        .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 5px; }
+        .btn-excel { background-color: #0084ff; width: 100%; margin-top: 5px; font-size: 0.95rem; padding: 14px;}
+        .btn-log { background-color: #64748b; width: 100%; margin-top: 8px; font-size: 0.85rem; padding: 12px; }
+        
+        .quick-filter-row { display: flex; gap: 6px; margin-bottom: 12px; }
+        .btn-quick { padding: 8px; font-size: 0.75rem; background-color: #e2e8f0; color: #334155; border-radius: 8px; flex: 1; text-align: center; font-weight: 700; }
+        .btn-quick:active { background-color: #cbd5e1; }
+
+        .grid-2 { 
+            display: grid; 
+            grid-template-columns: repeat(2, minmax(0, 1fr)); 
+            gap: 10px; 
+            width: 100%; 
+        }
+        .grid-2 > div { min-width: 0; }
+        .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 12px; }
+
+        .footer-id-btn { background-color: #475569; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
+        .table-container { overflow-x: auto; margin-top: 10px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 520px; table-layout: fixed; }
+        th, td { padding: 10px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        th { color: #64748b; background: #f8fafc; font-weight: 700; }
+        
+        th:nth-child(1), td:nth-child(1) { width: 40px; color: #64748b; font-weight: 700; } /* STT */
+        th:nth-child(2), td:nth-child(2) { width: 110px; text-align: left; padding-left: 4px; font-weight: 700; color: #334155; } /* Index Key */
+        th:nth-child(3), td:nth-child(3) { width: 105px; text-align: left; } /* Ngày */
+        th:nth-child(4), td:nth-child(4) { width: 50px; } /* Vào */
+        th:nth-child(5), td:nth-child(5) { width: 50px; } /* Về */
+        th:nth-child(6), td:nth-child(6) { width: 45px; } /* Công */
+        th:nth-child(7), td:nth-child(7) { width: 105px; } /* Hành động */
+
+        .action-btn { padding: 5px 8px; font-size: 0.72rem; border-radius: 6px; margin: 0 1px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
+        .btn-edit { background-color: #ff9800; color: white; }
+        .btn-delete { background-color: #e53935; color: white; }
+        .network-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; }
+        .online { background: #d1fae5; color: #065f46; }
+        .offline { background: #fee2e2; color: #991b1b; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; padding: 15px; }
+        .modal-content { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 5px; }
+        .btn-close { background-color: #94a3b8; flex: 1; }
+        .btn-confirm { background-color: #10b981; flex: 1; }
+        .sync-status { font-size: 0.75rem; color: #64748b; margin-top: 4px; font-style: italic; text-align: center; }
+
+        .filter-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .filter-summary-title { font-size: 0.85rem; font-weight: 700; color: #166534; }
+        .filter-summary-value { font-size: 1.1rem; font-weight: 800; color: #15803d; }
+    </style>
 </head>
 <body>
+<div class="container">
+    <!-- CARD 1: Hôm nay -->
+    <div class="card">
+        <div id="networkStatus" class="network-badge online">Đang trực tuyến</div>
+        <div class="title">Chấm Công Cá Nhân</div>
+        <div class="clock" id="liveClock">00:00:00</div>
+        <div class="stats-box">
+            <div class="stats-title">Tổng công tích lũy (Tất cả)</div>
+            <div class="stats-count"><span id="txtTotalCong">0</span> công</div>
+        </div>
+        <label class="label-text">Chọn loại công hôm nay:</label>
+        <select id="selCongHomNay">
+            <option value="1">1 công (Ngày làm đủ)</option>
+            <option value="0.5">0.5 công (Nửa ngày)</option>
+            <option value="0">0 công (Nghỉ lễ/Phép)</option>
+        </select>
+        <div class="btn-row">
+            <button class="btn-in" onclick="chamCongMee('Vào', document.getElementById('selCongHomNay').value)">Vào Làm (Hôm Nay)</button>
+            <button class="btn-out" onclick="chamCongMee('Về', document.getElementById('selCongHomNay').value)">Tan Làm (Hôm Nay)</button>
+        </div>
+    </div>
+    
+    <!-- CARD 2: Chấm công ngày bất kỳ -->
+    <div class="card">
+        <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Chấm công ngày bất kỳ</div>
+        <div class="grid-2">
+            <div><label class="label-text">Chọn Ngày:</label><input type="date" id="txtBatKyNgay"></div>
+            <div>
+                <label class="label-text">Tính Công:</label>
+                <select id="selBatKyCong"><option value="1">1 công</option><option value="0.5">0.5 công</option><option value="0">0 công</option></select>
+            </div>
+        </div>
+        <div class="grid-2">
+            <div><label class="label-text">Giờ Vào:</label><input type="time" id="txtBatKyGioVao" value="08:00"></div>
+            <div><label class="label-text">Giờ Về:</label><input type="time" id="txtBatKyGioVe" value="17:00"></div>
+        </div>
+        <button class="btn-save" onclick="chamCongNgayBatKyMee()">Lưu Ngày Đã Chọn</button>
+    </div>
 
-  <!-- Loading Overlay -->
-  <div id="loading" class="loading-overlay d-none">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-      <span class="visually-hidden">Đang tải...</span>
+    <!-- CARD 3: Bộ lọc & Bảng công chi tiết -->
+    <div class="card">
+        <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
+        
+        <div class="quick-filter-row">
+            <button class="btn-quick" onclick="setQuickFilter('thisMonth')">Tháng này</button>
+            <button class="btn-quick" onclick="setQuickFilter('lastMonth')">Tháng trước</button>
+            <button class="btn-quick" onclick="setQuickFilter('all')">Tất cả</button>
+        </div>
+
+        <div class="grid-2">
+            <div><label class="label-text">Từ ngày:</label><input type="date" id="filterFrom" onchange="renderTable()"></div>
+            <div><label class="label-text">Đến ngày:</label><input type="date" id="filterTo" onchange="renderTable()"></div>
+        </div>
+
+        <div class="filter-summary">
+            <span class="filter-summary-title" id="filterSummaryTitle">Tổng công hiển thị:</span>
+            <span class="filter-summary-value"><span id="txtFilterCong">0</span> công</span>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>STT</th>
+                <th>Index Key</th>
+                <th>Ngày</th>
+                <th>Vào</th>
+                <th>Về</th>
+                <th>Công</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTable">
+              <!-- Render động -->
+            </tbody>
+          </table>
+        </div>
+
+        <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV có Index/STT)</button>
+        <button class="btn-log" onclick="viewHistoryLogs()">📜 Xem Lịch Sử Chỉnh Sửa</button>
+        <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">......</span> (Bấm để đổi mã)</button>
+        <div class="sync-status" id="syncStatus">Trạng thái Google Sheets: Sẵn sàng</div>
+    </div>
+</div>
+
+<!-- Modal Sửa Công -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Sửa công ngày <span id="editDateLabel"></span></div>
+    <input type="hidden" id="editDateKey">
+    
+    <label class="label-text">Tính Công:</label>
+    <select id="editWorkType">
+      <option value="1">1 công</option>
+      <option value="0.5">0.5 công</option>
+      <option value="0">0 công</option>
+    </select>
+
+    <div class="grid-2">
+      <div><label class="label-text">Giờ Vào:</label><input type="time" id="editCheckIn"></div>
+      <div><label class="label-text">Giờ Về:</label><input type="time" id="editCheckOut"></div>
+    </div>
+
+    <div class="modal-buttons">
+      <button class="btn-close" onclick="closeModal('editModal')">Hủy</button>
+      <button class="btn-confirm" onclick="saveEdit()">Lưu</button>
     </div>
   </div>
+</div>
 
-  <div class="container py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="text-primary fw-bold"><i class="fa-solid fa-calendar-check me-2"></i>Chấm Công Nhân Viên</h2>
-      <button class="btn btn-outline-info" onclick="openLogsModal()">
-        <i class="fa-solid fa-history me-1"></i> Xem Lịch Sử Log
-      </button>
-    </div>
-
-    <!-- Thanh Tìm Kiếm / Chọn Nhân Viên & Tháng -->
-    <div class="card p-3 mb-4">
-      <div class="row g-3 align-items-center">
-        <div class="col-md-4">
-          <label for="userCode" class="form-label fw-bold">Mã Nhân Viên (UserCode)</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-            <input type="text" id="userCode" class="form-control" placeholder="VD: NV001" value="NV001">
-          </div>
-        </div>
-        <div class="col-md-4">
-          <label for="monthPicker" class="form-label fw-bold">Chọn Tháng</label>
-          <input type="month" id="monthPicker" class="form-control">
-        </div>
-        <div class="col-md-4 d-flex align-items-end">
-          <button class="btn btn-primary w-100 me-2" onclick="loadAttendanceData()">
-            <i class="fa-solid fa-magnifying-glass me-1"></i> Lấy Dữ Liệu
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bảng Dữ Liệu Chấm Công -->
-    <div class="card p-3 mb-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="card-title mb-0 fw-bold text-secondary">Chi Tiết Bảng Công</h5>
-        <button class="btn btn-success" onclick="saveAttendanceData()">
-          <i class="fa-solid fa-floppy-disk me-1"></i> Lưu Thay Đổi
-        </button>
-      </div>
-
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead>
-            <tr>
-              <th style="width: 120px;">Ngày</th>
-              <th style="width: 100px;">Thứ</th>
-              <th style="width: 150px;">Giờ Vào</th>
-              <th style="width: 150px;">Giờ Ra</th>
-              <th>Loại Công</th>
-              <th style="width: 80px;">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody id="attendanceTableBody">
-            <tr>
-              <td colspan="6" class="text-center text-muted">Vui lòng nhập Mã Nhân Viên và bấm "Lấy Dữ Liệu"</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<!-- Modal Đổi Mã Sync -->
+<div id="codeModal" class="modal">
+  <div class="modal-content">
+    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Đổi Mã Đồng Bộ</div>
+    <label class="label-text">Nhập mã mới của bạn:</label>
+    <input type="text" id="newCodeInput" placeholder="Ví dụ: 121221">
+    
+    <div class="modal-buttons">
+      <button class="btn-close" onclick="closeModal('codeModal')">Hủy</button>
+      <button class="btn-confirm" onclick="confirmChangeCode()">Đồng ý</button>
     </div>
   </div>
+</div>
 
-  <!-- Modal Lịch Sử Logs -->
-  <div class="modal fade" id="logsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header bg-info text-white">
-          <h5 class="modal-title"><i class="fa-solid fa-clock-rotate-left me-2"></i>Lịch Sử Chỉnh Sửa Log</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th style="width: 160px;">Thời Gian</th>
-                  <th style="width: 100px;">Hành Động</th>
-                  <th>Chi Tiết</th>
-                </tr>
-              </thead>
-              <tbody id="logsTableBody">
-                <tr>
-                  <td colspan="3" class="text-center text-muted">Đang tải lịch sử...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+<!-- Modal Lịch Sử Chỉnh Sửa -->
+<div id="historyModal" class="modal">
+  <div class="modal-content" style="max-width: 460px;">
+    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Lịch Sử Chỉnh Sửa</div>
+    <div class="table-container" style="max-height: 280px; overflow-y: auto;">
+      <table style="min-width: 380px;">
+        <thead>
+          <tr>
+            <th style="width: 110px;">Thời Gian</th>
+            <th style="width: 75px;">Thao Tác</th>
+            <th style="text-align: left; padding-left: 6px;">Chi Tiết</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <!-- Render lịch sử -->
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-buttons" style="margin-top: 15px;">
+      <button class="btn-close" onclick="closeModal('historyModal')">Đóng</button>
     </div>
   </div>
+</div>
 
-  <!-- Bootstrap 5 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysuifR5ojnay1RCZG7whsbZ3Y3274ZnEbeMf1E0-9tES1l3mRQ4fhV8wKPbEI9LcuN/exec";
 
-  <script>
-    // URL Apps Script Web App mới của bạn
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQv9yRfeSqnYl6TS2Dnbkmsf-pmt-KpscjBSlfhw_1tOxhTj180XFfVtJkhLNSl1yM/exec";
+  let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
+  
+  let userCode = localStorage.getItem('my_user_code');
+  if (!userCode) {
+    let inputCode = prompt("Vui lòng nhập Mã đồng bộ cá nhân của bạn (ví dụ: SĐT hoặc mã 6 số):");
+    userCode = (inputCode && inputCode.trim() !== '') 
+      ? inputCode.trim() 
+      : Math.floor(100000 + Math.random() * 900000).toString();
 
-    let currentRecords = {};
+    localStorage.setItem('my_user_code', userCode);
+  }
 
-    // Khởi tạo tháng hiện tại
-    document.addEventListener("DOMContentLoaded", () => {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      document.getElementById("monthPicker").value = `${yyyy}-${mm}`;
-      
-      // Load dữ liệu mặc định
-      loadAttendanceData();
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('displayUserCode').innerText = userCode;
+    document.getElementById('txtBatKyNgay').value = getTodayStr();
+    
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    window.addEventListener('online', () => {
+      updateNetworkStatus();
+      syncToGoogleSheet();
+    });
+    window.addEventListener('offline', updateNetworkStatus);
+    updateNetworkStatus();
+
+    renderTable();
+    loadFromGoogleSheet();
+
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
+    };
+  });
+
+  async function syncToGoogleSheet(deletedDate = null) {
+    const statusText = document.getElementById('syncStatus');
+    if (!navigator.onLine) {
+      statusText.innerText = "Trạng thái Google Sheets: Đang ngoại tuyến (Đã lưu máy)";
+      return;
+    }
+
+    statusText.innerText = "Trạng thái Google Sheets: Đang đồng bộ...";
+
+    const payload = {
+      userCode: userCode,
+      records: records
+    };
+
+    if (deletedDate) {
+      payload.deletedDate = deletedDate;
+    }
+
+    try {
+      let response = await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      let result = await response.json();
+      if (result.status === "success") {
+        statusText.innerText = "Trạng thái Google Sheets: Đã đồng bộ xong ✓";
+      } else {
+        statusText.innerText = "Trạng thái Google Sheets: " + (result.message || "Lỗi đồng bộ");
+      }
+    } catch (err) {
+      console.error(err);
+      statusText.innerText = "Trạng thái Google Sheets: Lỗi kết nối (Đã lưu máy)";
+    }
+  }
+
+  async function loadFromGoogleSheet() {
+    const statusText = document.getElementById('syncStatus');
+    if (!navigator.onLine) {
+      statusText.innerText = "Trạng thái Google Sheets: Đang ngoại tuyến (Chế độ lưu máy)";
+      return;
+    }
+
+    statusText.innerText = "Trạng thái Google Sheets: Đang tải dữ liệu...";
+
+    try {
+      let response = await fetch(`${SCRIPT_URL}?userCode=${userCode}`);
+      let resData = await response.json();
+
+      if (resData && typeof resData === 'object' && resData.status !== "error") {
+        let loadedRecords = {};
+
+        if (resData.records && typeof resData.records === 'object') {
+          loadedRecords = resData.records;
+        } else if (Array.isArray(resData.data)) {
+          resData.data.forEach(item => {
+            if (item.date) {
+              loadedRecords[item.date] = {
+                checkIn: item.checkIn || '',
+                checkOut: item.checkOut || '',
+                workType: item.workType !== undefined ? String(item.workType) : '1'
+              };
+            }
+          });
+        }
+
+        records = loadedRecords;
+        localStorage.setItem('my_attendance_data', JSON.stringify(records));
+        renderTable();
+        statusText.innerText = "Trạng thái Google Sheets: Đã cập nhật từ Cloud ✓";
+      } else {
+        statusText.innerText = "Trạng thái Google Sheets: " + (resData.message || "Chưa có dữ liệu trên Cloud");
+      }
+    } catch (err) {
+      console.error(err);
+      statusText.innerText = "Trạng thái Google Sheets: Không thể tải từ Cloud";
+    }
+  }
+
+  function saveAndSync(deletedDate = null) {
+    localStorage.setItem('my_attendance_data', JSON.stringify(records));
+    renderTable();
+    syncToGoogleSheet(deletedDate);
+  }
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('liveClock').innerText = now.toTimeString().split(' ')[0];
+  }
+
+  function updateNetworkStatus() {
+    const badge = document.getElementById('networkStatus');
+    if (navigator.onLine) {
+      badge.className = 'network-badge online';
+      badge.innerText = 'Đang trực tuyến';
+    } else {
+      badge.className = 'network-badge offline';
+      badge.innerText = 'Đang ngoại tuyến (Offline)';
+    }
+  }
+
+  function getTodayStr() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function chamCongMee(type, workType) {
+    const today = getTodayStr();
+    const timeNow = new Date().toTimeString().substring(0, 5);
+
+    if (!records[today]) {
+      records[today] = { checkIn: '', checkOut: '', workType: workType };
+    }
+
+    if (type === 'Vào') {
+      records[today].checkIn = timeNow;
+      records[today].workType = workType;
+      alert(`Đã ghi nhận VÀO LÀM lúc ${timeNow}`);
+    } else if (type === 'Về') {
+      records[today].checkOut = timeNow;
+      records[today].workType = workType;
+      alert(`Đã ghi nhận TAN LÀM lúc ${timeNow}`);
+    }
+
+    saveAndSync();
+  }
+
+  function chamCongNgayBatKyMee() {
+    const date = document.getElementById('txtBatKyNgay').value;
+    if (!date) return alert('Vui lòng chọn ngày!');
+
+    const workType = document.getElementById('selBatKyCong').value;
+    const checkIn = document.getElementById('txtBatKyGioVao').value;
+    const checkOut = document.getElementById('txtBatKyGioVe').value;
+
+    records[date] = { checkIn, checkOut, workType };
+    saveAndSync();
+    alert(`Đã lưu công ngày ${formatDateVi(date)}!`);
+  }
+
+  function setQuickFilter(mode) {
+    const now = new Date();
+    const y = now.getFullYear();
+    
+    if (mode === 'thisMonth') {
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+      document.getElementById('filterFrom').value = `${y}-${m}-01`;
+      document.getElementById('filterTo').value = `${y}-${m}-${String(lastDay).padStart(2, '0')}`;
+    } else if (mode === 'lastMonth') {
+      const prevMonthDate = new Date(y, now.getMonth() - 1, 1);
+      const prevY = prevMonthDate.getFullYear();
+      const prevM = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+      const lastDay = new Date(prevY, prevMonthDate.getMonth() + 1, 0).getDate();
+      document.getElementById('filterFrom').value = `${prevY}-${prevM}-01`;
+      document.getElementById('filterTo').value = `${prevY}-${prevM}-${String(lastDay).padStart(2, '0')}`;
+    } else if (mode === 'all') {
+      document.getElementById('filterFrom').value = '';
+      document.getElementById('filterTo').value = '';
+    }
+    renderTable();
+  }
+
+  /**
+   * Render Bảng kèm Cột STT giảm dần chính xác theo kết quả đã lọc
+   */
+  function renderTable() {
+    const tbody = document.getElementById('attendanceTable');
+    tbody.innerHTML = '';
+
+    const from = document.getElementById('filterFrom').value;
+    const to = document.getElementById('filterTo').value;
+
+    let totalCongTatCa = 0;
+    let totalCongBoLoc = 0;
+
+    // Tính tổng tất cả công
+    Object.keys(records).forEach(d => {
+      totalCongTatCa += parseFloat(records[d].workType || 0);
     });
 
-    function showLoading(show) {
-      const loader = document.getElementById("loading");
-      if (show) loader.classList.remove("d-none");
-      else loader.classList.add("d-none");
+    // Lọc danh sách ngày theo khoảng chọn
+    const allDates = Object.keys(records).sort().reverse();
+    const filteredDates = allDates.filter(date => {
+      if (from && date < from) return false;
+      if (to && date > to) return false;
+      return true;
+    });
+
+    let stt = filteredDates.length;
+
+    filteredDates.forEach(date => {
+      const item = records[date];
+      const congVal = parseFloat(item.workType || 0);
+      totalCongBoLoc += congVal;
+
+      const indexKey = `${userCode}_${date}`;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><b>${stt--}</b></td>
+        <td title="${indexKey}">${indexKey}</td>
+        <td>${formatDateVi(date)}</td>
+        <td>${item.checkIn || '--:--'}</td>
+        <td>${item.checkOut || '--:--'}</td>
+        <td><b>${item.workType}</b></td>
+        <td>
+          <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
+          <button class="action-btn btn-delete" onclick="deleteRecord('${date}')">Xóa</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('txtTotalCong').innerText = totalCongTatCa;
+    document.getElementById('txtFilterCong').innerText = totalCongBoLoc;
+
+    const summaryTitle = document.getElementById('filterSummaryTitle');
+    if (from || to) {
+      summaryTitle.innerText = `Tổng công lọc (${filteredDates.length} ngày hiển thị):`;
+    } else {
+      summaryTitle.innerText = "Tổng công hiển thị:";
     }
+  }
 
-    // 1. Tải dữ liệu chấm công từ Google Sheet
-    async function loadAttendanceData() {
-      const userCode = document.getElementById("userCode").value.trim();
-      if (!userCode) {
-        alert("Vui lòng nhập Mã Nhân Viên!");
-        return;
-      }
+  function formatDateVi(dateStr) {
+    if (!dateStr) return '';
+    const [y, m, d] = dateStr.split('-');
+    // Đặt giờ là 12 để tránh lệch ngày do múi giờ UTC khi convert
+    const dateObj = new Date(y, parseInt(m) - 1, d, 12, 0, 0);
+    const days = ['CN', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    return `${days[dateObj.getDay()]} ${d}/${m}/${y}`;
+  }
 
-      showLoading(true);
-      try {
-        const response = await fetch(`${SCRIPT_URL}?userCode=${encodeURIComponent(userCode)}`);
-        const result = await response.json();
-
-        if (result.status === "success") {
-          currentRecords = result.records || {};
-          renderAttendanceTable();
-        } else {
-          alert("Lỗi: " + result.message);
-        }
-      } catch (err) {
-        alert("Không thể kết nối đến máy chủ: " + err.message);
-      } finally {
-        showLoading(false);
-      }
+  function deleteRecord(date) {
+    if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu ngày ${formatDateVi(date)}?`)) {
+      delete records[date];
+      saveAndSync(date);
     }
+  }
 
-    // 2. Hiển thị danh sách các ngày trong tháng đã chọn lên bảng
-    function renderAttendanceTable() {
-      const monthValue = document.getElementById("monthPicker").value; // Format: YYYY-MM
-      if (!monthValue) return;
+  function openEditModal(date) {
+    const item = records[date];
+    document.getElementById('editDateKey').value = date;
+    document.getElementById('editDateLabel').innerText = formatDateVi(date);
+    document.getElementById('editWorkType').value = item.workType || '1';
+    document.getElementById('editCheckIn').value = item.checkIn || '08:00';
+    document.getElementById('editCheckOut').value = item.checkOut || '17:00';
+    document.getElementById('editModal').style.display = 'flex';
+  }
 
-      const [year, month] = monthValue.split("-").map(Number);
-      const daysInMonth = new Date(year, month, 0).getDate();
-      const tbody = document.getElementById("attendanceTableBody");
-      tbody.innerHTML = "";
+  function saveEdit() {
+    const date = document.getElementById('editDateKey').value;
+    records[date] = {
+      workType: document.getElementById('editWorkType').value,
+      checkIn: document.getElementById('editCheckIn').value,
+      checkOut: document.getElementById('editCheckOut').value
+    };
+    closeModal('editModal');
+    saveAndSync();
+  }
 
-      const dayNames = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+  function openChangeCodeModal() {
+    document.getElementById('newCodeInput').value = userCode;
+    document.getElementById('codeModal').style.display = 'flex';
+  }
 
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dayString = String(day).padStart(2, '0');
-        const dateStr = `${year}-${String(month).padStart(2, '0')}-${dayString}`;
-        
-        const dateObj = new Date(year, month - 1, day);
-        const dayOfWeek = dayNames[dateObj.getDay()];
-
-        const record = currentRecords[dateStr] || { checkIn: "", checkOut: "", workType: "1" };
-
-        const row = document.createElement("tr");
-        if (dateObj.getDay() === 0) row.classList.add("table-warning"); // Tô màu Chủ Nhật
-
-        row.innerHTML = `
-          <td class="fw-bold text-center">${dateStr}</td>
-          <td class="text-center">${dayOfWeek}</td>
-          <td>
-            <input type="time" class="form-control form-control-sm" id="in_${dateStr}" value="${record.checkIn || ''}">
-          </td>
-          <td>
-            <input type="time" class="form-control form-control-sm" id="out_${dateStr}" value="${record.checkOut || ''}">
-          </td>
-          <td>
-            <select class="form-select form-select-sm" id="type_${dateStr}">
-              <option value="1" ${record.workType === '1' ? 'selected' : ''}>1 - Đủ Công</option>
-              <option value="0.5" ${record.workType === '0.5' ? 'selected' : ''}>0.5 - Nửa Công</option>
-              <option value="0" ${record.workType === '0' ? 'selected' : ''}>0 - Nghỉ Không Luơng</option>
-              <option value="P" ${record.workType === 'P' ? 'selected' : ''}>P - Nghỉ Phép</option>
-            </select>
-          </td>
-          <td class="text-center">
-            <button class="btn btn-outline-danger btn-sm" onclick="deleteRecord('${dateStr}')" title="Xóa công ngày này">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      }
+  function confirmChangeCode() {
+    const val = document.getElementById('newCodeInput').value.trim();
+    if (val) {
+      userCode = val;
+      localStorage.setItem('my_user_code', userCode);
+      document.getElementById('displayUserCode').innerText = userCode;
+      closeModal('codeModal');
+      loadFromGoogleSheet();
     }
+  }
 
-    // 3. Lưu thông tin Chấm Công (POST)
-    async function saveAttendanceData() {
-      const userCode = document.getElementById("userCode").value.trim();
-      const monthValue = document.getElementById("monthPicker").value;
-      if (!userCode || !monthValue) return;
+  async function viewHistoryLogs() {
+    document.getElementById('historyModal').style.display = 'flex';
+    const tbody = document.getElementById('historyTableBody');
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Đang tải lịch sử...</td></tr>';
 
-      const [year, month] = monthValue.split("-").map(Number);
-      const daysInMonth = new Date(year, month, 0).getDate();
+    try {
+      let response = await fetch(`${SCRIPT_URL}?userCode=${userCode}`);
+      let resData = await response.json();
 
-      const recordsToUpdate = {};
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dayString = String(day).padStart(2, '0');
-        const dateStr = `${year}-${String(month).padStart(2, '0')}-${dayString}`;
-
-        const checkIn = document.getElementById(`in_${dateStr}`).value;
-        const checkOut = document.getElementById(`out_${dateStr}`).value;
-        const workType = document.getElementById(`type_${dateStr}`).value;
-
-        // Chỉ lưu những dòng có nhập dữ liệu hoặc khác mặc định
-        if (checkIn || checkOut || workType !== "1" || currentRecords[dateStr]) {
-          recordsToUpdate[dateStr] = { checkIn, checkOut, workType };
-        }
-      }
-
-      showLoading(true);
-      try {
-        const payload = {
-          userCode: userCode,
-          records: recordsToUpdate
-        };
-
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (result.status === "success") {
-          alert("Lưu dữ liệu thành công!");
-          loadAttendanceData(); // Refresh lại dữ liệu
-        } else {
-          alert("Lỗi khi lưu: " + result.message);
-        }
-      } catch (err) {
-        alert("Lỗi kết nối: " + err.message);
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    // 4. Xóa công của 1 ngày
-    async function deleteRecord(dateStr) {
-      if (!confirm(`Bạn có chắc chắn muốn xóa công ngày ${dateStr} không?`)) return;
-
-      const userCode = document.getElementById("userCode").value.trim();
-      showLoading(true);
-
-      try {
-        const payload = {
-          userCode: userCode,
-          deletedDate: dateStr
-        };
-
-        const response = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (result.status === "success") {
-          alert(`Đã xóa thành công công ngày ${dateStr}`);
-          loadAttendanceData();
-        } else {
-          alert("Lỗi khi xóa: " + result.message);
-        }
-      } catch (err) {
-        alert("Lỗi kết nối: " + err.message);
-      } finally {
-        showLoading(false);
-      }
-    }
-
-    // 5. Xem Lịch sử Log Chỉnh sửa
-    async function openLogsModal() {
-      const userCode = document.getElementById("userCode").value.trim();
-      if (!userCode) {
-        alert("Vui lòng nhập Mã Nhân Viên để xem Log!");
-        return;
-      }
-
-      const modal = new bootstrap.Modal(document.getElementById('logsModal'));
-      modal.show();
-
-      const tbody = document.getElementById("logsTableBody");
-      tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Đang tải lịch sử...</td></tr>`;
-
-      try {
-        const response = await fetch(`${SCRIPT_URL}?userCode=${encodeURIComponent(userCode)}&action=getLogs`);
-        const result = await response.json();
-
-        if (result.status === "success" && result.logs && result.logs.length > 0) {
-          tbody.innerHTML = "";
-          result.logs.forEach(log => {
-            let badgeClass = "bg-secondary";
-            if (log.action === "TẠO MỚI") badgeClass = "bg-success";
-            else if (log.action === "SỬA") badgeClass = "bg-warning text-dark";
-            else if (log.action === "XÓA") badgeClass = "bg-danger";
-
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td><small>${log.time}</small></td>
-              <td><span class="badge ${badgeClass}">${log.action}</span></td>
-              <td><small>${log.detail}</small></td>
+      tbody.innerHTML = '';
+      if (resData && resData.data && resData.data.length > 0) {
+        let count = 0;
+        resData.data.slice().reverse().forEach(log => {
+          if (log.updatedAt) {
+            count++;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${log.updatedAt.substring(5, 16)}</td>
+              <td><b>Cập nhật</b></td>
+              <td style="text-align: left; padding-left:6px; white-space: normal;">Sửa ngày ${log.date} [Công: ${log.workType}]</td>
             `;
-            tbody.appendChild(row);
-          });
-        } else {
-          tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Chưa có lịch sử thay đổi nào</td></tr>`;
+            tbody.appendChild(tr);
+          }
+        });
+
+        if (count === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Chưa có lịch sử thay đổi.</td></tr>';
         }
-      } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">Lỗi khi tải log: ${err.message}</td></tr>`;
+      } else {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Chưa có dữ liệu nhật ký.</td></tr>';
       }
+    } catch (err) {
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Lỗi tải lịch sử từ Cloud.</td></tr>';
     }
-  </script>
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+  }
+
+  function exportToCSV() {
+    const from = document.getElementById('filterFrom').value;
+    const to = document.getElementById('filterTo').value;
+
+    let csv = "\uFEFFSTT,Index Key,Ngày,Giờ Vào,Giờ Về,Công\n";
+    const sortedDates = Object.keys(records).sort();
+
+    let tongCongXuat = 0;
+    let stt = 1;
+
+    sortedDates.forEach(date => {
+      if (from && date < from) return;
+      if (to && date > to) return;
+
+      const item = records[date];
+      const congVal = parseFloat(item.workType || 0);
+      tongCongXuat += congVal;
+
+      const indexKey = `${userCode}_${date}`;
+
+      csv += `"${stt++}","${indexKey}","${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}"\n`;
+    });
+
+    csv += `"TỔNG CÔNG","","","","","${tongCongXuat}"\n`;
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    let fileName = `Bang_Cong_${getTodayStr()}.csv`;
+    if (from || to) {
+      fileName = `Bang_Cong_Tu_${from || 'dau'}_den_${to || 'nay'}.csv`;
+    }
+
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
 </body>
 </html>
