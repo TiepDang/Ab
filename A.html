@@ -233,7 +233,6 @@
 </div>
 
 <script>
-  // Đã cập nhật URL Google Apps Script mới nhất của bạn
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7C4JoaAtqqY50e4hOcN2_S1v1UeMyS_ol6hMGajjoluCKpptf0B9maOsSvM5tbe_K/exec";
 
   let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
@@ -272,7 +271,6 @@
     };
   });
 
-  // HÀM LƯU NHẬT KÝ LỊCH SỬ CHỈNH SỬA
   function pushHistoryLog(date, actionName, oldVal, newVal) {
     if (!records[date]) return;
     if (!records[date].history) {
@@ -463,6 +461,13 @@
       const item = records[date];
       const congVal = parseFloat(item.workType || 0);
       
+      const isEmptyRecord = !item.checkIn && !item.checkOut && congVal === 0;
+
+      if (isEmptyRecord && (!item.history || item.history.length === 0)) {
+        delete records[date];
+        return;
+      }
+
       totalCongTatCa += congVal;
 
       if (from && date < from) return;
@@ -472,17 +477,29 @@
       countNgayBoLoc++;
 
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${formatDateVi(date)}</td>
-        <td>${item.checkIn || '--:--'}</td>
-        <td>${item.checkOut || '--:--'}</td>
-        <td><b>${item.workType}</b></td>
-        <td>
-          <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
-          <button class="action-btn btn-history" onclick="openHistoryModal('${date}')">Lịch sử</button>
-          <button class="action-btn btn-delete" onclick="deleteRecord('${date}')">Xóa</button>
-        </td>
-      `;
+      
+      if (isEmptyRecord) {
+        tr.style.backgroundColor = "#fafafa";
+        tr.innerHTML = `
+          <td style="color: #94a3b8; text-decoration: line-through;">${formatDateVi(date)}</td>
+          <td colspan="3" style="color: #94a3b8; font-style: italic;">Đã xóa dữ liệu</td>
+          <td>
+            <button class="action-btn btn-history" onclick="openHistoryModal('${date}')">Lịch sử</button>
+          </td>
+        `;
+      } else {
+        tr.innerHTML = `
+          <td>${formatDateVi(date)}</td>
+          <td>${item.checkIn || '--:--'}</td>
+          <td>${item.checkOut || '--:--'}</td>
+          <td><b>${item.workType}</b></td>
+          <td>
+            <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
+            <button class="action-btn btn-history" onclick="openHistoryModal('${date}')">Lịch sử</button>
+            <button class="action-btn btn-delete" onclick="deleteRecord('${date}')">Xóa</button>
+          </td>
+        `;
+      }
       tbody.appendChild(tr);
     });
 
@@ -504,9 +521,20 @@
     return `${days[dateObj.getDay()]} ${d}/${m}/${y}`;
   }
 
+  // Cập nhật hàm xóa: Giữ lại lịch sử thay vì xóa mất tích
   function deleteRecord(date) {
-    if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu ngày ${formatDateVi(date)}?`)) {
-      delete records[date];
+    if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu chấm công ngày ${formatDateVi(date)}? (Lịch sử chỉnh sửa vẫn sẽ được giữ lại)`)) {
+      const oldVal = records[date] ? JSON.parse(JSON.stringify(records[date])) : null;
+      const currentHistory = records[date] ? (records[date].history || []) : [];
+      
+      records[date] = {
+        checkIn: "",
+        checkOut: "",
+        workType: "0",
+        history: currentHistory
+      };
+
+      pushHistoryLog(date, "Xóa dữ liệu ngày", oldVal, records[date]);
       saveAndSync();
     }
   }
@@ -539,7 +567,6 @@
     saveAndSync();
   }
 
-  // HIỂN THỊ MÀN HÌNH LỊCH SỬ CHỈNH SỬA
   function openHistoryModal(date) {
     document.getElementById('historyDateLabel').innerText = formatDateVi(date);
     const container = document.getElementById('historyListContainer');
@@ -556,7 +583,9 @@
         card.className = 'history-card';
         
         let diffHtml = '';
-        if (log.oldVal) {
+        if (log.action.includes("Xóa")) {
+          diffHtml = `<div style="margin-top: 4px; color: #e53935; font-weight: bold;">Đã xóa sạch dữ liệu chấm công và reset về 0 công.</div>`;
+        } else if (log.oldVal) {
           diffHtml = `
             <table class="diff-table">
               <thead>
@@ -640,6 +669,10 @@
 
       const item = records[date];
       const congVal = parseFloat(item.workType || 0);
+      
+      // Không xuất các dòng đã xóa (0 công, không có giờ) ra file Excel
+      if (!item.checkIn && !item.checkOut && congVal === 0) return;
+
       tongCongXuat += congVal;
 
       csv += `"${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}"\n`;
