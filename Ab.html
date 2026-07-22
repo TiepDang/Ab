@@ -9,7 +9,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f6f9; padding: 12px; color: #1a1a1a; }
-        .container { width: 100%; max-width: 520px; margin: 0 auto; }
+        .container { width: 100%; max-width: 560px; margin: 0 auto; }
         .card { background: white; border-radius: 20px; padding: 18px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #edf0f5; width: 100%; overflow: hidden; }
         .title { font-size: 1.3rem; font-weight: 800; text-align: center; color: #0f172a; margin-bottom: 10px; }
         .clock { font-size: 2.4rem; font-weight: 800; text-align: center; color: #0f172a; margin: 10px 0; }
@@ -42,6 +42,7 @@
         .btn-out { background-color: #ff4b55; }
         .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 5px; }
         .btn-excel { background-color: #0084ff; width: 100%; margin-top: 5px; font-size: 0.95rem; padding: 14px;}
+        .btn-log { background-color: #64748b; width: 100%; margin-top: 8px; font-size: 0.85rem; padding: 12px; }
         
         .quick-filter-row { display: flex; gap: 6px; margin-bottom: 12px; }
         .btn-quick { padding: 8px; font-size: 0.75rem; background-color: #e2e8f0; color: #334155; border-radius: 8px; flex: 1; text-align: center; font-weight: 700; }
@@ -56,19 +57,20 @@
         .grid-2 > div { min-width: 0; }
         .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 12px; }
 
-        .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
+        .footer-id-btn { background-color: #475569; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
         .table-container { overflow-x: auto; margin-top: 10px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 500px; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 520px; table-layout: fixed; }
         th, td { padding: 10px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { color: #64748b; background: #f8fafc; font-weight: 700; }
         
-        /* Độ rộng từng cột */
-        th:nth-child(1), td:nth-child(1) { width: 110px; text-align: left; padding-left: 6px; font-weight: 700; color: #475569; } /* Index Key */
-        th:nth-child(2), td:nth-child(2) { width: 110px; text-align: left; } /* Ngày */
-        th:nth-child(3), td:nth-child(3) { width: 55px; } /* Vào */
-        th:nth-child(4), td:nth-child(4) { width: 55px; } /* Về */
-        th:nth-child(5), td:nth-child(5) { width: 45px; } /* Công */
-        th:nth-child(6), td:nth-child(6) { width: 110px; } /* Hành động */
+        /* Cấu hình các cột bao gồm Index & STT */
+        th:nth-child(1), td:nth-child(1) { width: 40px; color: #64748b; font-weight: 700; } /* STT */
+        th:nth-child(2), td:nth-child(2) { width: 110px; text-align: left; padding-left: 4px; font-weight: 700; color: #334155; } /* Index Key */
+        th:nth-child(3), td:nth-child(3) { width: 105px; text-align: left; } /* Ngày */
+        th:nth-child(4), td:nth-child(4) { width: 50px; } /* Vào */
+        th:nth-child(5), td:nth-child(5) { width: 50px; } /* Về */
+        th:nth-child(6), td:nth-child(6) { width: 45px; } /* Công */
+        th:nth-child(7), td:nth-child(7) { width: 105px; } /* Hành động */
 
         .action-btn { padding: 5px 8px; font-size: 0.72rem; border-radius: 6px; margin: 0 1px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
         .btn-edit { background-color: #ff9800; color: white; }
@@ -77,7 +79,7 @@
         .online { background: #d1fae5; color: #065f46; }
         .offline { background: #fee2e2; color: #991b1b; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; padding: 15px; }
-        .modal-content { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-buttons { display: flex; gap: 10px; margin-top: 5px; }
         .btn-close { background-color: #94a3b8; flex: 1; }
         .btn-confirm { background-color: #10b981; flex: 1; }
@@ -132,7 +134,6 @@
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
         
-        <!-- Nút lọc nhanh -->
         <div class="quick-filter-row">
             <button class="btn-quick" onclick="setQuickFilter('thisMonth')">Tháng này</button>
             <button class="btn-quick" onclick="setQuickFilter('lastMonth')">Tháng trước</button>
@@ -144,7 +145,6 @@
             <div><label class="label-text">Đến ngày:</label><input type="date" id="filterTo" onchange="renderTable()"></div>
         </div>
 
-        <!-- Khối Tổng quan theo Bộ Lọc -->
         <div class="filter-summary">
             <span class="filter-summary-title" id="filterSummaryTitle">Tổng công hiển thị:</span>
             <span class="filter-summary-value"><span id="txtFilterCong">0</span> công</span>
@@ -154,6 +154,7 @@
           <table>
             <thead>
               <tr>
+                <th>STT</th>
                 <th>Index Key</th>
                 <th>Ngày</th>
                 <th>Vào</th>
@@ -168,8 +169,9 @@
           </table>
         </div>
 
-        <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV kèm Index)</button>
-        <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">......</span> (Bấm để tải lại hoặc tự đặt mã mới)</button>
+        <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV có Index/STT)</button>
+        <button class="btn-log" onclick="viewHistoryLogs()">📜 Xem Lịch Sử Chỉnh Sửa</button>
+        <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">......</span> (Bấm để đổi mã)</button>
         <div class="sync-status" id="syncStatus">Trạng thái Google Sheets: Sẵn sàng</div>
     </div>
 </div>
@@ -213,10 +215,35 @@
   </div>
 </div>
 
+<!-- Modal Lịch Sử Chỉnh Sửa -->
+<div id="historyModal" class="modal">
+  <div class="modal-content" style="max-width: 460px;">
+    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Lịch Sử Chỉnh Sửa</div>
+    <div class="table-container" style="max-height: 280px; overflow-y: auto;">
+      <table style="min-width: 380px;">
+        <thead>
+          <tr>
+            <th style="width: 110px;">Thời Gian</th>
+            <th style="width: 75px;">Thao Tác</th>
+            <th style="text-align: left; padding-left: 6px;">Chi Tiết</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <!-- Render lịch sử -->
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-buttons" style="margin-top: 15px;">
+      <button class="btn-close" onclick="closeModal('historyModal')">Đóng</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysuifR5ojnay1RCZG7whsbZ3Y3274ZnEbeMf1E0-9tES1l3mRQ4fhV8wKPbEI9LcuN/exec";
 
   let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
+  let historyLogsCache = []; // Cache lịch sử
   
   let userCode = localStorage.getItem('my_user_code');
   if (!userCode) {
@@ -235,7 +262,6 @@
     updateClock();
     setInterval(updateClock, 1000);
     
-    // Kiểm tra mạng & Đồng bộ
     window.addEventListener('online', () => {
       updateNetworkStatus();
       syncToGoogleSheet();
@@ -246,7 +272,6 @@
     renderTable();
     loadFromGoogleSheet();
 
-    // Đóng Modal khi bấm ra ngoài
     window.onclick = function(event) {
       if (event.target.classList.contains('modal')) {
         event.target.style.display = 'none';
@@ -254,9 +279,6 @@
     };
   });
 
-  /**
-   * Đồng bộ lên Google Sheet (Có hỗ trợ deletedDate)
-   */
   async function syncToGoogleSheet(deletedDate = null) {
     const statusText = document.getElementById('syncStatus');
     if (!navigator.onLine) {
@@ -295,9 +317,6 @@
     }
   }
 
-  /**
-   * Tải dữ liệu từ Google Sheet (Nhận cả dạng records và indexKey)
-   */
   async function loadFromGoogleSheet() {
     const statusText = document.getElementById('syncStatus');
     if (!navigator.onLine) {
@@ -428,6 +447,9 @@
     renderTable();
   }
 
+  /**
+   * Render Bảng kèm Cột STT (Index Tăng Dần) & IndexKey
+   */
   function renderTable() {
     const tbody = document.getElementById('attendanceTable');
     tbody.innerHTML = '';
@@ -440,6 +462,7 @@
     let countNgayBoLoc = 0;
 
     const sortedDates = Object.keys(records).sort().reverse();
+    let stt = sortedDates.length; // Số thứ tự đếm ngược từ tổng số dòng
 
     sortedDates.forEach(date => {
       const item = records[date];
@@ -447,8 +470,8 @@
       
       totalCongTatCa += congVal;
 
-      if (from && date < from) return;
-      if (to && date > to) return;
+      if (from && date < from) { stt--; return; }
+      if (to && date > to) { stt--; return; }
 
       totalCongBoLoc += congVal;
       countNgayBoLoc++;
@@ -457,6 +480,7 @@
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
+        <td><b>${stt--}</b></td>
         <td title="${indexKey}">${indexKey}</td>
         <td>${formatDateVi(date)}</td>
         <td>${item.checkIn || '--:--'}</td>
@@ -533,6 +557,45 @@
     }
   }
 
+  /**
+   * Xem Nhật Ký Chỉnh Sửa
+   */
+  async function viewHistoryLogs() {
+    document.getElementById('historyModal').style.display = 'flex';
+    const tbody = document.getElementById('historyTableBody');
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Đang tải lịch sử...</td></tr>';
+
+    try {
+      let response = await fetch(`${SCRIPT_URL}?userCode=${userCode}`);
+      let resData = await response.json();
+
+      tbody.innerHTML = '';
+      if (resData && resData.data && resData.data.length > 0) {
+        let count = 0;
+        resData.data.slice().reverse().forEach(log => {
+          if (log.updatedAt) {
+            count++;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${log.updatedAt.substring(5, 16)}</td>
+              <td><b>Cập nhật</b></td>
+              <td style="text-align: left; padding-left:6px; white-space: normal;">Sửa ngày ${log.date} [Công: ${log.workType}]</td>
+            `;
+            tbody.appendChild(tr);
+          }
+        });
+
+        if (count === 0) {
+          tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Chưa có lịch sử thay đổi.</td></tr>';
+        }
+      } else {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Chưa có dữ liệu nhật ký.</td></tr>';
+      }
+    } catch (err) {
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Lỗi tải lịch sử từ Cloud.</td></tr>';
+    }
+  }
+
   function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
   }
@@ -541,10 +604,11 @@
     const from = document.getElementById('filterFrom').value;
     const to = document.getElementById('filterTo').value;
 
-    let csv = "\uFEFFIndex Key,Ngày,Giờ Vào,Giờ Về,Công\n";
+    let csv = "\uFEFFSTT,Index Key,Ngày,Giờ Vào,Giờ Về,Công\n";
     const sortedDates = Object.keys(records).sort();
 
     let tongCongXuat = 0;
+    let stt = 1;
 
     sortedDates.forEach(date => {
       if (from && date < from) return;
@@ -556,10 +620,10 @@
 
       const indexKey = `${userCode}_${date}`;
 
-      csv += `"${indexKey}","${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}"\n`;
+      csv += `"${stt++}","${indexKey}","${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}"\n`;
     });
 
-    csv += `"TỔNG CÔNG","","","","${tongCongXuat}"\n`;
+    csv += `"TỔNG CÔNG","","","","","${tongCongXuat}"\n`;
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
