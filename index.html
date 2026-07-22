@@ -528,8 +528,10 @@
   }
 
   function formatDateVi(dateStr) {
+    if (!dateStr || !dateStr.includes('-')) return dateStr;
     const [y, m, d] = dateStr.split('-');
     const dateObj = new Date(y, m - 1, d);
+    if (isNaN(dateObj.getTime())) return dateStr;
     const days = ['CN', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
     return `${days[dateObj.getDay()]} ${d}/${m}/${y}`;
   }
