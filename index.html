@@ -223,7 +223,7 @@
   <div class="modal-content">
     <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Đổi Mã Đồng Bộ</div>
     <label class="label-text">Nhập mã mới của bạn:</label>
-    <input type="text" id="newCodeInput" placeholder="Ví dụ: 121221">
+    <input type="text" id="newCodeInput" placeholder="Ví dụ: 12345">
     
     <div class="modal-buttons">
       <button class="btn-close" onclick="closeModal('codeModal')">Hủy</button>
@@ -233,16 +233,16 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTys9Um4nkgS_c7dNAYa9L9KwxYuawajxS3atIDgWQFfMvQ17hV01SlKmzylf6Y4S5uw/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzkeOAfMVnpeV4dWxeOBJScgSYMDkuM9ovF9CanEFbLhOFsNzSlIAdtXu2y2HNtxmxuxA/exec";
 
   let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
   
   let userCode = localStorage.getItem('my_user_code');
   if (!userCode) {
-    let inputCode = prompt("Vui lòng nhập Mã đồng bộ cá nhân của bạn (ví dụ: SĐT hoặc mã 6 số):");
+    let inputCode = prompt("Vui lòng nhập Mã đồng bộ cá nhân của bạn (ví dụ: 12345 hoặc SĐT):");
     userCode = (inputCode && inputCode.trim() !== '') 
       ? inputCode.trim() 
-      : Math.floor(100000 + Math.random() * 900000).toString();
+      : "12345";
 
     localStorage.setItem('my_user_code', userCode);
   }
