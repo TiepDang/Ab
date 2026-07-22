@@ -146,8 +146,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // URL Apps Script Web App của bạn
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlHrBQZHlh5oc3brUauKDsS3EHv8GMh3R8tcxOtgdiqg4T6LKLyfgUxhzrfq5b-ZIm/exec";
+    // URL Apps Script Web App mới của bạn
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQv9yRfeSqnYl6TS2Dnbkmsf-pmt-KpscjBSlfhw_1tOxhTj180XFfVtJkhLNSl1yM/exec";
 
     let currentRecords = {};
 
@@ -216,7 +216,7 @@
         const record = currentRecords[dateStr] || { checkIn: "", checkOut: "", workType: "1" };
 
         const row = document.createElement("tr");
-        if (dateObj.getDay() === 0) row.classList.add("table-warning"); // Tô màu Sunday
+        if (dateObj.getDay() === 0) row.classList.add("table-warning"); // Tô màu Chủ Nhật
 
         row.innerHTML = `
           <td class="fw-bold text-center">${dateStr}</td>
