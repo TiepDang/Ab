@@ -468,12 +468,14 @@
     let totalCongBoLoc = 0;
     let countNgayBoLoc = 0;
 
-    const sortedDates = Object.keys(records).sort().reverse();
+    const validDates = Object.keys(records).filter(date => date && date !== "undefined");
+    const sortedDates = validDates.sort().reverse();
 
     sortedDates.forEach(date => {
       const item = records[date];
+      if (!item) return;
+
       const congVal = parseFloat(item.workType || 0);
-      
       const isEmptyRecord = !item.checkIn && !item.checkOut && congVal === 0;
 
       if (isEmptyRecord && (!item.history || item.history.length === 0)) {
@@ -528,11 +530,28 @@
   }
 
   function formatDateVi(dateStr) {
-    if (!dateStr || !dateStr.includes('-')) return dateStr;
-    const [y, m, d] = dateStr.split('-');
-    const dateObj = new Date(y, m - 1, d);
+    if (!dateStr) return '';
+    
+    let dateObj;
+    if (isNaN(dateStr) && !dateStr.includes('-')) {
+      dateObj = new Date(dateStr);
+    } else {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const [y, m, d] = parts;
+        dateObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+      } else {
+        dateObj = new Date(dateStr);
+      }
+    }
+
     if (isNaN(dateObj.getTime())) return dateStr;
+
     const days = ['CN', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const y = dateObj.getFullYear();
+    
     return `${days[dateObj.getDay()]} ${d}/${m}/${y}`;
   }
 
