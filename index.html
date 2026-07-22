@@ -55,15 +55,17 @@
         .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 12px; }
 
         .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
+        
         .table-container { overflow-x: auto; margin-top: 10px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 520px; table-layout: fixed; }
-        th, td { padding: 10px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 520px; table-layout: fixed; }
+        th, td { padding: 8px 2px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { color: #64748b; background: #f8fafc; font-weight: 700; }
-        th:nth-child(1), td:nth-child(1) { width: 120px; text-align: left; padding-left: 8px; }
-        th:nth-child(2), td:nth-child(2) { width: 60px; }
-        th:nth-child(3), td:nth-child(3) { width: 60px; }
-        th:nth-child(4), td:nth-child(4) { width: 50px; }
-        th:nth-child(5), td:nth-child(5) { width: 180px; }
+        
+        th:nth-child(1), td:nth-child(1) { width: 110px; text-align: left; padding-left: 6px; }
+        th:nth-child(2), td:nth-child(2) { width: 50px; }
+        th:nth-child(3), td:nth-child(3) { width: 50px; }
+        th:nth-child(4), td:nth-child(4) { width: 45px; }
+        th:nth-child(5), td:nth-child(5) { width: 160px; }
 
         .action-btn { padding: 6px 8px; font-size: 0.72rem; border-radius: 8px; margin: 0 1px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
         .btn-edit { background-color: #ff9800; color: white; }
@@ -505,8 +507,8 @@
       } else {
         tr.innerHTML = `
           <td>${formatDateVi(date)}</td>
-          <td>${item.checkIn || '--:--'}</td>
-          <td>${item.checkOut || '--:--'}</td>
+          <td>${formatTimeShort(item.checkIn)}</td>
+          <td>${formatTimeShort(item.checkOut)}</td>
           <td><b>${item.workType}</b></td>
           <td>
             <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
@@ -555,6 +557,19 @@
     return `${days[dateObj.getDay()]} ${d}/${m}/${y}`;
   }
 
+  function formatTimeShort(timeStr) {
+    if (!timeStr) return '--:--';
+    if (timeStr.includes(':')) {
+      const parts = timeStr.trim().split(' ');
+      for (let p of parts) {
+        if (p.includes(':') && p.length <= 5) {
+          return p;
+        }
+      }
+    }
+    return timeStr.length > 5 ? timeStr.substring(0, 5) : timeStr;
+  }
+
   function deleteRecord(date) {
     if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu chấm công ngày ${formatDateVi(date)}? (Lịch sử chỉnh sửa vẫn sẽ được giữ lại)`)) {
       const oldVal = records[date] ? JSON.parse(JSON.stringify(records[date])) : null;
@@ -577,8 +592,8 @@
     document.getElementById('editDateKey').value = date;
     document.getElementById('editDateLabel').innerText = formatDateVi(date);
     document.getElementById('editWorkType').value = item.workType || '1';
-    document.getElementById('editCheckIn').value = item.checkIn || '08:00';
-    document.getElementById('editCheckOut').value = item.checkOut || '17:00';
+    document.getElementById('editCheckIn').value = formatTimeShort(item.checkIn) !== '--:--' ? formatTimeShort(item.checkIn) : '08:00';
+    document.getElementById('editCheckOut').value = formatTimeShort(item.checkOut) !== '--:--' ? formatTimeShort(item.checkOut) : '17:00';
     document.getElementById('editModal').style.display = 'flex';
   }
 
@@ -631,13 +646,13 @@
               <tbody>
                 <tr>
                   <td><b>Giờ Vào</b></td>
-                  <td><span class="val-old">${log.oldVal.checkIn}</span></td>
-                  <td><span class="val-new">${log.newVal.checkIn}</span></td>
+                  <td><span class="val-old">${formatTimeShort(log.oldVal.checkIn)}</span></td>
+                  <td><span class="val-new">${formatTimeShort(log.newVal.checkIn)}</span></td>
                 </tr>
                 <tr>
                   <td><b>Giờ Về</b></td>
-                  <td><span class="val-old">${log.oldVal.checkOut}</span></td>
-                  <td><span class="val-new">${log.newVal.checkOut}</span></td>
+                  <td><span class="val-old">${formatTimeShort(log.oldVal.checkOut)}</span></td>
+                  <td><span class="val-new">${formatTimeShort(log.newVal.checkOut)}</span></td>
                 </tr>
                 <tr>
                   <td><b>Tính Công</b></td>
@@ -649,7 +664,7 @@
           `;
         } else {
           diffHtml = `
-            <div style="margin-top: 4px;"><b>Giá trị ghi nhận:</b> Vào ${log.newVal.checkIn} | Về ${log.newVal.checkOut} | Công ${log.newVal.workType}</div>
+            <div style="margin-top: 4px;"><b>Giá trị ghi nhận:</b> Vào ${formatTimeShort(log.newVal.checkIn)} | Về ${formatTimeShort(log.newVal.checkOut)} | Công ${log.newVal.workType}</div>
           `;
         }
 
@@ -707,7 +722,7 @@
 
       tongCongXuat += congVal;
 
-      csv += `"${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}"\n`;
+      csv += `"${formatDateVi(date)}","${formatTimeShort(item.checkIn)}","${formatTimeShort(item.checkOut)}","${congVal}"\n`;
     });
 
     csv += `"TỔNG CÔNG","","","${tongCongXuat}"\n`;
