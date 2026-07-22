@@ -350,6 +350,14 @@
       let cloudData = await response.json();
 
       if (cloudData && Object.keys(cloudData).length > 0) {
+        // Tự động làm sạch giờ cho các dữ liệu cũ tải từ Cloud về
+        Object.keys(cloudData).forEach(date => {
+          if (cloudData[date]) {
+            if (cloudData[date].checkIn) cloudData[date].checkIn = formatTimeShort(cloudData[date].checkIn);
+            if (cloudData[date].checkOut) cloudData[date].checkOut = formatTimeShort(cloudData[date].checkOut);
+          }
+        });
+
         records = cloudData;
         localStorage.setItem('my_attendance_data', JSON.stringify(records));
         renderTable();
