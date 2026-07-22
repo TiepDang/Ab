@@ -233,7 +233,7 @@
 </div>
 
 <script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7C4JoaAtqqY50e4hOcN2_S1v1UeMyS_ol6hMGajjoluCKpptf0B9maOsSvM5tbe_K/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTys9Um4nkgS_c7dNAYa9L9KwxYuawajxS3atIDgWQFfMvQ17hV01SlKmzylf6Y4S5uw/exec";
 
   let records = JSON.parse(localStorage.getItem('my_attendance_data')) || {};
   
@@ -521,7 +521,6 @@
     return `${days[dateObj.getDay()]} ${d}/${m}/${y}`;
   }
 
-  // Cập nhật hàm xóa: Giữ lại lịch sử thay vì xóa mất tích
   function deleteRecord(date) {
     if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu chấm công ngày ${formatDateVi(date)}? (Lịch sử chỉnh sửa vẫn sẽ được giữ lại)`)) {
       const oldVal = records[date] ? JSON.parse(JSON.stringify(records[date])) : null;
@@ -670,7 +669,6 @@
       const item = records[date];
       const congVal = parseFloat(item.workType || 0);
       
-      // Không xuất các dòng đã xóa (0 công, không có giờ) ra file Excel
       if (!item.checkIn && !item.checkOut && congVal === 0) return;
 
       tongCongXuat += congVal;
