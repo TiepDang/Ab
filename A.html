@@ -8,17 +8,17 @@
     <link rel="apple-touch-icon" href="icon.png">
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            --card-bg: rgba(255, 255, 255, 0.9);
+            --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
             --card-border: rgba(255, 255, 255, 0.8);
-            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --danger-gradient: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            --radius-card: 24px;
-            --radius-element: 14px;
+            --shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+            --radius-card: 28px;
+            --radius-element: 16px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,107 +27,120 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background: var(--bg-gradient); 
             min-height: 100vh;
-            padding: 16px 12px; 
+            padding: 20px 14px; 
             color: var(--text-main); 
         }
 
-        .container { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
 
         .card { 
             background: var(--card-bg); 
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(16px);
             border-radius: var(--radius-card); 
-            padding: 22px; 
+            padding: 24px; 
             box-shadow: var(--shadow); 
             border: 1px solid var(--card-border); 
             width: 100%; 
             overflow: hidden; 
+            transition: transform 0.3s ease;
         }
 
-        .title { font-size: 1.25rem; font-weight: 800; text-align: center; color: var(--text-main); margin-bottom: 12px; letter-spacing: -0.5px; }
-        
-        .clock { 
-            font-size: 2.8rem; 
+        .title { 
+            font-size: 1.35rem; 
             font-weight: 800; 
             text-align: center; 
             color: var(--text-main); 
-            margin: 8px 0 16px 0; 
+            margin-bottom: 14px; 
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .clock { 
+            font-size: 3rem; 
+            font-weight: 900; 
+            text-align: center; 
+            color: #4f46e5; 
+            margin: 6px 0 16px 0; 
             font-variant-numeric: tabular-nums;
-            letter-spacing: -1px;
+            letter-spacing: -1.5px;
+            text-shadow: 0 2px 10px rgba(79, 70, 229, 0.1);
         }
 
         .stats-box { 
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); 
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); 
             border-radius: var(--radius-element); 
-            padding: 16px; 
+            padding: 18px; 
             text-align: center; 
-            margin-bottom: 18px; 
-            border: 1px solid rgba(59, 130, 246, 0.1);
+            margin-bottom: 20px; 
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
         }
-        .stats-title { font-size: 0.8rem; font-weight: 700; color: #1d4ed8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stats-count { font-size: 1.8rem; font-weight: 800; color: #1e40af; }
+        .stats-title { font-size: 0.75rem; font-weight: 800; color: #4f46e5; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .stats-count { font-size: 2rem; font-weight: 900; color: #312e81; }
         
-        .label-text { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-align: left; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        .label-text { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-align: left; display: block; text-transform: uppercase; letter-spacing: 0.8px; }
         
         select, input, textarea { 
             width: 100%; 
             min-width: 0; 
             max-width: 100%;
-            padding: 12px 14px; 
+            padding: 14px 16px; 
             border-radius: var(--radius-element); 
-            border: 1px solid #e2e8f0; 
+            border: 2px solid #e2e8f0; 
             background-color: #f8fafc; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
+            font-size: 0.95rem; 
+            font-weight: 700; 
             color: var(--text-main); 
             margin-bottom: 16px; 
             outline: none; 
             display: block; 
             -webkit-appearance: none;
             font-family: inherit;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
         }
         select:focus, input:focus {
-            border-color: #3b82f6;
+            border-color: #4f46e5;
             background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
         }
 
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 4px; }
         
         button { 
             border: none; 
-            padding: 16px; 
+            padding: 18px; 
             border-radius: var(--radius-element); 
             color: white; 
-            font-weight: 700; 
-            font-size: 0.95rem; 
+            font-weight: 800; 
+            font-size: 1rem; 
             cursor: pointer; 
-            transition: transform 0.1s ease, filter 0.2s ease; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
-        button:active { transform: scale(0.97); filter: brightness(0.95); }
+        button:active { transform: scale(0.96); filter: brightness(0.9); }
         
-        .btn-in { background: var(--success-gradient); }
-        .btn-out { background: var(--danger-gradient); }
-        .btn-save { background: var(--primary-gradient); width: 100%; margin-top: 4px; }
-        .btn-excel { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); width: 100%; margin-top: 12px; font-size: 0.95rem; padding: 14px;}
+        .btn-in { background: var(--success-gradient); box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.4); }
+        .btn-out { background: var(--danger-gradient); box-shadow: 0 10px 20px -5px rgba(244, 63, 94, 0.4); }
+        .btn-save { background: var(--primary-gradient); width: 100%; margin-top: 4px; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
+        .btn-excel { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); width: 100%; margin-top: 14px; font-size: 1rem; padding: 16px; box-shadow: 0 10px 20px -5px rgba(14, 165, 233, 0.4); }
         
         /* Fast filter buttons */
-        .quick-filter-row { display: flex; gap: 8px; margin-bottom: 14px; }
+        .quick-filter-row { display: flex; gap: 8px; margin-bottom: 16px; }
         .btn-quick { 
-            padding: 10px; 
+            padding: 12px; 
             font-size: 0.8rem; 
             background-color: #f1f5f9; 
             color: var(--text-muted); 
-            border-radius: 10px; 
+            border-radius: 12px; 
             flex: 1; 
             text-align: center; 
-            font-weight: 700; 
-            border: 1px solid #e2e8f0;
+            font-weight: 800; 
+            border: 2px solid #e2e8f0;
             box-shadow: none;
         }
-        .btn-quick:active, .btn-quick:hover { background-color: #e2e8f0; color: var(--text-main); }
+        .btn-quick:active, .btn-quick:hover { background-color: #e2e8f0; color: var(--text-main); border-color: #cbd5e1; }
 
         .grid-2 { 
             display: grid; 
@@ -136,63 +149,63 @@
             width: 100%; 
         }
         .grid-2 > div { min-width: 0; }
-        .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 14px; }
+        .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 16px; }
 
         .footer-id-btn { 
-            background: linear-gradient(135deg, #475569 100%, #334155 0%); 
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%); 
             width: 100%; 
-            margin-top: 14px; 
-            font-size: 0.85rem; 
-            padding: 14px; 
+            margin-top: 16px; 
+            font-size: 0.9rem; 
+            padding: 16px; 
             color: white; 
             border: none; 
             border-radius: var(--radius-element); 
             word-break: break-all; 
             white-space: normal; 
             line-height: 1.4; 
-            box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2);
+            box-shadow: 0 10px 20px -5px rgba(30, 41, 59, 0.3);
         }
         
-        .table-container { overflow-x: auto; margin-top: 12px; background: #fff; border-radius: var(--radius-element); width: 100%; border: 1px solid #e2e8f0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.01); }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 540px; table-layout: fixed; }
-        th, td { padding: 12px 6px; border-bottom: 1px solid #f1f5f9; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        th { color: var(--text-muted); background: #f8fafc; font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        .table-container { overflow-x: auto; margin-top: 14px; background: #fff; border-radius: var(--radius-element); width: 100%; border: 2px solid #e2e8f0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 540px; table-layout: fixed; }
+        th, td { padding: 14px 8px; border-bottom: 2px solid #f1f5f9; text-align: center; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        th { color: var(--text-muted); background: #f8fafc; font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.8px; }
         
         /* Cấu hình độ rộng các cột trong bảng chính */
-        th:nth-child(1), td:nth-child(1) { width: 105px; text-align: left; padding-left: 10px; }
+        th:nth-child(1), td:nth-child(1) { width: 105px; text-align: left; padding-left: 12px; }
         th:nth-child(2), td:nth-child(2) { width: 50px; }
         th:nth-child(3), td:nth-child(3) { width: 50px; }
         th:nth-child(4), td:nth-child(4) { width: 45px; }
-        th:nth-child(5), td:nth-child(5) { width: 95px; text-align: left; padding-left: 6px; }
+        th:nth-child(5), td:nth-child(5) { width: 95px; text-align: left; padding-left: 8px; }
         th:nth-child(6), td:nth-child(6) { width: 145px; }
         
         .history-table th:nth-child(1), .history-table td:nth-child(1) { width: 110px; }
         .history-table th:nth-child(2), .history-table td:nth-child(2) { width: 90px; text-align: center; }
         .history-table th:nth-child(3), .history-table td:nth-child(3) { width: 200px; text-align: left; padding-left: 8px; }
 
-        .action-btn { padding: 6px 8px; font-size: 0.75rem; border-radius: 8px; margin: 0 2px; font-weight: 700; border: none; cursor: pointer; display: inline-block; box-shadow: none; }
+        .action-btn { padding: 8px 10px; font-size: 0.75rem; border-radius: 10px; margin: 0 2px; font-weight: 800; border: none; cursor: pointer; display: inline-block; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .btn-edit { background-color: #f59e0b; color: white; }
         .btn-delete { background-color: #ef4444; color: white; }
         .btn-log-item { background-color: #64748b; color: white; }
         
-        .network-badge { display: inline-block; padding: 6px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 700; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .online { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .offline { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .network-badge { display: inline-block; padding: 8px 16px; border-radius: 30px; font-size: 0.75rem; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .online { background: #d1fae5; color: #065f46; border: 2px solid #a7f3d0; }
+        .offline { background: #fee2e2; color: #991b1b; border: 2px solid #fecaca; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 9999; padding: 16px; }
-        .modal-content { background: white; padding: 24px; border-radius: var(--radius-card); width: 100%; max-width: 380px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255,255,255,0.8); }
-        .modal-large { max-width: 440px; }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 18px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 9999; padding: 16px; }
+        .modal-content { background: white; padding: 28px; border-radius: var(--radius-card); width: 100%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 2px solid rgba(255,255,255,0.8); }
+        .modal-large { max-width: 460px; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
         .btn-close { background-color: #94a3b8; flex: 1; }
         .btn-confirm { background-color: #10b981; flex: 1; }
-        .sync-status { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; font-style: italic; text-align: center; }
+        .sync-status { font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; font-weight: 600; font-style: italic; text-align: center; }
 
-        .filter-summary { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; border-radius: var(--radius-element); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .filter-summary-title { font-size: 0.85rem; font-weight: 700; color: #166534; }
-        .filter-summary-value { font-size: 1.2rem; font-weight: 800; color: #15803d; }
+        .filter-summary { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #bbf7d0; border-radius: var(--radius-element); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.6); }
+        .filter-summary-title { font-size: 0.9rem; font-weight: 800; color: #166534; }
+        .filter-summary-value { font-size: 1.3rem; font-weight: 900; color: #15803d; }
         
-        .date-label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .day-badge-inline { font-size: 0.75rem; color: #1d4ed8; font-weight: 800; background: #dbeafe; padding: 3px 8px; border-radius: 6px; }
+        .date-label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .day-badge-inline { font-size: 0.75rem; color: #4f46e5; font-weight: 900; background: #e0e7ff; padding: 4px 10px; border-radius: 8px; }
 
         /* Style cho dòng bị gạch ngang */
         .deleted-row td {
@@ -232,7 +245,7 @@
     
     <!-- CARD 2: Thêm công ngày bất kỳ -->
     <div class="card">
-        <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Thêm công ngày bất kỳ</div>
+        <div class="title" style="font-size: 1.2rem; text-align: left; margin-bottom: 14px;">Thêm công ngày bất kỳ</div>
         <div class="grid-2">
             <div>
                 <div class="date-label-container">
@@ -257,7 +270,7 @@
 
     <!-- CARD 3: Bộ lọc & Bảng công chi tiết -->
     <div class="card">
-        <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
+        <div class="title" style="font-size: 1.2rem; text-align: left; margin-bottom: 14px;">Bộ lọc & Bảng công chi tiết</div>
         
         <div class="quick-filter-row">
             <button class="btn-quick" onclick="setQuickFilter('thisMonth')">Tháng này</button>
@@ -302,7 +315,7 @@
 <!-- Modal Sửa Công -->
 <div id="editModal" class="modal">
   <div class="modal-content">
-    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Sửa công ngày <span id="editDateLabel"></span></div>
+    <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 14px;">Sửa công ngày <span id="editDateLabel"></span></div>
     <input type="hidden" id="editDateKey">
     
     <label class="label-text">Tính Công:</label>
@@ -330,7 +343,7 @@
 <!-- Modal Xem Lịch Sử Theo Ngày -->
 <div id="historyModal" class="modal">
   <div class="modal-content modal-large">
-    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Lịch sử ngày <span id="historyDateLabel"></span></div>
+    <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 14px;">Lịch sử ngày <span id="historyDateLabel"></span></div>
     <div class="table-container" style="max-height: 280px; overflow-y: auto;">
       <table class="history-table">
         <thead>
@@ -345,7 +358,7 @@
         </tbody>
       </table>
     </div>
-    <div class="modal-buttons" style="margin-top: 12px;">
+    <div class="modal-buttons" style="margin-top: 14px;">
       <button class="btn-close" onclick="closeModal('historyModal')">Đóng</button>
     </div>
   </div>
@@ -354,7 +367,7 @@
 <!-- Modal Đổi Mã Sync -->
 <div id="codeModal" class="modal">
   <div class="modal-content">
-    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Đổi Mã Đồng Bộ</div>
+    <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 14px;">Đổi Mã Đồng Bộ</div>
     <label class="label-text">Nhập mã mới của bạn:</label>
     <input type="text" id="newCodeInput" placeholder="Ví dụ: 12345">
     
