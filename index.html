@@ -112,17 +112,28 @@
         let userCode = localStorage.getItem('timelog_userCode') || '12345';
         document.getElementById('user-code-span').innerText = userCode;
 
-        let rawRecords = JSON.parse(localStorage.getItem('timelog_records')) || {};
-        let records = {};
-        // Chuẩn hóa lại key để đảm bảo luôn đúng định dạng YYYY-MM-DD
-        Object.keys(rawRecords).forEach(k => {
-            let cleanKey = k.trim();
-            if (cleanKey.includes('.')) {
-                let parts = cleanKey.split('.');
-                if (parts.length === 3) cleanKey = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-            }
-            records[cleanKey] = rawRecords[k];
-        });
+        let records = JSON.parse(localStorage.getItem('timelog_records')) || {};
+
+        // Tự động tải dữ liệu từ Cloud (Google Sheets) về khi khởi động để không bị mất khi xóa trình duyệt
+        function loadDataFromCloud() {
+            document.getElementById('cloud-status').innerText = "Đang tải dữ liệu từ đám mây...";
+            fetch(`${SCRIPT_URL}?userCode=${userCode}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                        records = data;
+                        localStorage.setItem('timelog_records', JSON.stringify(records));
+                        renderTable();
+                        document.getElementById('cloud-status').innerText = "Đã đồng bộ từ đám mây ✓";
+                    } else {
+                        document.getElementById('cloud-status').innerText = "Trạng thái: Sẵn sàng";
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('cloud-status').innerText = "Dùng dữ liệu lưu trên máy";
+                    renderTable();
+                });
+        }
 
         setInterval(() => {
             const now = new Date();
@@ -153,6 +164,7 @@
 
             sortedKeys.forEach(dateStr => {
                 let item = records[dateStr];
+                if (!item) return;
                 total += parseFloat(item.workType || 0);
                 let style = item.isDeleted ? "opacity-40 bg-gray-50 line-through" : "";
 
@@ -164,9 +176,9 @@
                     <td class="py-2 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
                     <td class="py-2 px-1 font-bold text-gray-800">${item.workType}</td>
                     <td class="py-2 px-1 text-center whitespace-nowrap">
-                        <button type="button" data-date="${dateStr}" class="btn-history bg-indigo-100 text-indigo-700 px-1.5 py-1 rounded-md text-[10px] font-bold">📜</button>
-                        <button type="button" data-date="${dateStr}" class="btn-edit bg-amber-500 text-white px-2 py-1 rounded-md text-[10px] font-bold">Sửa</button>
-                        <button type="button" data-date="${dateStr}" class="btn-delete bg-rose-100 text-rose-700 px-1.5 py-1 rounded-md text-[10px] font-bold">❌</button>
+                        <button type="button" onclick="showHistory('${dateStr}')" class="bg-indigo-100 text-indigo-700 px-1.5 py-1 rounded-md text-[10px] font-bold">📜</button>
+                        <button type="button" onclick="editDay('${dateStr}')" class="bg-amber-500 text-white px-2 py-1 rounded-md text-[10px] font-bold">Sửa</button>
+                        <button type="button" onclick="deleteDay('${dateStr}')" class="bg-rose-100 text-rose-700 px-1.5 py-1 rounded-md text-[10px] font-bold">❌</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -174,22 +186,6 @@
 
             document.getElementById('total-work-display').innerText = total + " công";
         }
-
-        // Bắt sự kiện click trực tiếp bằng addEventListener thay vì thuộc tính HTML onclick
-        document.getElementById('records-table-body').addEventListener('click', function(e) {
-            let btn = e.target.closest('button');
-            if (!btn) return;
-            let dateStr = btn.getAttribute('data-date');
-            if (!dateStr) return;
-
-            if (btn.classList.contains('btn-history')) {
-                showHistory(dateStr);
-            } else if (btn.classList.contains('btn-edit')) {
-                editDay(dateStr);
-            } else if (btn.classList.contains('btn-delete')) {
-                deleteDay(dateStr);
-            }
-        });
 
         function showHistory(dateStr) {
             let item = records[dateStr];
@@ -306,8 +302,8 @@
                 userCode = newCode.trim();
                 localStorage.setItem('timelog_userCode', userCode);
                 document.getElementById('user-code-span').innerText = userCode;
-                alert("Đã đổi mã! Dữ liệu sẽ được tải theo mã mới.");
-                location.reload();
+                alert("Đã đổi mã! Đang tải dữ liệu theo mã mới...");
+                loadDataFromCloud();
             }
         }
 
@@ -325,7 +321,8 @@
             document.body.removeChild(link);
         }
 
-        renderTable();
+        // Khởi chạy tải dữ liệu từ cloud
+        loadDataFromCloud();
     </script>
 </body>
 </html>
