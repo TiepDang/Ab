@@ -255,8 +255,27 @@
         .filter-summary-title { font-size: 0.85rem; font-weight: 800; color: #34d399; }
         .filter-summary-value { font-size: 1.25rem; font-weight: 900; color: #6ee7b7; text-shadow: 0 2px 10px rgba(16, 185, 129, 0.3); }
         
-        .date-label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .day-badge-inline { font-size: 0.75rem; color: #c084fc; font-weight: 900; background: rgba(192, 132, 252, 0.12); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(192, 132, 252, 0.25); }
+        /* ĐÃ CÂN CHỈNH ĐỐI XỨNG TUYỆT ĐỐI CHO TIÊU ĐỀ NGÀY & HUY HIỆU THỨ */
+        .date-label-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 8px; 
+            height: 24px;
+        }
+        .day-badge-inline { 
+            font-size: 0.75rem; 
+            color: #c084fc; 
+            font-weight: 900; 
+            background: rgba(192, 132, 252, 0.12); 
+            padding: 2px 10px; 
+            border-radius: 6px; 
+            border: 1px solid rgba(192, 132, 252, 0.25); 
+            line-height: 1.4;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         .deleted-row td {
             text-decoration: line-through;
