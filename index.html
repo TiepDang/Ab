@@ -13,26 +13,26 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-4 pb-12">
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-3 pb-12">
 
     <!-- Phần Chấm công nhanh hôm nay -->
-    <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-5 mb-4">
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-4 mb-4">
         <!-- Header / Đồng hồ thời gian thực -->
-        <div class="text-center mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
-            <span class="text-xs font-semibold text-gray-500 uppercase">Thời gian hiện tại</span>
-            <div id="live-clock" class="text-2xl font-extrabold text-indigo-600 mt-0.5">00:00:00</div>
+        <div class="text-center mb-3 bg-gray-50 p-2.5 rounded-2xl border border-gray-100">
+            <span class="text-[11px] font-semibold text-gray-500 uppercase">Thời gian hiện tại</span>
+            <div id="live-clock" class="text-xl font-extrabold text-indigo-600 mt-0.5">00:00:00</div>
         </div>
 
         <!-- Tổng công tích lũy -->
-        <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 text-center mb-4">
-            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">Tổng công tích lũy (Tất cả)</span>
-            <div id="total-work-display" class="text-3xl font-extrabold text-indigo-700 mt-1">0 công</div>
+        <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-3 text-center mb-3">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-600">Tổng công tích lũy (Tất cả)</span>
+            <div id="total-work-display" class="text-2xl font-extrabold text-indigo-700 mt-0.5">0 công</div>
         </div>
 
         <!-- Chọn loại công hôm nay -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-500 mb-1">Chọn loại công hôm nay:</label>
-            <select id="quick-work-type" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-4 font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <div class="mb-3">
+            <label class="block text-xs font-medium text-gray-500 mb-1">Chọn loại công hôm nay:</label>
+            <select id="quick-work-type" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-2.5 px-3 text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="1">1 công (Ngày làm đủ)</option>
                 <option value="0.5">0.5 công (Nửa ngày)</option>
                 <option value="0">0 công (Nghỉ/Không tính)</option>
@@ -40,30 +40,30 @@
         </div>
 
         <!-- Nút Vào Làm / Tan Làm -->
-        <div class="grid grid-cols-2 gap-3">
-            <button onclick="quickCheckIn()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-3 rounded-2xl shadow-md transition duration-200 text-center text-sm flex flex-col items-center justify-center">
+        <div class="grid grid-cols-2 gap-2">
+            <button onclick="quickCheckIn()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-2 rounded-2xl shadow-md transition duration-200 text-center text-xs flex flex-col items-center justify-center">
                 <span>Vào Làm</span>
-                <span class="text-xs font-normal opacity-90">(Hôm Nay)</span>
+                <span class="text-[10px] font-normal opacity-90">(Hôm Nay)</span>
             </button>
-            <button onclick="quickCheckOut()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-3 rounded-2xl shadow-md transition duration-200 text-center text-sm flex flex-col items-center justify-center">
+            <button onclick="quickCheckOut()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-2 rounded-2xl shadow-md transition duration-200 text-center text-xs flex flex-col items-center justify-center">
                 <span>Tan Làm</span>
-                <span class="text-xs font-normal opacity-90">(Hôm Nay)</span>
+                <span class="text-[10px] font-normal opacity-90">(Hôm Nay)</span>
             </button>
         </div>
     </div>
 
     <!-- Chấm công ngày bất kỳ -->
-    <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-5 mb-4">
-        <h2 class="text-lg font-bold text-gray-800 mb-3">Chấm công ngày bất kỳ</h2>
+    <div id="custom-section" class="w-full max-w-md bg-white rounded-3xl shadow-lg p-4 mb-4 scroll-mt-4">
+        <h2 class="text-base font-bold text-gray-800 mb-2">Chấm công ngày bất kỳ</h2>
         
-        <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="grid grid-cols-2 gap-2 mb-2">
             <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1">Chọn Ngày:</label>
-                <input type="date" id="custom-date" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-3 text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Chọn Ngày:</label>
+                <input type="date" id="custom-date" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-2.5 px-2 text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1">Tính Công:</label>
-                <select id="custom-work-type" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-3 text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Tính Công:</label>
+                <select id="custom-work-type" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-2.5 px-2 text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <option value="1">1 công</option>
                     <option value="0.5">0.5 công</option>
                     <option value="0">0 công</option>
@@ -71,48 +71,48 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="grid grid-cols-2 gap-2 mb-3">
             <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1">Giờ Vào:</label>
-                <input type="time" id="custom-check-in" value="08:00" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-3 text-center font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Giờ Vào:</label>
+                <input type="time" id="custom-check-in" value="08:00" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-2.5 px-2 text-center text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1">Giờ Về:</label>
-                <input type="time" id="custom-check-out" value="17:00" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3 px-3 text-center font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label class="block text-xs font-medium text-gray-500 mb-1">Giờ Về:</label>
+                <input type="time" id="custom-check-out" value="17:00" class="w-full bg-gray-50 border border-gray-200 rounded-2xl py-2.5 px-2 text-center text-xs font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
         </div>
 
-        <button onclick="saveCustomDay()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-2xl shadow-md transition duration-200">
+        <button onclick="saveCustomDay()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-3 rounded-2xl shadow-md transition duration-200 text-xs">
             Lưu Ngày Đã Chọn
         </button>
     </div>
 
     <!-- Bộ lọc & Bảng công chi tiết -->
-    <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-5">
-        <h2 class="text-lg font-bold text-gray-800 mb-3">Bộ lọc & Bảng công chi tiết</h2>
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-4">
+        <h2 class="text-base font-bold text-gray-800 mb-2">Bảng công chi tiết</h2>
         
         <!-- Lọc theo khoảng ngày -->
-        <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="grid grid-cols-2 gap-2 mb-3">
             <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Từ ngày:</label>
-                <input type="date" id="filter-from-date" onchange="renderTable()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label class="block text-[11px] font-medium text-gray-500 mb-1">Từ ngày:</label>
+                <input type="date" id="filter-from-date" onchange="renderTable()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-1.5 px-2 text-[11px] font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Đến ngày:</label>
-                <input type="date" id="filter-to-date" onchange="renderTable()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-2 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <label class="block text-[11px] font-medium text-gray-500 mb-1">Đến ngày:</label>
+                <input type="date" id="filter-to-date" onchange="renderTable()" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-1.5 px-2 text-[11px] font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
         </div>
 
-        <!-- Bảng danh sách công (Đã tối ưu không bị đè cột) -->
-        <div class="overflow-x-auto mb-4">
+        <!-- Bảng danh sách công -->
+        <div class="overflow-x-auto mb-3">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-gray-100 text-gray-400 text-[11px] font-semibold uppercase">
-                        <th class="py-2 px-1 w-[28%]">Ngày</th>
-                        <th class="py-2 px-1 w-[18%]">Vào</th>
-                        <th class="py-2 px-1 w-[18%]">Về</th>
+                    <tr class="border-b border-gray-100 text-gray-400 text-[10px] font-semibold uppercase">
+                        <th class="py-2 px-1 w-[26%]">Ngày</th>
+                        <th class="py-2 px-1 w-[17%]">Vào</th>
+                        <th class="py-2 px-1 w-[17%]">Về</th>
                         <th class="py-2 px-1 w-[12%]">Công</th>
-                        <th class="py-2 px-1 text-center w-[24%]">Hành động</th>
+                        <th class="py-2 px-1 text-center w-[28%]">Hành động</th>
                     </tr>
                 </thead>
                 <tbody id="records-table-body" class="text-xs text-gray-700 divide-y divide-gray-50">
@@ -122,26 +122,26 @@
         </div>
 
         <!-- Nút xuất file -->
-        <button onclick="exportCSV()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-2xl shadow-sm mb-3 transition">
+        <button onclick="exportCSV()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2.5 px-3 rounded-2xl shadow-sm mb-2.5 transition text-xs">
             Xuất file Excel (CSV)
         </button>
 
         <!-- Mã người dùng / Đồng bộ Cloud -->
-        <button onclick="changeUserCode()" id="sync-btn" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-xs font-medium py-3 px-4 rounded-2xl shadow-sm text-center transition">
-            Mã của bạn: <span id="user-code-span">121221</span> (Bấm để đổi mã mới)
+        <button onclick="changeUserCode()" id="sync-btn" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-[11px] font-medium py-2.5 px-3 rounded-2xl shadow-sm text-center transition">
+            Mã của bạn: <span id="user-code-span">121221</span> (Bấm để đổi mã)
         </button>
-        <p id="cloud-status" class="text-center text-xs text-gray-400 mt-2 italic">Trạng thái Google Sheets: Đã đồng bộ tự động ✓</p>
+        <p id="cloud-status" class="text-center text-[11px] text-gray-400 mt-2 italic">Trạng thái Google Sheets: Đã đồng bộ tự động ✓</p>
     </div>
 
     <!-- Modal Xem Lịch Sử Chỉnh Sửa -->
     <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl">
-            <h3 class="text-lg font-bold text-gray-800 mb-1">Lịch sử chỉnh sửa</h3>
+        <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl">
+            <h3 class="text-base font-bold text-gray-800 mb-1">Lịch sử chỉnh sửa</h3>
             <p id="modal-date-title" class="text-xs font-semibold text-indigo-600 mb-3"></p>
             <div id="modal-history-content" class="bg-gray-50 border border-gray-100 rounded-2xl p-3 text-xs text-gray-600 max-h-48 overflow-y-auto space-y-2 mb-4">
                 <!-- Nội dung lịch sử -->
             </div>
-            <button onclick="closeHistoryModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition">
+            <button onclick="closeHistoryModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition text-xs">
                 Đóng
             </button>
         </div>
@@ -196,15 +196,17 @@
                 let wType = parseFloat(item.workType || 0);
                 total += wType;
 
-                let row = `<tr class="hover:bg-gray-50">
-                    <td class="py-2.5 px-1 font-medium text-gray-800 text-xs">${getFormattedDateVN(dateStr)}</td>
-                    <td class="py-2.5 px-1 text-gray-600">${item.checkIn || '--:--'}</td>
-                    <td class="py-2.5 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
-                    <td class="py-2.5 px-1 font-bold text-gray-800">${item.workType}</td>
-                    <td class="py-2.5 px-1 text-center whitespace-nowrap">
-                        <button onclick="showHistory('${dateStr}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 w-7 h-7 rounded-lg text-xs font-bold inline-flex items-center justify-center mr-0.5" title="Xem lịch sử">📜</button>
-                        <button onclick="editDay('${dateStr}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 w-7 h-7 rounded-lg text-xs font-bold inline-flex items-center justify-center mr-0.5" title="Sửa">✏️</button>
-                        <button onclick="deleteDay('${dateStr}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 w-7 h-7 rounded-lg text-xs font-bold inline-flex items-center justify-center" title="Xóa">❌</button>
+                let isDeletedClass = item.isDeleted ? "opacity-50 bg-gray-50 line-through" : "";
+
+                let row = `<tr class="hover:bg-gray-50 ${isDeletedClass}">
+                    <td class="py-2 px-1 font-medium text-gray-800 text-[11px]">${getFormattedDateVN(dateStr)}</td>
+                    <td class="py-2 px-1 text-gray-600">${item.checkIn || '--:--'}</td>
+                    <td class="py-2 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
+                    <td class="py-2 px-1 font-bold text-gray-800">${item.workType}</td>
+                    <td class="py-2 px-1 text-center whitespace-nowrap">
+                        <button onclick="showHistory('${dateStr}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 w-6 h-6 rounded-md text-[11px] font-bold inline-flex items-center justify-center mr-0.5" title="Xem lịch sử">📜</button>
+                        <button onclick="editDay('${dateStr}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 w-6 h-6 rounded-md text-[11px] font-bold inline-flex items-center justify-center mr-0.5" title="Sửa">✏️</button>
+                        <button onclick="deleteDay('${dateStr}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 w-6 h-6 rounded-md text-[11px] font-bold inline-flex items-center justify-center" title="Xóa">❌</button>
                     </td>
                 </tr>`;
                 tbody.insertAdjacentHTML('beforeend', row);
@@ -269,12 +271,13 @@
             const timestamp = now.toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: timeStr, checkOut: "", workType: workType, history: [`[${timestamp}] Vào làm: ${timeStr}`] };
+                records[dateKey] = { checkIn: timeStr, checkOut: "", workType: workType, isDeleted: false, history: [`[${timestamp}] Vào làm: ${timeStr}`] };
             } else {
                 if (!records[dateKey].history) records[dateKey].history = [];
                 records[dateKey].history.push(`[${timestamp}] Cập nhật giờ vào: ${records[dateKey].checkIn || 'Trống'} -> ${timeStr}`);
                 records[dateKey].checkIn = timeStr;
                 records[dateKey].workType = workType;
+                records[dateKey].isDeleted = false;
             }
 
             saveDataAndSync();
@@ -288,11 +291,12 @@
             const timestamp = now.toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: "", checkOut: timeStr, workType: "1", history: [`[${timestamp}] Tan làm: ${timeStr}`] };
+                records[dateKey] = { checkIn: "", checkOut: timeStr, workType: "1", isDeleted: false, history: [`[${timestamp}] Tan làm: ${timeStr}`] };
             } else {
                 if (!records[dateKey].history) records[dateKey].history = [];
                 records[dateKey].history.push(`[${timestamp}] Cập nhật giờ về: ${records[dateKey].checkOut || 'Trống'} -> ${timeStr}`);
                 records[dateKey].checkOut = timeStr;
+                records[dateKey].isDeleted = false;
             }
 
             saveDataAndSync();
@@ -311,13 +315,14 @@
             const timestamp = new Date().toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: checkIn, checkOut: checkOut, workType: workType, history: [`[${timestamp}] Thêm mới ngày ${dateKey}`] };
+                records[dateKey] = { checkIn: checkIn, checkOut: checkOut, workType: workType, isDeleted: false, history: [`[${timestamp}] Thêm mới ngày ${dateKey}`] };
             } else {
                 if (!records[dateKey].history) records[dateKey].history = [];
                 records[dateKey].history.push(`[${timestamp}] Sửa thủ công: Vào(${checkIn}), Về(${checkOut}), Công(${workType})`);
                 records[dateKey].checkIn = checkIn;
                 records[dateKey].checkOut = checkOut;
                 records[dateKey].workType = workType;
+                records[dateKey].isDeleted = false;
             }
 
             saveDataAndSync();
@@ -330,12 +335,18 @@
             document.getElementById('custom-check-in').value = item.checkIn || "08:00";
             document.getElementById('custom-check-out').value = item.checkOut || "17:00";
             document.getElementById('custom-work-type').value = item.workType || "1";
-            window.scrollTo({ top: 400, behavior: 'smooth' });
+            
+            // Cuộn màn hình mượt mà lên khung chỉnh sửa phía trên để thao tác dễ dàng
+            document.getElementById('custom-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         function deleteDay(dateStr) {
-            if (confirm(`Bạn có chắc muốn xóa ngày ${dateStr}?`)) {
-                delete records[dateStr];
+            if (confirm(`Bạn có chắc muốn xóa bản ghi ngày ${dateStr}? (Hệ thống sẽ lưu vết trong lịch sử)`)) {
+                const timestamp = new Date().toLocaleString('vi-VN');
+                if (!records[dateStr].history) records[dateStr].history = [];
+                records[dateStr].history.push(`[${timestamp}] Đã xóa ngày công này`);
+                records[dateStr].workType = "0";
+                records[dateStr].isDeleted = true;
                 saveDataAndSync();
             }
         }
@@ -352,11 +363,12 @@
         }
 
         function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,Ngay,GioVao,GioVe,Cong,LichSuChinhSua\n";
+            let csvContent = "data:text/csv;charset=utf-8,Ngay,GioVao,GioVe,Cong,TrangThai,LichSuChinhSua\n";
             for (let date in records) {
                 let r = records[date];
+                let status = r.isDeleted ? "Da Xoa" : "Hoat Dong";
                 let historyStr = (r.history && r.history.length > 0) ? `"${r.history.join(' | ')}"` : "Không có chỉnh sửa";
-                csvContent += `${date},${r.checkIn},${r.checkOut},${r.workType},${historyStr}\n`;
+                csvContent += `${date},${r.checkIn},${r.checkOut},${r.workType},${status},${historyStr}\n`;
             }
             let encodedUri = encodeURI(csvContent);
             let link = document.createElement("a");
