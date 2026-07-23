@@ -97,12 +97,6 @@
             font-variant-numeric: tabular-nums;
             letter-spacing: -1px;
             filter: drop-shadow(0 4px 16px rgba(129, 140, 248, 0.3));
-            animation: pulseGlow 3s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            from { filter: drop-shadow(0 2px 8px rgba(129, 140, 248, 0.2)); }
-            to { filter: drop-shadow(0 6px 20px rgba(192, 132, 252, 0.5)); }
         }
 
         .stats-box { 
@@ -112,7 +106,6 @@
             text-align: center; 
             margin-bottom: 20px; 
             border: 1px solid rgba(129, 140, 248, 0.2);
-            box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.05);
         }
         .stats-title { font-size: 0.75rem; font-weight: 800; color: #a5b4fc; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; }
         .stats-count { font-size: 2.2rem; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(168, 85, 247, 0.4); text-align: center; }
@@ -139,7 +132,7 @@
         select:focus, input:focus {
             border-color: #818cf8;
             background-color: rgba(15, 23, 42, 0.85);
-            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.25), 0 0 20px rgba(129, 140, 248, 0.15);
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.25);
         }
 
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; }
@@ -153,8 +146,6 @@
             font-size: 0.95rem; 
             cursor: pointer; 
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); 
-            position: relative;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -180,7 +171,7 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: none;
         }
-        .btn-quick:active, .btn-quick:hover { background: rgba(255, 255, 255, 0.1); color: #fff; border-color: rgba(255, 255, 255, 0.15); }
+        .btn-quick:active, .btn-quick:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
 
         .grid-2 { 
             display: grid; 
@@ -195,96 +186,74 @@
             background: linear-gradient(135deg, rgba(51, 65, 85, 0.6) 0%, rgba(30, 41, 59, 0.8) 100%); 
             width: 100%; 
             margin-top: 16px; 
-            font-size: 0.85rem; 
-            padding: 16px; 
+            font-size: 0.8rem; 
+            padding: 14px; 
             color: #cbd5e1; 
             border: 1px solid rgba(255, 255, 255, 0.08); 
             border-radius: var(--radius-element); 
-            word-break: break-all; 
-            white-space: normal; 
-            line-height: 1.4; 
+            line-height: 1.5; 
             box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.3);
             text-align: center;
+            display: block;
         }
+        .footer-id-btn span { color: #38bdf8; font-weight: 800; }
         
-        .table-container { overflow-x: auto; margin-top: 16px; background: rgba(15, 23, 42, 0.4); border-radius: var(--radius-element); width: 100%; border: 1px solid rgba(255, 255, 255, 0.07); box-shadow: inset 0 2px 6px rgba(0,0,0,0.2); }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 540px; table-layout: fixed; }
-        th, td { padding: 14px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: center; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #e2e8f0; }
-        th { color: #94a3b8; background: rgba(15, 23, 42, 0.7); font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
+        .table-container { overflow-x: auto; margin-top: 16px; background: rgba(15, 23, 42, 0.4); border-radius: var(--radius-element); width: 100%; border: 1px solid rgba(255, 255, 255, 0.07); }
         
-        th:nth-child(1), td:nth-child(1) { width: 105px; text-align: left; padding-left: 14px; }
-        th:nth-child(2), td:nth-child(2) { width: 50px; }
-        th:nth-child(3), td:nth-child(3) { width: 50px; }
-        th:nth-child(4), td:nth-child(4) { width: 45px; }
-        th:nth-child(5), td:nth-child(5) { width: 95px; text-align: left; padding-left: 10px; }
-        th:nth-child(6), td:nth-child(6) { width: 145px; }
+        /* CỐ ĐỊNH HOÀN TOÀN CẤU TRÚC BẢNG ĐỂ KHÔNG BỊ LỆCH HÀNG NGANG */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.75rem; 
+            min-width: 520px; 
+            table-layout: fixed; 
+        }
+        th, td { 
+            padding: 12px 4px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+            text-align: center; 
+            font-weight: 700; 
+            color: #e2e8f0; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+        }
+        th { color: #94a3b8; background: rgba(15, 23, 42, 0.7); font-weight: 800; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; }
         
-        .history-table th:nth-child(1), .history-table td:nth-child(1) { width: 110px; }
-        .history-table th:nth-child(2), .history-table td:nth-child(2) { width: 90px; text-align: center; }
-        .history-table th:nth-child(3), .history-table td:nth-child(3) { width: 200px; text-align: left; padding-left: 10px; }
+        /* PHÂN CHIA TỈ LỆ CHIỀU RỘNG CHUẨN XÁC CHO TỪNG CỘT */
+        th:nth-child(1), td:nth-child(1) { width: 27%; text-align: left; padding-left: 10px; } /* Ngày */
+        th:nth-child(2), td:nth-child(2) { width: 13%; } /* Vào */
+        th:nth-child(3), td:nth-child(3) { width: 13%; } /* Về */
+        th:nth-child(4), td:nth-child(4) { width: 13%; } /* Công (1 công) */
+        th:nth-child(5), td:nth-child(5) { width: 16%; text-align: left; } /* Ghi chú */
+        th:nth-child(6), td:nth-child(6) { width: 18%; } /* Hành động */
 
-        .action-btn { padding: 6px 10px; font-size: 0.75rem; border-radius: 8px; margin: 0 2px; font-weight: 800; border: none; cursor: pointer; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.2s ease; }
-        .action-btn:hover { transform: scale(1.08); }
+        .action-btn { padding: 5px 6px; font-size: 0.65rem; border-radius: 6px; margin: 0 1px; font-weight: 800; border: none; cursor: pointer; display: inline-block; }
         .btn-edit { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
         .btn-delete { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
         .btn-log-item { background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white; }
         
-        .network-badge { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; animation: pulseBadge 2s infinite; width: 100%; text-align: center; }
-        @keyframes pulseBadge {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
+        .network-badge { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; width: 100%; text-align: center; }
         .online { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .offline { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); animation: none; }
+        .offline { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 9999; padding: 16px; animation: fadeInModal 0.3s ease; }
-        @keyframes fadeInModal {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 9999; padding: 16px; }
         .modal-content { background: #1e1b4b; padding: 26px; border-radius: var(--radius-card); width: 100%; max-width: 420px; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.12); }
         .modal-large { max-width: 480px; }
         .modal-buttons { display: flex; gap: 14px; margin-top: 20px; }
         .btn-close { background: rgba(255, 255, 255, 0.08); color: #cbd5e1; flex: 1; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .btn-close:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
-        .btn-confirm { background: var(--success-gradient); flex: 1; box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.4); }
+        .btn-confirm { background: var(--success-gradient); flex: 1; }
         .sync-status { font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; font-weight: 600; font-style: italic; text-align: center; }
 
-        .filter-summary { background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.12) 100%); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-element); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; box-shadow: inset 0 2px 6px rgba(255,255,255,0.04); }
+        .filter-summary { background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.12) 100%); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-element); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .filter-summary-title { font-size: 0.85rem; font-weight: 800; color: #34d399; }
-        .filter-summary-value { font-size: 1.25rem; font-weight: 900; color: #6ee7b7; text-shadow: 0 2px 10px rgba(16, 185, 129, 0.3); }
+        .filter-summary-value { font-size: 1.25rem; font-weight: 900; color: #6ee7b7; }
         
-        /* ĐÃ CÂN CHỈNH ĐỐI XỨNG TUYỆT ĐỐI CHO TIÊU ĐỀ NGÀY & HUY HIỆU THỨ */
-        .date-label-container { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 8px; 
-            height: 24px;
-        }
-        .day-badge-inline { 
-            font-size: 0.75rem; 
-            color: #c084fc; 
-            font-weight: 900; 
-            background: rgba(192, 132, 252, 0.12); 
-            padding: 2px 10px; 
-            border-radius: 6px; 
-            border: 1px solid rgba(192, 132, 252, 0.25); 
-            line-height: 1.4;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .date-label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; height: 24px; }
+        .day-badge-inline { font-size: 0.75rem; color: #c084fc; font-weight: 900; background: rgba(192, 132, 252, 0.12); padding: 2px 10px; border-radius: 6px; border: 1px solid rgba(192, 132, 252, 0.25); }
 
-        .deleted-row td {
-            text-decoration: line-through;
-            color: #64748b !important;
-            background-color: rgba(15, 23, 42, 0.25);
-        }
-        .deleted-row td .action-btn {
-            text-decoration: none; 
-        }
+        .deleted-row td { text-decoration: line-through; color: #64748b !important; background-color: rgba(15, 23, 42, 0.25); }
+        .deleted-row td .action-btn { text-decoration: none; }
     </style>
 </head>
 <body>
@@ -376,7 +345,7 @@
         </div>
 
         <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV có Tổng Công)</button>
-        <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">......</span> (Bấm để tải lại hoặc tự đặt mã mới)</button>
+        <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã định danh: <span id="displayUserCode">......</span> (Bấm để đổi mã)</button>
         <div class="sync-status" id="syncStatus">Trạng thái Google Sheets: Sẵn sàng</div>
     </div>
 </div>
@@ -614,13 +583,13 @@
       records[today].checkIn = timeNow;
       records[today].workType = workType;
       records[today].isDeleted = false;
-      logHistory('Vào làm', `Ngày ${formatDateVi(today)} vào lúc ${timeNow} ${records[today].note ? '(Ghi chú: ' + records[today].note + ')' : ''}`, today);
+      logHistory('Vào làm', `Ngày ${formatDateVi(today)} vào lúc ${timeNow}`, today);
       alert(`Đã ghi nhận VÀO LÀM lúc ${timeNow}`);
     } else if (type === 'Về') {
       records[today].checkOut = timeNow;
       records[today].workType = workType;
       records[today].isDeleted = false;
-      logHistory('Tan làm', `Ngày ${formatDateVi(today)} về lúc ${timeNow} ${records[today].note ? '(Ghi chú: ' + records[today].note + ')' : ''}`, today);
+      logHistory('Tan làm', `Ngày ${formatDateVi(today)} về lúc ${timeNow}`, today);
       alert(`Đã ghi nhận TAN LÀM lúc ${timeNow}`);
     }
 
@@ -637,7 +606,7 @@
     const note = document.getElementById('txtBatKyNote').value.trim();
 
     records[date] = { checkIn, checkOut, workType, note, isDeleted: false };
-    logHistory('Thêm mới', `Thêm ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut}) [Ghi chú: ${note || 'Không'}]`, date);
+    logHistory('Thêm mới', `Thêm ngày ${formatDateVi(date)} (${workType} công)`, date);
     saveAndSync();
     alert(`Đã thêm mới công ngày ${formatDateVi(date)} thành công!`);
   }
@@ -680,7 +649,6 @@
 
     sortedDates.forEach(date => {
       const item = records[date];
-      
       const isDel = item.isDeleted === true;
       const congVal = isDel ? 0 : parseFloat(item.workType || 0);
       
@@ -700,7 +668,7 @@
           <td>${item.checkIn || '--'}</td>
           <td>${item.checkOut || '--'}</td>
           <td>${item.workType || 0}</td>
-          <td style="text-align: left;">${item.note || ''}</td>
+          <td>${item.note || ''}</td>
           <td>
             <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
             <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Khôi phục</button>
@@ -712,7 +680,7 @@
           <td>${item.checkIn || '--:--'}</td>
           <td>${item.checkOut || '--:--'}</td>
           <td><b>${item.workType}</b></td>
-          <td style="text-align: left;" title="${item.note || ''}">${item.note || ''}</td>
+          <td title="${item.note || ''}">${item.note || ''}</td>
           <td>
             <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
             <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
@@ -728,7 +696,7 @@
 
     const summaryTitle = document.getElementById('filterSummaryTitle');
     if (from || to) {
-      summaryTitle.innerText = `Tổng công lọc (${countNgayBoLoc} ngày hiển thị):`;
+      summaryTitle.innerText = `Tổng công lọc (${countNgayBoLoc} ngày):`;
     } else {
       summaryTitle.innerText = "Tổng công hiển thị:";
     }
@@ -744,13 +712,9 @@
   function deleteRecord(date) {
     if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu ngày ${formatDateVi(date)}?`)) {
       const oldItem = records[date];
-      const infoStr = oldItem ? `(${oldItem.workType} công, Ghi chú: ${oldItem.note || 'Không'})` : '';
+      logHistory('Xóa công', `Đã xóa dữ liệu ngày ${formatDateVi(date)}`, date);
       
-      logHistory('Xóa công', `Đã xóa dữ liệu ngày ${formatDateVi(date)} ${infoStr}`, date);
-      
-      if (!records[date]) {
-        records[date] = {};
-      }
+      if (!records[date]) records[date] = {};
       records[date].isDeleted = true;
       records[date].workType = 0;
 
@@ -777,7 +741,7 @@
     const note = document.getElementById('editNote').value.trim();
 
     records[date] = { workType, checkIn, checkOut, note, isDeleted: false };
-    logHistory('Sửa công', `Cập nhật/Khôi phục ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut}) [Ghi chú: ${note || 'Không'}]`, date);
+    logHistory('Sửa công', `Cập nhật ngày ${formatDateVi(date)} (${workType} công)`, date);
     closeModal('editModal');
     saveAndSync();
   }
@@ -790,13 +754,13 @@
     const filteredLogs = editHistory.filter(item => item.date === dateKey);
 
     if (filteredLogs.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 15px;">Chưa có lịch sử chỉnh sửa cho ngày này.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 15px;">Chưa có lịch sử.</td></tr>`;
     } else {
       filteredLogs.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td style="font-size: 0.75rem; color: #94a3b8;">${item.time}</td>
-          <td><span style="display: inline-block; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.1); font-size: 0.7rem; color: #fff;">${item.action}</span></td>
+          <td><span>${item.action}</span></td>
           <td style="text-align: left; font-size: 0.75rem; color: #cbd5e1;">${item.detail}</td>
         `;
         tbody.appendChild(tr);
