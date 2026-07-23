@@ -200,7 +200,6 @@
         
         .table-container { overflow-x: auto; margin-top: 16px; background: rgba(15, 23, 42, 0.4); border-radius: var(--radius-element); width: 100%; border: 1px solid rgba(255, 255, 255, 0.07); }
         
-        /* CỐ ĐỊNH HOÀN TOÀN CẤU TRÚC BẢNG ĐỂ CÁC CỘT KHÔNG BỊ XÊ DỊCH */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -220,15 +219,13 @@
         }
         th { color: #94a3b8; background: rgba(15, 23, 42, 0.7); font-weight: 800; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.5px; }
         
-        /* ĐẶT TỈ LỆ CHIỀU RỘNG CHUẨN XÁC CHO 6 CỘT */
-        th:nth-child(1), td:nth-child(1) { width: 25%; text-align: left; padding-left: 8px; } /* Ngày */
-        th:nth-child(2), td:nth-child(2) { width: 12%; } /* Vào */
-        th:nth-child(3), td:nth-child(3) { width: 12%; } /* Về */
-        th:nth-child(4), td:nth-child(4) { width: 11%; } /* Công */
-        th:nth-child(5), td:nth-child(5) { width: 15%; text-align: left; } /* Ghi chú */
-        th:nth-child(6), td:nth-child(6) { width: 25%; } /* Cột hành động đủ không gian chứa cụm nút */
+        th:nth-child(1), td:nth-child(1) { width: 25%; text-align: left; padding-left: 8px; } 
+        th:nth-child(2), td:nth-child(2) { width: 12%; } 
+        th:nth-child(3), td:nth-child(3) { width: 12%; } 
+        th:nth-child(4), td:nth-child(4) { width: 11%; } 
+        th:nth-child(5), td:nth-child(5) { width: 15%; text-align: left; } 
+        th:nth-child(6), td:nth-child(6) { width: 25%; } 
 
-        /* GOM NHÓM CÁC NÚT HÀNH ĐỘNG GỌN GÀNG */
         .action-group {
             display: flex;
             align-items: center;
@@ -248,6 +245,7 @@
             justify-content: center;
             min-width: 22px;
             height: 24px;
+            text-decoration: none !important;
         }
         .btn-edit { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
         .btn-delete { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
@@ -274,12 +272,11 @@
         .day-badge-inline { font-size: 0.75rem; color: #c084fc; font-weight: 900; background: rgba(192, 132, 252, 0.12); padding: 2px 10px; border-radius: 6px; border: 1px solid rgba(192, 132, 252, 0.25); }
 
         .deleted-row td { text-decoration: line-through; color: #64748b !important; background-color: rgba(15, 23, 42, 0.25); }
-        .deleted-row td .action-btn { text-decoration: none; }
+        .deleted-row td:last-child { text-decoration: none !important; }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- CARD 1: Hôm nay -->
     <div class="card">
         <div id="networkStatus" class="network-badge online">Đang trực tuyến</div>
         <div class="title">Chấm Công Cá Nhân</div>
@@ -302,7 +299,6 @@
         </div>
     </div>
     
-    <!-- CARD 2: Thêm công ngày bất kỳ -->
     <div class="card">
         <div class="title" style="font-size: 1.2rem; text-align: left; margin-bottom: 14px;">Thêm công ngày bất kỳ</div>
         <div class="grid-2">
@@ -327,7 +323,6 @@
         <button class="btn-save" onclick="themCongNgayBatKyMee()">Thêm công mới</button>
     </div>
 
-    <!-- CARD 3: Bộ lọc & Bảng công chi tiết -->
     <div class="card">
         <div class="title" style="font-size: 1.2rem; text-align: left; margin-bottom: 14px;">Bộ lọc & Bảng công chi tiết</div>
         
@@ -360,7 +355,6 @@
               </tr>
             </thead>
             <tbody id="attendanceTable">
-              <!-- Render động -->
             </tbody>
           </table>
         </div>
@@ -371,7 +365,6 @@
     </div>
 </div>
 
-<!-- Modal Sửa Công -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 14px;">Sửa công ngày <span id="editDateLabel"></span></div>
@@ -399,7 +392,6 @@
   </div>
 </div>
 
-<!-- Modal Xem Lịch Sử Theo Ngày -->
 <div id="historyModal" class="modal">
   <div class="modal-content modal-large">
     <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 14px;">Lịch sử ngày <span id="historyDateLabel"></span></div>
@@ -413,7 +405,6 @@
           </tr>
         </thead>
         <tbody id="historyTableBody">
-          <!-- Render lịch sử ngày -->
         </tbody>
       </table>
     </div>
@@ -423,7 +414,6 @@
   </div>
 </div>
 
-<!-- Modal Đổi Mã Sync -->
 <div id="codeModal" class="modal">
   <div class="modal-content">
     <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 14px;">Đổi Mã Đồng Bộ</div>
