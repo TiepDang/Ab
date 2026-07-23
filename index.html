@@ -110,6 +110,7 @@
                         <th class="py-2 px-1">Vào</th>
                         <th class="py-2 px-1">Về</th>
                         <th class="py-2 px-1">Công</th>
+                        <th class="py-2 px-1">Lịch sử</th>
                         <th class="py-2 px-1 text-center">Hành động</th>
                     </tr>
                 </thead>
@@ -132,16 +133,12 @@
     </div>
 
     <script>
-        // Cấu hình URL Apps Script mới của bạn
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLeHR_Ze2XQ6mH3OiTPAwHgTq0Rh5RzXEgtXhuaaxduuS8UCsT9TrlubRQ45S3sFW0/exec";
         
         let userCode = localStorage.getItem('timelog_userCode') || '121221';
         document.getElementById('user-code-span').innerText = userCode;
 
-        // Dữ liệu chấm công lưu trong localStorage
-        let records = JSON.parse(localStorage.getItem('timelog_records')) || {
-            "2026-07-20": { checkIn: "08:00", checkOut: "17:00", workType: "1", history: [] }
-        };
+        let records = JSON.parse(localStorage.getItem('timelog_records')) || {};
 
         // Đồng hồ thời gian thực
         setInterval(() => {
@@ -149,7 +146,6 @@
             document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
         }, 1000);
 
-        // Đặt giá trị mặc định cho ô chọn ngày bất kỳ là ngày hôm nay
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('custom-date').value = todayStr;
 
@@ -171,6 +167,12 @@
 
             const sortedKeys = Object.keys(records).sort().reverse();
 
+            if (sortedKeys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-400 text-xs">Chưa có dữ liệu chấm công</td></tr>`;
+                document.getElementById('total-work-display').innerText = "0 công";
+                return;
+            }
+
             sortedKeys.forEach(dateStr => {
                 if (fromDate && dateStr < fromDate) return;
                 if (toDate && dateStr > toDate) return;
@@ -179,14 +181,17 @@
                 let wType = parseFloat(item.workType || 0);
                 total += wType;
 
+                let latestHistory = (item.history && item.history.length > 0) ? item.history[item.history.length - 1] : "Tạo mới";
+
                 let row = `<tr class="hover:bg-gray-50">
                     <td class="py-2.5 px-1 font-medium text-gray-800 text-xs">${getFormattedDateVN(dateStr)}</td>
                     <td class="py-2.5 px-1 text-gray-600">${item.checkIn || '--:--'}</td>
                     <td class="py-2.5 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
                     <td class="py-2.5 px-1 font-bold text-gray-800">${item.workType}</td>
+                    <td class="py-2.5 px-1 text-xs text-gray-500 max-w-[120px] truncate" title="${item.history ? item.history.join('\n') : ''}">${latestHistory}</td>
                     <td class="py-2.5 px-1 text-center">
-                        <button onclick="editDay('${dateStr}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1 rounded-lg text-xs font-bold mr-1">✏️</button>
-                        <button onclick="deleteDay('${dateStr}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 px-2 py-1 rounded-lg text-xs font-bold">❌</button>
+                        <button onclick="editDay('${dateStr}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1 rounded-lg text-xs font-bold mr-1" title="Sửa">✏️</button>
+                        <button onclick="deleteDay('${dateStr}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 px-2 py-1 rounded-lg text-xs font-bold" title="Xóa">❌</button>
                     </td>
                 </tr>`;
                 tbody.insertAdjacentHTML('beforeend', row);
@@ -195,7 +200,6 @@
             document.getElementById('total-work-display').innerText = total + " công";
         }
 
-        // Tự động đồng bộ lên Google Sheets (Chạy ẩn không cần bấm)
         function syncDataToCloudAuto() {
             let statusText = document.getElementById('cloud-status');
             statusText.innerText = "Trạng thái Google Sheets: Đang tự động đồng bộ...";
@@ -231,11 +235,10 @@
             const timestamp = now.toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: timeStr, checkOut: "", workType: workType, history: [] };
+                records[dateKey] = { checkIn: timeStr, checkOut: "", workType: workType, history: [`[${timestamp}] Vào làm: ${timeStr}`] };
             } else {
                 if (!records[dateKey].history) records[dateKey].history = [];
-                records[dateKey].history.push(`[${timestamp}] Vào: ${records[dateKey].checkIn || 'Trống'} -> ${timeStr}`);
-                
+                records[dateKey].history.push(`[${timestamp}] Cập nhật giờ vào: ${records[dateKey].checkIn || 'Trống'} -> ${timeStr}`);
                 records[dateKey].checkIn = timeStr;
                 records[dateKey].workType = workType;
             }
@@ -251,11 +254,10 @@
             const timestamp = now.toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: "08:00", checkOut: timeStr, workType: "1", history: [] };
+                records[dateKey] = { checkIn: "08:00", checkOut: timeStr, workType: "1", history: [`[${timestamp}] Tan làm: ${timeStr}`] };
             } else {
                 if (!records[dateKey].history) records[dateKey].history = [];
-                records[dateKey].history.push(`[${timestamp}] Về: ${records[dateKey].checkOut || 'Trống'} -> ${timeStr}`);
-
+                records[dateKey].history.push(`[${timestamp}] Cập nhật giờ về: ${records[dateKey].checkOut || 'Trống'} -> ${timeStr}`);
                 records[dateKey].checkOut = timeStr;
             }
 
@@ -275,11 +277,10 @@
             const timestamp = new Date().toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: checkIn, checkOut: checkOut, workType: workType, history: [`[${timestamp}] Tạo mới ngày ${dateKey}`] };
+                records[dateKey] = { checkIn: checkIn, checkOut: checkOut, workType: workType, history: [`[${timestamp}] Thêm mới ngày ${dateKey}`] };
             } else {
                 if (!records[dateKey].history) records[dateKey].history = [];
-                records[dateKey].history.push(`[${timestamp}] Sửa thủ công: Vào(${checkIn}), Về(${checkOut}), Công(${workType})`);
-
+                records[dateKey].history.push(`[${timestamp}] Sửa: Vào(${checkIn}), Về(${checkOut}), Công(${workType})`);
                 records[dateKey].checkIn = checkIn;
                 records[dateKey].checkOut = checkOut;
                 records[dateKey].workType = workType;
@@ -332,7 +333,6 @@
             document.body.removeChild(link);
         }
 
-        // Khởi chạy khi tải trang
         renderTable();
         syncDataToCloudAuto();
     </script>
