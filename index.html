@@ -92,9 +92,18 @@
         .filter-summary-title { font-size: 0.85rem; font-weight: 700; color: #166534; }
         .filter-summary-value { font-size: 1.1rem; font-weight: 800; color: #15803d; }
         
-        /* Gộp nhãn Thứ trực tiếp lên tiêu đề của ô chọn ngày */
         .date-label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .day-badge-inline { font-size: 0.75rem; color: #2563eb; font-weight: 800; background: #e0f2fe; padding: 2px 8px; border-radius: 6px; }
+
+        /* Style cho dòng bị gạch ngang */
+        .deleted-row td {
+            text-decoration: line-through;
+            color: #94a3b8 !important;
+            background-color: #f8fafc;
+        }
+        .deleted-row td .action-btn {
+            text-decoration: none; /* Không gạch ngang chữ trên nút bấm */
+        }
     </style>
 </head>
 <body>
@@ -147,7 +156,6 @@
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Bộ lọc & Bảng công chi tiết</div>
         
-        <!-- Nút lọc nhanh -->
         <div class="quick-filter-row">
             <button class="btn-quick" onclick="setQuickFilter('thisMonth')">Tháng này</button>
             <button class="btn-quick" onclick="setQuickFilter('lastMonth')">Tháng trước</button>
@@ -159,7 +167,6 @@
             <div><label class="label-text">Đến ngày:</label><input type="date" id="filterTo" onchange="renderTable()"></div>
         </div>
 
-        <!-- Khối Tổng quan theo Bộ Lọc -->
         <div class="filter-summary">
             <span class="filter-summary-title" id="filterSummaryTitle">Tổng công hiển thị:</span>
             <span class="filter-summary-value"><span id="txtFilterCong">0</span> công</span>
@@ -402,18 +409,20 @@
     const today = getTodayStr();
     const timeNow = new Date().toTimeString().substring(0, 5);
 
-    if (!records[today]) {
-      records[today] = { checkIn: '', checkOut: '', workType: workType };
+    if (!records[today] || records[today].isDeleted) {
+      records[today] = { checkIn: '', checkOut: '', workType: workType, isDeleted: false };
     }
 
     if (type === 'Vào') {
       records[today].checkIn = timeNow;
       records[today].workType = workType;
+      records[today].isDeleted = false;
       logHistory('Vào làm', `Ngày ${formatDateVi(today)} vào lúc ${timeNow}`, today);
       alert(`Đã ghi nhận VÀO LÀM lúc ${timeNow}`);
     } else if (type === 'Về') {
       records[today].checkOut = timeNow;
       records[today].workType = workType;
+      records[today].isDeleted = false;
       logHistory('Tan làm', `Ngày ${formatDateVi(today)} về lúc ${timeNow}`, today);
       alert(`Đã ghi nhận TAN LÀM lúc ${timeNow}`);
     }
@@ -425,16 +434,11 @@
     const date = document.getElementById('txtBatKyNgay').value;
     if (!date) return alert('Vui lòng chọn ngày!');
 
-    if (records[date]) {
-      alert(`Ngày ${formatDateVi(date)} đã có dữ liệu chấm công rồi! Vui lòng dùng nút "Sửa" ở bảng bên dưới nếu muốn thay đổi.`);
-      return;
-    }
-
     const workType = document.getElementById('selBatKyCong').value;
     const checkIn = document.getElementById('txtBatKyGioVao').value;
     const checkOut = document.getElementById('txtBatKyGioVe').value;
 
-    records[date] = { checkIn, checkOut, workType };
+    records[date] = { checkIn, checkOut, workType, isDeleted: false };
     logHistory('Thêm mới', `Thêm ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`, date);
     saveAndSync();
     alert(`Đã thêm mới công ngày ${formatDateVi(date)} thành công!`);
@@ -478,7 +482,9 @@
 
     sortedDates.forEach(date => {
       const item = records[date];
-      const congVal = parseFloat(item.workType || 0);
+      
+      const isDel = item.isDeleted === true;
+      const congVal = isDel ? 0 : parseFloat(item.workType || 0);
       
       totalCongTatCa += congVal;
 
@@ -489,17 +495,31 @@
       countNgayBoLoc++;
 
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${formatDateVi(date)}</td>
-        <td>${item.checkIn || '--:--'}</td>
-        <td>${item.checkOut || '--:--'}</td>
-        <td><b>${item.workType}</b></td>
-        <td>
-          <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
-          <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
-          <button class="action-btn btn-delete" onclick="deleteRecord('${date}')">Xóa</button>
-        </td>
-      `;
+      if (isDel) {
+        tr.className = "deleted-row";
+        tr.innerHTML = `
+          <td>${formatDateVi(date)}</td>
+          <td>${item.checkIn || '--'}</td>
+          <td>${item.checkOut || '--'}</td>
+          <td>${item.workType || 0}</td>
+          <td>
+            <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
+            <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Khôi phục</button>
+          </td>
+        `;
+      } else {
+        tr.innerHTML = `
+          <td>${formatDateVi(date)}</td>
+          <td>${item.checkIn || '--:--'}</td>
+          <td>${item.checkOut || '--:--'}</td>
+          <td><b>${item.workType}</b></td>
+          <td>
+            <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
+            <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
+            <button class="action-btn btn-delete" onclick="deleteRecord('${date}')">Xóa</button>
+          </td>
+        `;
+      }
       tbody.appendChild(tr);
     });
 
@@ -526,15 +546,20 @@
       const oldItem = records[date];
       const infoStr = oldItem ? `(${oldItem.workType} công, Vào: ${oldItem.checkIn || '--'}, Về: ${oldItem.checkOut || '--'})` : '';
       
-      logHistory('Xóa công', `Đã xóa hoàn toàn dữ liệu ngày ${formatDateVi(date)} ${infoStr}`, date);
+      logHistory('Xóa công', `Đã xóa dữ liệu ngày ${formatDateVi(date)} ${infoStr}`, date);
       
-      delete records[date];
+      if (!records[date]) {
+        records[date] = {};
+      }
+      records[date].isDeleted = true;
+      records[date].workType = 0;
+
       saveAndSync();
     }
   }
 
   function openEditModal(date) {
-    const item = records[date];
+    const item = records[date] || {};
     document.getElementById('editDateKey').value = date;
     document.getElementById('editDateLabel').innerText = formatDateVi(date);
     document.getElementById('editWorkType').value = item.workType || '1';
@@ -549,8 +574,8 @@
     const checkIn = document.getElementById('editCheckIn').value;
     const checkOut = document.getElementById('editCheckOut').value;
 
-    records[date] = { workType, checkIn, checkOut };
-    logHistory('Sửa công', `Cập nhật ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`, date);
+    records[date] = { workType, checkIn, checkOut, isDeleted: false };
+    logHistory('Sửa công', `Cập nhật/Khôi phục ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`, date);
     closeModal('editModal');
     saveAndSync();
   }
@@ -612,6 +637,8 @@
       if (to && date > to) return;
 
       const item = records[date];
+      if (item.isDeleted) return; 
+
       const congVal = parseFloat(item.workType || 0);
       tongCongXuat += congVal;
 
