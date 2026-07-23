@@ -109,7 +109,6 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLeHR_Ze2XQ6mH3OiTPAwHgTq0Rh5RzXEgtXhuaaxduuS8UCsT9TrlubRQ45S3sFW0/exec";
         
-        // Đặt mã mặc định là 12345 cho máy mới
         let userCode = localStorage.getItem('timelog_userCode') || '12345';
         document.getElementById('user-code-span').innerText = userCode;
 
@@ -155,21 +154,32 @@
                     <td class="py-2 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
                     <td class="py-2 px-1 font-bold text-gray-800">${item.workType}</td>
                     <td class="py-2 px-1 text-center whitespace-nowrap">
-                        <button type="button" class="btn-history bg-indigo-100 text-indigo-700 px-1.5 py-1 rounded-md text-[10px] font-bold">📜</button>
-                        <button type="button" class="btn-edit bg-amber-500 text-white px-2 py-1 rounded-md text-[10px] font-bold">Sửa</button>
-                        <button type="button" class="btn-delete bg-rose-100 text-rose-700 px-1.5 py-1 rounded-md text-[10px] font-bold">❌</button>
+                        <button type="button" data-date="${dateStr}" class="btn-history bg-indigo-100 text-indigo-700 px-1.5 py-1 rounded-md text-[10px] font-bold">📜</button>
+                        <button type="button" data-date="${dateStr}" class="btn-edit bg-amber-500 text-white px-2 py-1 rounded-md text-[10px] font-bold">Sửa</button>
+                        <button type="button" data-date="${dateStr}" class="btn-delete bg-rose-100 text-rose-700 px-1.5 py-1 rounded-md text-[10px] font-bold">❌</button>
                     </td>
                 `;
-
-                tr.querySelector('.btn-history').onclick = function() { showHistory(dateStr); };
-                tr.querySelector('.btn-edit').onclick = function() { editDay(dateStr); };
-                tr.querySelector('.btn-delete').onclick = function() { deleteDay(dateStr); };
-
                 tbody.appendChild(tr);
             });
 
             document.getElementById('total-work-display').innerText = total + " công";
         }
+
+        // Bắt sự kiện toàn cục trong bảng để loại bỏ hoàn toàn lỗi không phản hồi trên di động
+        document.getElementById('records-table-body').onclick = function(e) {
+            let btn = e.target.closest('button');
+            if (!btn) return;
+            let dateStr = btn.getAttribute('data-date');
+            if (!dateStr || !records[dateStr]) return;
+
+            if (btn.classList.contains('btn-history')) {
+                showHistory(dateStr);
+            } else if (btn.classList.contains('btn-edit')) {
+                editDay(dateStr);
+            } else if (btn.classList.contains('btn-delete')) {
+                deleteDay(dateStr);
+            }
+        };
 
         function showHistory(dateStr) {
             let item = records[dateStr];
