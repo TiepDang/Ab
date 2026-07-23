@@ -13,7 +13,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-4">
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-4 pb-12">
 
     <!-- Phần Chấm công nhanh hôm nay -->
     <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-5 mb-4">
@@ -41,10 +41,10 @@
 
         <!-- Nút Vào Làm / Tan Làm -->
         <div class="grid grid-cols-2 gap-3">
-            <button onclick="quickCheckIn()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow-md transition duration-200 text-center">
+            <button onclick="quickCheckIn()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-3 rounded-2xl shadow-md transition duration-200 text-center text-sm">
                 Vào Làm (Hôm Nay)
             </button>
-            <button onclick="quickCheckOut()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-4 rounded-2xl shadow-md transition duration-200 text-center">
+            <button onclick="quickCheckOut()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-3 rounded-2xl shadow-md transition duration-200 text-center text-sm">
                 Tan Làm (Hôm Nay)
             </button>
         </div>
@@ -126,24 +126,21 @@
 
         <!-- Mã người dùng / Đồng bộ Cloud -->
         <button onclick="changeUserCode()" id="sync-btn" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-xs font-medium py-3 px-4 rounded-2xl shadow-sm text-center transition">
-            Mã của bạn: <span id="user-code-span">121221</span> (Bấm để tải lại hoặc tự đặt mã mới)
+            Mã của bạn: <span id="user-code-span">121221</span> (Bấm để đổi mã mới)
         </button>
-        <button onclick="syncDataToCloud()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium py-2 px-4 rounded-2xl shadow-sm text-center transition">
-            Đồng bộ dữ liệu lên Google Sheets
-        </button>
-        <p id="cloud-status" class="text-center text-xs text-gray-400 mt-2 italic">Trạng thái Google Sheets: Chưa đồng bộ</p>
+        <p id="cloud-status" class="text-center text-xs text-gray-400 mt-2 italic">Trạng thái Google Sheets: Đã đồng bộ tự động ✓</p>
     </div>
 
     <script>
-        // Cấu hình URL Apps Script
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwoZN6H-aO2ThcLXvoSdoN_BJzAjFOshaPzqgk06TJI-xDq8sii85h3TcBt16NjKpwFNw/exec";
+        // Cấu hình URL Apps Script mới của bạn
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLeHR_Ze2XQ6mH3OiTPAwHgTq0Rh5RzXEgtXhuaaxduuS8UCsT9TrlubRQ45S3sFW0/exec";
         
         let userCode = localStorage.getItem('timelog_userCode') || '121221';
         document.getElementById('user-code-span').innerText = userCode;
 
         // Dữ liệu chấm công lưu trong localStorage
         let records = JSON.parse(localStorage.getItem('timelog_records')) || {
-            "2026-07-20": { checkIn: "08:00", checkOut: "17:00", workType: "1" }
+            "2026-07-20": { checkIn: "08:00", checkOut: "17:00", workType: "1", history: [] }
         };
 
         // Đồng hồ thời gian thực
@@ -175,7 +172,6 @@
             const sortedKeys = Object.keys(records).sort().reverse();
 
             sortedKeys.forEach(dateStr => {
-                // Lọc theo khoảng ngày nếu có nhập
                 if (fromDate && dateStr < fromDate) return;
                 if (toDate && dateStr > toDate) return;
 
@@ -199,21 +195,52 @@
             document.getElementById('total-work-display').innerText = total + " công";
         }
 
+        // Tự động đồng bộ lên Google Sheets (Chạy ẩn không cần bấm)
+        function syncDataToCloudAuto() {
+            let statusText = document.getElementById('cloud-status');
+            statusText.innerText = "Trạng thái Google Sheets: Đang tự động đồng bộ...";
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "sync",
+                    userCode: userCode,
+                    records: records
+                })
+            }).then(() => {
+                statusText.innerText = "Trạng thái Google Sheets: Đã đồng bộ tự động ✓";
+            }).catch(err => {
+                statusText.innerText = "Trạng thái Google Sheets: Lỗi đồng bộ";
+                console.error(err);
+            });
+        }
+
+        function saveDataAndSync() {
+            localStorage.setItem('timelog_records', JSON.stringify(records));
+            renderTable();
+            syncDataToCloudAuto();
+        }
+
         function quickCheckIn() {
             const now = new Date();
             const dateKey = now.toISOString().split('T')[0];
             const timeStr = now.toTimeString().substring(0, 5);
             const workType = document.getElementById('quick-work-type').value;
+            const timestamp = now.toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: timeStr, checkOut: "", workType: workType };
+                records[dateKey] = { checkIn: timeStr, checkOut: "", workType: workType, history: [] };
             } else {
+                if (!records[dateKey].history) records[dateKey].history = [];
+                records[dateKey].history.push(`[${timestamp}] Vào: ${records[dateKey].checkIn || 'Trống'} -> ${timeStr}`);
+                
                 records[dateKey].checkIn = timeStr;
                 records[dateKey].workType = workType;
             }
 
-            localStorage.setItem('timelog_records', JSON.stringify(records));
-            renderTable();
+            saveDataAndSync();
             alert(`Đã ghi nhận giờ vào lúc ${timeStr}!`);
         }
 
@@ -221,15 +248,18 @@
             const now = new Date();
             const dateKey = now.toISOString().split('T')[0];
             const timeStr = now.toTimeString().substring(0, 5);
+            const timestamp = now.toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: "08:00", checkOut: timeStr, workType: "1" };
+                records[dateKey] = { checkIn: "08:00", checkOut: timeStr, workType: "1", history: [] };
             } else {
+                if (!records[dateKey].history) records[dateKey].history = [];
+                records[dateKey].history.push(`[${timestamp}] Về: ${records[dateKey].checkOut || 'Trống'} -> ${timeStr}`);
+
                 records[dateKey].checkOut = timeStr;
             }
 
-            localStorage.setItem('timelog_records', JSON.stringify(records));
-            renderTable();
+            saveDataAndSync();
             alert(`Đã ghi nhận giờ về lúc ${timeStr}!`);
         }
 
@@ -242,16 +272,21 @@
             let checkIn = document.getElementById('custom-check-in').value;
             let checkOut = document.getElementById('custom-check-out').value;
             let workType = document.getElementById('custom-work-type').value;
+            const timestamp = new Date().toLocaleString('vi-VN');
 
-            records[dateKey] = {
-                checkIn: checkIn,
-                checkOut: checkOut,
-                workType: workType
-            };
+            if (!records[dateKey]) {
+                records[dateKey] = { checkIn: checkIn, checkOut: checkOut, workType: workType, history: [`[${timestamp}] Tạo mới ngày ${dateKey}`] };
+            } else {
+                if (!records[dateKey].history) records[dateKey].history = [];
+                records[dateKey].history.push(`[${timestamp}] Sửa thủ công: Vào(${checkIn}), Về(${checkOut}), Công(${workType})`);
 
-            localStorage.setItem('timelog_records', JSON.stringify(records));
-            renderTable();
-            alert("Đã lưu ngày thành công!");
+                records[dateKey].checkIn = checkIn;
+                records[dateKey].checkOut = checkOut;
+                records[dateKey].workType = workType;
+            }
+
+            saveDataAndSync();
+            alert("Đã lưu ngày thành công và tự động đồng bộ!");
         }
 
         function editDay(dateStr) {
@@ -266,8 +301,7 @@
         function deleteDay(dateStr) {
             if (confirm(`Bạn có chắc muốn xóa ngày ${dateStr}?`)) {
                 delete records[dateStr];
-                localStorage.setItem('timelog_records', JSON.stringify(records));
-                renderTable();
+                saveDataAndSync();
             }
         }
 
@@ -278,36 +312,16 @@
                 localStorage.setItem('timelog_userCode', userCode);
                 document.getElementById('user-code-span').innerText = userCode;
                 alert("Đã cập nhật mã thành công!");
+                syncDataToCloudAuto();
             }
         }
 
-        function syncDataToCloud() {
-            let statusText = document.getElementById('cloud-status');
-            statusText.innerText = "Trạng thái Google Sheets: Đang đồng bộ lên Cloud...";
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({
-                    action: "sync",
-                    userCode: userCode,
-                    records: records
-                })
-            }).then(() => {
-                statusText.innerText = "Trạng thái Google Sheets: Đã đồng bộ xong ✓";
-                alert("Đồng bộ dữ liệu thành công lên Google Sheets!");
-            }).catch(err => {
-                statusText.innerText = "Trạng thái Google Sheets: Lỗi đồng bộ";
-                console.error(err);
-            });
-        }
-
         function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,Ngay,GioVao,GioVe,Cong\n";
+            let csvContent = "data:text/csv;charset=utf-8,Ngay,GioVao,GioVe,Cong,LichSuChinhSua\n";
             for (let date in records) {
                 let r = records[date];
-                csvContent += `${date},${r.checkIn},${r.checkOut},${r.workType}\n`;
+                let historyStr = (r.history && r.history.length > 0) ? `"${r.history.join(' | ')}"` : "Không có chỉnh sửa";
+                csvContent += `${date},${r.checkIn},${r.checkOut},${r.workType},${historyStr}\n`;
             }
             let encodedUri = encodeURI(csvContent);
             let link = document.createElement("a");
@@ -320,6 +334,7 @@
 
         // Khởi chạy khi tải trang
         renderTable();
+        syncDataToCloudAuto();
     </script>
 </body>
 </html>
