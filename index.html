@@ -107,14 +107,13 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLeHR_Ze2XQ6mH3OiTPAwHgTq0Rh5RzXEgtXhuaaxduuS8UCsT9TrlubRQ45S3sFW0/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzmSQf6Betc70TyAqRJpd2DfiErgokO08ZV7NCjwEGomJCzhrvodEhaVeps3-nHgAU/exec";
         
         let userCode = localStorage.getItem('timelog_userCode') || '12345';
         document.getElementById('user-code-span').innerText = userCode;
 
         let records = JSON.parse(localStorage.getItem('timelog_records')) || {};
 
-        // Tự động tải dữ liệu từ Cloud (Google Sheets) về khi khởi động để không bị mất khi xóa trình duyệt
         function loadDataFromCloud() {
             document.getElementById('cloud-status').innerText = "Đang tải dữ liệu từ đám mây...";
             fetch(`${SCRIPT_URL}?userCode=${userCode}`)
@@ -126,11 +125,12 @@
                         renderTable();
                         document.getElementById('cloud-status').innerText = "Đã đồng bộ từ đám mây ✓";
                     } else {
-                        document.getElementById('cloud-status').innerText = "Trạng thái: Sẵn sàng";
+                        document.getElementById('cloud-status').innerText = "Chưa có dữ liệu trên mây (Dùng máy)";
+                        renderTable();
                     }
                 })
-                .catch(() => {
-                    document.getElementById('cloud-status').innerText = "Dùng dữ liệu lưu trên máy";
+                .catch(err => {
+                    document.getElementById('cloud-status').innerText = "Lỗi tải mây: " + err.message;
                     renderTable();
                 });
         }
@@ -205,7 +205,7 @@
         }
 
         function syncDataToCloud() {
-            document.getElementById('cloud-status').innerText = "Đang đồng bộ...";
+            document.getElementById('cloud-status').innerText = "Đang đồng bộ lên mây...";
             fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -213,8 +213,8 @@
                 body: JSON.stringify({ userCode: userCode, records: records })
             }).then(() => {
                 document.getElementById('cloud-status').innerText = "Đã đồng bộ tự động ✓";
-            }).catch(() => {
-                document.getElementById('cloud-status').innerText = "Lỗi đồng bộ";
+            }).catch(err => {
+                document.getElementById('cloud-status').innerText = "Lỗi đồng bộ: " + err.message;
             });
         }
 
@@ -321,7 +321,6 @@
             document.body.removeChild(link);
         }
 
-        // Khởi chạy tải dữ liệu từ cloud
         loadDataFromCloud();
     </script>
 </body>
