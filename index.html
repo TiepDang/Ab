@@ -42,7 +42,6 @@
         .btn-out { background-color: #ff4b55; }
         .btn-save { background-color: #0284c7; width: 100%; margin-top: 5px; }
         .btn-excel { background-color: #0084ff; width: 100%; margin-top: 5px; font-size: 0.95rem; padding: 14px;}
-        .btn-history { background-color: #475569; width: 100%; margin-top: 8px; font-size: 0.85rem; padding: 12px; }
         
         /* Fast filter buttons */
         .quick-filter-row { display: flex; gap: 6px; margin-bottom: 12px; }
@@ -92,6 +91,7 @@
         .filter-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .filter-summary-title { font-size: 0.85rem; font-weight: 700; color: #166534; }
         .filter-summary-value { font-size: 1.1rem; font-weight: 800; color: #15803d; }
+        .day-of-week-hint { font-size: 0.75rem; color: #2563eb; font-weight: 700; margin-top: -10px; margin-bottom: 10px; text-align: right; }
     </style>
 </head>
 <body>
@@ -121,12 +121,13 @@
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Thêm công ngày bất kỳ</div>
         <div class="grid-2">
-            <div><label class="label-text">Chọn Ngày:</label><input type="date" id="txtBatKyNgay"></div>
+            <div><label class="label-text">Chọn Ngày:</label><input type="date" id="txtBatKyNgay" onchange="updateDayHint()"></div>
             <div>
                 <label class="label-text">Tính Công:</label>
                 <select id="selBatKyCong"><option value="1">1 công</option><option value="0.5">0.5 công</option><option value="0">0 công</option></select>
             </div>
         </div>
+        <div class="day-of-week-hint" id="txtDayHint">Thứ...</div>
         <div class="grid-2">
             <div><label class="label-text">Giờ Vào:</label><input type="time" id="txtBatKyGioVao" value="08:00"></div>
             <div><label class="label-text">Giờ Về:</label><input type="time" id="txtBatKyGioVe" value="17:00"></div>
@@ -257,6 +258,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('displayUserCode').innerText = userCode;
     document.getElementById('txtBatKyNgay').value = getTodayStr();
+    updateDayHint();
     
     updateClock();
     setInterval(updateClock, 1000);
@@ -278,11 +280,23 @@
     };
   });
 
+  function updateDayHint() {
+    const val = document.getElementById('txtBatKyNgay').value;
+    if (!val) {
+      document.getElementById('txtDayHint').innerText = "";
+      return;
+    }
+    const [y, m, d] = val.split('-');
+    const dateObj = new Date(y, m - 1, d);
+    const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    document.getElementById('txtDayHint').innerText = days[dateObj.getDay()];
+  }
+
   function logHistory(actionType, detailStr, dateKey) {
     const now = new Date();
     const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' ' + now.toLocaleDateString('vi-VN');
     editHistory.unshift({ time: timeStr, action: actionType, detail: detailStr, date: dateKey });
-    if (editHistory.length > 100) editHistory.pop();
+    if (editHistory.length > 150) editHistory.pop();
     localStorage.setItem('my_attendance_history', JSON.stringify(editHistory));
   }
 
@@ -403,7 +417,6 @@
     const date = document.getElementById('txtBatKyNgay').value;
     if (!date) return alert('Vui lòng chọn ngày!');
 
-    // Kiểm tra nếu ngày đó đã tồn tại công rồi thì không cho thêm mới
     if (records[date]) {
       alert(`Ngày ${formatDateVi(date)} đã có dữ liệu chấm công rồi! Vui lòng dùng nút "Sửa" ở bảng bên dưới nếu muốn thay đổi.`);
       return;
@@ -505,7 +518,8 @@
       const oldItem = records[date];
       const infoStr = oldItem ? `(${oldItem.workType} công, Vào: ${oldItem.checkIn || '--'}, Về: ${oldItem.checkOut || '--'})` : '';
       
-      logHistory('Xóa công', `Đã xóa ngày ${formatDateVi(date)} ${infoStr}`, date);
+      // Ghi lại lịch sử thao tác Xóa để lưu dấu vết
+      logHistory('Xóa công', `Đã xóa hoàn toàn dữ liệu ngày ${formatDateVi(date)} ${infoStr}`, date);
       
       delete records[date];
       saveAndSync();
@@ -539,7 +553,6 @@
     const tbody = document.getElementById('historyTableBody');
     tbody.innerHTML = '';
     
-    // Lọc lịch sử theo đúng ngày được chọn
     const filteredLogs = editHistory.filter(item => item.date === dateKey);
 
     if (filteredLogs.length === 0) {
