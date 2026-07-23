@@ -92,7 +92,7 @@
         </div>
 
         <button onclick="exportCSV()" class="w-full bg-blue-500 text-white font-semibold py-2.5 px-3 rounded-2xl shadow-sm mb-2.5 text-xs">Xuất file Excel (CSV)</button>
-        <button onclick="changeUserCode()" class="w-full bg-slate-600 text-white text-[11px] font-medium py-2.5 px-3 rounded-2xl text-center">Mã của bạn: <span id="user-code-span">121221</span> (Đổi mã)</button>
+        <button onclick="changeUserCode()" class="w-full bg-slate-600 text-white text-[11px] font-medium py-2.5 px-3 rounded-2xl text-center">Mã của bạn: <span id="user-code-span">12345</span> (Đổi mã)</button>
         <p id="cloud-status" class="text-center text-[11px] text-gray-400 mt-2 italic">Trạng thái: Sẵn sàng</p>
     </div>
 
@@ -109,7 +109,8 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLeHR_Ze2XQ6mH3OiTPAwHgTq0Rh5RzXEgtXhuaaxduuS8UCsT9TrlubRQ45S3sFW0/exec";
         
-        let userCode = localStorage.getItem('timelog_userCode') || '121221';
+        // Đặt mã mặc định là 12345 cho máy mới
+        let userCode = localStorage.getItem('timelog_userCode') || '12345';
         document.getElementById('user-code-span').innerText = userCode;
 
         let records = JSON.parse(localStorage.getItem('timelog_records')) || {};
@@ -252,7 +253,7 @@
             records[dateKey].checkIn = checkIn;
             records[dateKey].checkOut = checkOut;
             records[dateKey].workType = workType;
-            records[dateKey].isDeleted, isDeleted = false;
+            records[dateKey].isDeleted = false;
 
             saveDataAndSync();
             alert("Đã lưu thành công!");
