@@ -80,11 +80,11 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-gray-100 text-gray-400 text-[10px] font-semibold uppercase">
-                        <th class="py-2 px-1 w-[28%]">Ngày</th>
+                        <th class="py-2 px-1 w-[30%]">Ngày</th>
                         <th class="py-2 px-1 w-[18%]">Vào</th>
                         <th class="py-2 px-1 w-[18%]">Về</th>
                         <th class="py-2 px-1 w-[12%]">Công</th>
-                        <th class="py-2 px-1 text-center w-[24%]">Hành động</th>
+                        <th class="py-2 px-1 text-center w-[22%]">Hành động</th>
                     </tr>
                 </thead>
                 <tbody id="records-table-body" class="text-xs text-gray-700 divide-y divide-gray-50"></tbody>
@@ -154,15 +154,15 @@
                     <td class="py-2 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
                     <td class="py-2 px-1 font-bold text-gray-800">${item.workType}</td>
                     <td class="py-2 px-1 text-center whitespace-nowrap">
-                        <button type="button" class="btn-history bg-indigo-100 text-indigo-700 w-6 h-6 rounded-md text-[11px] font-bold mr-0.5">📜</button>
-                        <button type="button" class="btn-edit bg-amber-100 text-amber-700 w-6 h-6 rounded-md text-[11px] font-bold mr-0.5">✏️</button>
-                        <button type="button" class="btn-delete bg-rose-100 text-rose-700 w-6 h-6 rounded-md text-[11px] font-bold">❌</button>
+                        <button type="button" class="btn-history bg-indigo-100 text-indigo-700 px-1.5 py-1 rounded-md text-[10px] font-bold">📜</button>
+                        <button type="button" class="btn-edit bg-amber-500 text-white px-2 py-1 rounded-md text-[10px] font-bold">Sửa</button>
+                        <button type="button" class="btn-delete bg-rose-100 text-rose-700 px-1.5 py-1 rounded-md text-[10px] font-bold">❌</button>
                     </td>
                 `;
 
-                tr.querySelector('.btn-history').onclick = function(e) { e.stopPropagation(); showHistory(dateStr); };
-                tr.querySelector('.btn-edit').onclick = function(e) { e.stopPropagation(); editDay(dateStr); };
-                tr.querySelector('.btn-delete').onclick = function(e) { e.stopPropagation(); deleteDay(dateStr); };
+                tr.querySelector('.btn-history').onclick = function() { showHistory(dateStr); };
+                tr.querySelector('.btn-edit').onclick = function() { editDay(dateStr); };
+                tr.querySelector('.btn-delete').onclick = function() { deleteDay(dateStr); };
 
                 tbody.appendChild(tr);
             });
@@ -252,7 +252,7 @@
             records[dateKey].checkIn = checkIn;
             records[dateKey].checkOut = checkOut;
             records[dateKey].workType = workType;
-            records[dateKey].isDeleted = false;
+            records[dateKey].isDeleted, isDeleted = false;
 
             saveDataAndSync();
             alert("Đã lưu thành công!");
