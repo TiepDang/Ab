@@ -91,7 +91,10 @@
         .filter-summary { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .filter-summary-title { font-size: 0.85rem; font-weight: 700; color: #166534; }
         .filter-summary-value { font-size: 1.1rem; font-weight: 800; color: #15803d; }
-        .day-of-week-hint { font-size: 0.75rem; color: #2563eb; font-weight: 700; margin-top: -10px; margin-bottom: 10px; text-align: right; }
+        
+        /* Gộp nhãn Thứ trực tiếp lên tiêu đề của ô chọn ngày */
+        .date-label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .day-badge-inline { font-size: 0.75rem; color: #2563eb; font-weight: 800; background: #e0f2fe; padding: 2px 8px; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -121,13 +124,18 @@
     <div class="card">
         <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Thêm công ngày bất kỳ</div>
         <div class="grid-2">
-            <div><label class="label-text">Chọn Ngày:</label><input type="date" id="txtBatKyNgay" onchange="updateDayHint()"></div>
+            <div>
+                <div class="date-label-container">
+                    <span class="label-text" style="margin-bottom:0;">Chọn Ngày:</span>
+                    <span class="day-badge-inline" id="txtDayHint">Thứ...</span>
+                </div>
+                <input type="date" id="txtBatKyNgay" onchange="updateDayHint()">
+            </div>
             <div>
                 <label class="label-text">Tính Công:</label>
                 <select id="selBatKyCong"><option value="1">1 công</option><option value="0.5">0.5 công</option><option value="0">0 công</option></select>
             </div>
         </div>
-        <div class="day-of-week-hint" id="txtDayHint">Thứ...</div>
         <div class="grid-2">
             <div><label class="label-text">Giờ Vào:</label><input type="time" id="txtBatKyGioVao" value="08:00"></div>
             <div><label class="label-text">Giờ Về:</label><input type="time" id="txtBatKyGioVe" value="17:00"></div>
@@ -518,7 +526,6 @@
       const oldItem = records[date];
       const infoStr = oldItem ? `(${oldItem.workType} công, Vào: ${oldItem.checkIn || '--'}, Về: ${oldItem.checkOut || '--'})` : '';
       
-      // Ghi lại lịch sử thao tác Xóa để lưu dấu vết
       logHistory('Xóa công', `Đã xóa hoàn toàn dữ liệu ngày ${formatDateVi(date)} ${infoStr}`, date);
       
       delete records[date];
