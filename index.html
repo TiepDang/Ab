@@ -144,18 +144,26 @@
                 total += parseFloat(item.workType || 0);
                 let style = item.isDeleted ? "opacity-40 bg-gray-50 line-through" : "";
 
-                let row = `<tr class="hover:bg-gray-50 ${style}">
+                let tr = document.createElement('tr');
+                tr.className = `hover:bg-gray-50 ${style}`;
+                tr.innerHTML = `
                     <td class="py-2 px-1 font-medium text-gray-800 text-[11px]">${getFormattedDateVN(dateStr)}</td>
                     <td class="py-2 px-1 text-gray-600">${item.checkIn || '--:--'}</td>
                     <td class="py-2 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
                     <td class="py-2 px-1 font-bold text-gray-800">${item.workType}</td>
                     <td class="py-2 px-1 text-center whitespace-nowrap">
-                        <button onclick="showHistory('${dateStr}')" class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-md text-[11px] font-bold">📜</button>
-                        <button onclick="editDay('${dateStr}')" class="bg-amber-100 text-amber-700 w-6 h-6 rounded-md text-[11px] font-bold">✏️</button>
-                        <button onclick="deleteDay('${dateStr}')" class="bg-rose-100 text-rose-700 w-6 h-6 rounded-md text-[11px] font-bold">❌</button>
+                        <button type="button" class="btn-history bg-indigo-100 text-indigo-700 w-6 h-6 rounded-md text-[11px] font-bold mr-1">📜</button>
+                        <button type="button" class="btn-edit bg-amber-100 text-amber-700 w-6 h-6 rounded-md text-[11px] font-bold mr-1">✏️</button>
+                        <button type="button" class="btn-delete bg-rose-100 text-rose-700 w-6 h-6 rounded-md text-[11px] font-bold">❌</button>
                     </td>
-                </tr>`;
-                tbody.insertAdjacentHTML('beforeend', row);
+                `;
+
+                // Gắn sự kiện trực tiếp bằng Javascript DOM để đảm bảo không bị lỗi trên mọi thiết bị
+                tr.querySelector('.btn-history').onclick = function() { showHistory(dateStr); };
+                tr.querySelector('.btn-edit').onclick = function() { editDay(dateStr); };
+                tr.querySelector('.btn-delete').onclick = function() { deleteDay(dateStr); };
+
+                tbody.appendChild(tr);
             });
 
             document.getElementById('total-work-display').innerText = total + " công";
@@ -251,6 +259,7 @@
 
         function editDay(dateStr) {
             let item = records[dateStr];
+            if (!item) return;
             document.getElementById('custom-date').value = dateStr;
             document.getElementById('custom-check-in').value = item.checkIn || "08:00";
             document.getElementById('custom-check-out').value = item.checkOut || "17:00";
