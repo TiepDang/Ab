@@ -380,6 +380,9 @@
         renderTable();
         statusText.innerText = "Trạng thái Google Sheets: Đã cập nhật từ Cloud ✓";
       } else {
+        records = {};
+        localStorage.removeItem('my_attendance_data');
+        renderTable();
         statusText.innerText = "Trạng thái Google Sheets: Chưa có dữ liệu trên Cloud";
       }
     } catch (err) {
@@ -637,7 +640,16 @@
       userCode = val;
       localStorage.setItem('my_user_code', userCode);
       document.getElementById('displayUserCode').innerText = userCode;
+      
+      // Xóa sạch dữ liệu và lịch sử cũ trên máy để tránh dính dữ liệu giữa các ID
+      records = {};
+      editHistory = [];
+      localStorage.removeItem('my_attendance_data');
+      localStorage.removeItem('my_attendance_history');
+      
       closeModal('codeModal');
+      
+      // Tải dữ liệu chính xác của ID mới từ Google Sheets
       loadFromGoogleSheet();
     }
   }
