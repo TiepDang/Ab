@@ -17,10 +17,10 @@
 
     <!-- Phần Chấm công nhanh hôm nay -->
     <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-5 mb-4">
-        <!-- Header / Đồng hồ thời gian thực -->
-        <div class="text-center mb-4">
-            <h1 class="text-xl font-bold text-gray-800">Chấm Công Cá Nhân</h1>
-            <div id="live-clock" class="text-2xl font-bold text-indigo-600 mt-1">00:00:00</div>
+        <!-- Header / Đồng hồ thời gian thực (Đã sửa không bị đè chữ) -->
+        <div class="text-center mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
+            <span class="text-xs font-semibold text-gray-500 uppercase">Thời gian hiện tại</span>
+            <div id="live-clock" class="text-2xl font-extrabold text-indigo-600 mt-0.5">00:00:00</div>
         </div>
 
         <!-- Tổng công tích lũy -->
@@ -41,11 +41,13 @@
 
         <!-- Nút Vào Làm / Tan Làm -->
         <div class="grid grid-cols-2 gap-3">
-            <button onclick="quickCheckIn()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-3 rounded-2xl shadow-md transition duration-200 text-center text-sm">
-                Vào Làm (Hôm Nay)
+            <button onclick="quickCheckIn()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-3 rounded-2xl shadow-md transition duration-200 text-center text-sm flex flex-col items-center justify-center">
+                <span>Vào Làm</span>
+                <span class="text-xs font-normal opacity-90">(Hôm Nay)</span>
             </button>
-            <button onclick="quickCheckOut()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-3 rounded-2xl shadow-md transition duration-200 text-center text-sm">
-                Tan Làm (Hôm Nay)
+            <button onclick="quickCheckOut()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-3 rounded-2xl shadow-md transition duration-200 text-center text-sm flex flex-col items-center justify-center">
+                <span>Tan Làm</span>
+                <span class="text-xs font-normal opacity-90">(Hôm Nay)</span>
             </button>
         </div>
     </div>
@@ -110,7 +112,7 @@
                         <th class="py-2 px-1">Vào</th>
                         <th class="py-2 px-1">Về</th>
                         <th class="py-2 px-1">Công</th>
-                        <th class="py-2 px-1">Lịch sử</th>
+                        <th class="py-2 px-1 text-center">Lịch sử</th>
                         <th class="py-2 px-1 text-center">Hành động</th>
                     </tr>
                 </thead>
@@ -130,6 +132,20 @@
             Mã của bạn: <span id="user-code-span">121221</span> (Bấm để đổi mã mới)
         </button>
         <p id="cloud-status" class="text-center text-xs text-gray-400 mt-2 italic">Trạng thái Google Sheets: Đã đồng bộ tự động ✓</p>
+    </div>
+
+    <!-- Modal Xem Lịch Sử Chỉnh Sửa -->
+    <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Lịch sử chỉnh sửa</h3>
+            <p id="modal-date-title" class="text-xs font-semibold text-indigo-600 mb-3"></p>
+            <div id="modal-history-content" class="bg-gray-50 border border-gray-100 rounded-2xl p-3 text-xs text-gray-600 max-h-48 overflow-y-auto space-y-1 mb-4">
+                <!-- Nội dung lịch sử -->
+            </div>
+            <button onclick="closeHistoryModal()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2.5 rounded-xl transition">
+                Đóng
+            </button>
+        </div>
     </div>
 
     <script>
@@ -181,14 +197,14 @@
                 let wType = parseFloat(item.workType || 0);
                 total += wType;
 
-                let latestHistory = (item.history && item.history.length > 0) ? item.history[item.history.length - 1] : "Tạo mới";
-
                 let row = `<tr class="hover:bg-gray-50">
                     <td class="py-2.5 px-1 font-medium text-gray-800 text-xs">${getFormattedDateVN(dateStr)}</td>
                     <td class="py-2.5 px-1 text-gray-600">${item.checkIn || '--:--'}</td>
                     <td class="py-2.5 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
                     <td class="py-2.5 px-1 font-bold text-gray-800">${item.workType}</td>
-                    <td class="py-2.5 px-1 text-xs text-gray-500 max-w-[120px] truncate" title="${item.history ? item.history.join('\n') : ''}">${latestHistory}</td>
+                    <td class="py-2.5 px-1 text-center">
+                        <button onclick="showHistory('${dateStr}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded-lg text-xs font-bold" title="Xem lịch sử">📜 Xem</button>
+                    </td>
                     <td class="py-2.5 px-1 text-center">
                         <button onclick="editDay('${dateStr}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1 rounded-lg text-xs font-bold mr-1" title="Sửa">✏️</button>
                         <button onclick="deleteDay('${dateStr}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 px-2 py-1 rounded-lg text-xs font-bold" title="Xóa">❌</button>
@@ -198,6 +214,27 @@
             });
 
             document.getElementById('total-work-display').innerText = total + " công";
+        }
+
+        function showHistory(dateStr) {
+            let item = records[dateStr];
+            document.getElementById('modal-date-title').innerText = `Ngày: ${dateStr}`;
+            let contentDiv = document.getElementById('modal-history-content');
+            contentDiv.innerHTML = '';
+
+            if (item && item.history && item.history.length > 0) {
+                item.history.forEach(h => {
+                    contentDiv.innerHTML += `<div>• ${h}</div>`;
+                });
+            } else {
+                contentDiv.innerHTML = `<div class="text-gray-400 italic">Không có lịch sử chỉnh sửa chi tiết.</div>`;
+            }
+
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('history-modal').classList.add('hidden');
         }
 
         function syncDataToCloudAuto() {
