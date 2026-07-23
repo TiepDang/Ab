@@ -17,7 +17,7 @@
 
     <!-- Phần Chấm công nhanh hôm nay -->
     <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-5 mb-4">
-        <!-- Header / Đồng hồ thời gian thực (Đã sửa không bị đè chữ) -->
+        <!-- Header / Đồng hồ thời gian thực -->
         <div class="text-center mb-4 bg-gray-50 p-3 rounded-2xl border border-gray-100">
             <span class="text-xs font-semibold text-gray-500 uppercase">Thời gian hiện tại</span>
             <div id="live-clock" class="text-2xl font-extrabold text-indigo-600 mt-0.5">00:00:00</div>
@@ -103,20 +103,19 @@
             </div>
         </div>
 
-        <!-- Bảng danh sách công -->
+        <!-- Bảng danh sách công (Đã tối ưu không bị đè cột) -->
         <div class="overflow-x-auto mb-4">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-semibold uppercase">
-                        <th class="py-2 px-1">Ngày</th>
-                        <th class="py-2 px-1">Vào</th>
-                        <th class="py-2 px-1">Về</th>
-                        <th class="py-2 px-1">Công</th>
-                        <th class="py-2 px-1 text-center">Lịch sử</th>
-                        <th class="py-2 px-1 text-center">Hành động</th>
+                    <tr class="border-b border-gray-100 text-gray-400 text-[11px] font-semibold uppercase">
+                        <th class="py-2 px-1 w-[28%]">Ngày</th>
+                        <th class="py-2 px-1 w-[18%]">Vào</th>
+                        <th class="py-2 px-1 w-[18%]">Về</th>
+                        <th class="py-2 px-1 w-[12%]">Công</th>
+                        <th class="py-2 px-1 text-center w-[24%]">Hành động</th>
                     </tr>
                 </thead>
-                <tbody id="records-table-body" class="text-sm text-gray-700 divide-y divide-gray-50">
+                <tbody id="records-table-body" class="text-xs text-gray-700 divide-y divide-gray-50">
                     <!-- Dữ liệu render tự động -->
                 </tbody>
             </table>
@@ -137,12 +136,12 @@
     <!-- Modal Xem Lịch Sử Chỉnh Sửa -->
     <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl">
-            <h3 class="text-lg font-bold text-gray-800 mb-2">Lịch sử chỉnh sửa</h3>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Lịch sử chỉnh sửa</h3>
             <p id="modal-date-title" class="text-xs font-semibold text-indigo-600 mb-3"></p>
-            <div id="modal-history-content" class="bg-gray-50 border border-gray-100 rounded-2xl p-3 text-xs text-gray-600 max-h-48 overflow-y-auto space-y-1 mb-4">
+            <div id="modal-history-content" class="bg-gray-50 border border-gray-100 rounded-2xl p-3 text-xs text-gray-600 max-h-48 overflow-y-auto space-y-2 mb-4">
                 <!-- Nội dung lịch sử -->
             </div>
-            <button onclick="closeHistoryModal()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2.5 rounded-xl transition">
+            <button onclick="closeHistoryModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition">
                 Đóng
             </button>
         </div>
@@ -184,7 +183,7 @@
             const sortedKeys = Object.keys(records).sort().reverse();
 
             if (sortedKeys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-gray-400 text-xs">Chưa có dữ liệu chấm công</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-gray-400 text-xs">Chưa có dữ liệu chấm công</td></tr>`;
                 document.getElementById('total-work-display').innerText = "0 công";
                 return;
             }
@@ -202,12 +201,10 @@
                     <td class="py-2.5 px-1 text-gray-600">${item.checkIn || '--:--'}</td>
                     <td class="py-2.5 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
                     <td class="py-2.5 px-1 font-bold text-gray-800">${item.workType}</td>
-                    <td class="py-2.5 px-1 text-center">
-                        <button onclick="showHistory('${dateStr}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded-lg text-xs font-bold" title="Xem lịch sử">📜 Xem</button>
-                    </td>
-                    <td class="py-2.5 px-1 text-center">
-                        <button onclick="editDay('${dateStr}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1 rounded-lg text-xs font-bold mr-1" title="Sửa">✏️</button>
-                        <button onclick="deleteDay('${dateStr}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 px-2 py-1 rounded-lg text-xs font-bold" title="Xóa">❌</button>
+                    <td class="py-2.5 px-1 text-center whitespace-nowrap">
+                        <button onclick="showHistory('${dateStr}')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 w-7 h-7 rounded-lg text-xs font-bold inline-flex items-center justify-center mr-0.5" title="Xem lịch sử">📜</button>
+                        <button onclick="editDay('${dateStr}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 w-7 h-7 rounded-lg text-xs font-bold inline-flex items-center justify-center mr-0.5" title="Sửa">✏️</button>
+                        <button onclick="deleteDay('${dateStr}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 w-7 h-7 rounded-lg text-xs font-bold inline-flex items-center justify-center" title="Xóa">❌</button>
                     </td>
                 </tr>`;
                 tbody.insertAdjacentHTML('beforeend', row);
@@ -224,10 +221,10 @@
 
             if (item && item.history && item.history.length > 0) {
                 item.history.forEach(h => {
-                    contentDiv.innerHTML += `<div>• ${h}</div>`;
+                    contentDiv.innerHTML += `<div class="border-b border-gray-100 pb-1 mb-1">• ${h}</div>`;
                 });
             } else {
-                contentDiv.innerHTML = `<div class="text-gray-400 italic">Không có lịch sử chỉnh sửa chi tiết.</div>`;
+                contentDiv.innerHTML = `<div class="text-gray-400 italic text-center">Không có lịch sử chỉnh sửa.</div>`;
             }
 
             document.getElementById('history-modal').classList.remove('hidden');
@@ -291,7 +288,7 @@
             const timestamp = now.toLocaleString('vi-VN');
 
             if (!records[dateKey]) {
-                records[dateKey] = { checkIn: "08:00", checkOut: timeStr, workType: "1", history: [`[${timestamp}] Tan làm: ${timeStr}`] };
+                records[dateKey] = { checkIn: "", checkOut: timeStr, workType: "1", history: [`[${timestamp}] Tan làm: ${timeStr}`] };
             } else {
                 if (!records[dateKey].history) records[dateKey].history = [];
                 records[dateKey].history.push(`[${timestamp}] Cập nhật giờ về: ${records[dateKey].checkOut || 'Trống'} -> ${timeStr}`);
@@ -317,7 +314,7 @@
                 records[dateKey] = { checkIn: checkIn, checkOut: checkOut, workType: workType, history: [`[${timestamp}] Thêm mới ngày ${dateKey}`] };
             } else {
                 if (!records[dateKey].history) records[dateKey].history = [];
-                records[dateKey].history.push(`[${timestamp}] Sửa: Vào(${checkIn}), Về(${checkOut}), Công(${workType})`);
+                records[dateKey].history.push(`[${timestamp}] Sửa thủ công: Vào(${checkIn}), Về(${checkOut}), Công(${workType})`);
                 records[dateKey].checkIn = checkIn;
                 records[dateKey].checkOut = checkOut;
                 records[dateKey].workType = workType;
