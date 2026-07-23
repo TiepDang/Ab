@@ -40,7 +40,7 @@
         button:active { transform: scale(0.98); opacity: 0.9; }
         .btn-in { background-color: #10b981; }
         .btn-out { background-color: #ff4b55; }
-        .btn-save { background-color: #5c6bc0; width: 100%; margin-top: 5px; }
+        .btn-save { background-color: #0284c7; width: 100%; margin-top: 5px; }
         .btn-excel { background-color: #0084ff; width: 100%; margin-top: 5px; font-size: 0.95rem; padding: 14px;}
         .btn-history { background-color: #475569; width: 100%; margin-top: 8px; font-size: 0.85rem; padding: 12px; }
         
@@ -60,22 +60,24 @@
 
         .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
         .table-container { overflow-x: auto; margin-top: 10px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 440px; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 480px; table-layout: fixed; }
         th, td { padding: 10px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { color: #64748b; background: #f8fafc; font-weight: 700; }
-        th:nth-child(1), td:nth-child(1) { width: 130px; text-align: left; padding-left: 8px; }
-        th:nth-child(2), td:nth-child(2) { width: 65px; }
-        th:nth-child(3), td:nth-child(3) { width: 65px; }
-        th:nth-child(4), td:nth-child(4) { width: 55px; }
-        th:nth-child(5), td:nth-child(5) { width: 125px; }
+        th:nth-child(1), td:nth-child(1) { width: 115px; text-align: left; padding-left: 6px; }
+        th:nth-child(2), td:nth-child(2) { width: 55px; }
+        th:nth-child(3), td:nth-child(3) { width: 55px; }
+        th:nth-child(4), td:nth-child(4) { width: 45px; }
+        th:nth-child(5), td:nth-child(5) { width: 160px; }
         
         .history-table th:nth-child(1), .history-table td:nth-child(1) { width: 110px; }
         .history-table th:nth-child(2), .history-table td:nth-child(2) { width: 90px; text-align: center; }
         .history-table th:nth-child(3), .history-table td:nth-child(3) { width: 200px; text-align: left; padding-left: 8px; }
 
-        .action-btn { padding: 6px 10px; font-size: 0.75rem; border-radius: 8px; margin: 0 2px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
+        .action-btn { padding: 5px 6px; font-size: 0.7rem; border-radius: 6px; margin: 0 1px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
         .btn-edit { background-color: #ff9800; color: white; }
         .btn-delete { background-color: #e53935; color: white; }
+        .btn-log-item { background-color: #64748b; color: white; }
+        
         .network-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; }
         .online { background: #d1fae5; color: #065f46; }
         .offline { background: #fee2e2; color: #991b1b; }
@@ -115,9 +117,9 @@
         </div>
     </div>
     
-    <!-- CARD 2: Chấm công / Chỉnh sửa ngày bất kỳ -->
+    <!-- CARD 2: Thêm công ngày bất kỳ -->
     <div class="card">
-        <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Thêm / Chỉnh sửa công ngày bất kỳ</div>
+        <div class="title" style="font-size: 1.15rem; text-align: left; margin-bottom: 12px;">Thêm công ngày bất kỳ</div>
         <div class="grid-2">
             <div><label class="label-text">Chọn Ngày:</label><input type="date" id="txtBatKyNgay"></div>
             <div>
@@ -129,7 +131,7 @@
             <div><label class="label-text">Giờ Vào:</label><input type="time" id="txtBatKyGioVao" value="08:00"></div>
             <div><label class="label-text">Giờ Về:</label><input type="time" id="txtBatKyGioVe" value="17:00"></div>
         </div>
-        <button class="btn-save" onclick="chamCongNgayBatKyMee()">Lưu / Cập Nhật Công</button>
+        <button class="btn-save" onclick="themCongNgayBatKyMee()">Thêm công mới</button>
     </div>
 
     <!-- CARD 3: Bộ lọc & Bảng công chi tiết -->
@@ -172,13 +174,12 @@
         </div>
 
         <button class="btn-excel" onclick="exportToCSV()">Xuất file Excel (CSV có Tổng Công)</button>
-        <button class="btn-history" onclick="openHistoryModal()">Xem Lịch Sử Chỉnh Sửa</button>
         <button class="footer-id-btn" id="userCodeBtn" onclick="openChangeCodeModal()">Mã của bạn: <span id="displayUserCode">......</span> (Bấm để tải lại hoặc tự đặt mã mới)</button>
         <div class="sync-status" id="syncStatus">Trạng thái Google Sheets: Sẵn sàng</div>
     </div>
 </div>
 
-<!-- Modal Sửa Công Nhanh -->
+<!-- Modal Sửa Công -->
 <div id="editModal" class="modal">
   <div class="modal-content">
     <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Sửa công ngày <span id="editDateLabel"></span></div>
@@ -203,27 +204,26 @@
   </div>
 </div>
 
-<!-- Modal Xem Lịch Sử Chỉnh Sửa -->
+<!-- Modal Xem Lịch Sử Theo Ngày -->
 <div id="historyModal" class="modal">
   <div class="modal-content modal-large">
-    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Lịch sử chỉnh sửa</div>
+    <div class="title" style="font-size: 1.1rem; text-align: left; margin-bottom: 12px;">Lịch sử ngày <span id="historyDateLabel"></span></div>
     <div class="table-container" style="max-height: 280px; overflow-y: auto;">
       <table class="history-table">
         <thead>
           <tr>
             <th>Thời gian</th>
             <th>Hành động</th>
-            <th>Chi tiết thay đổi</th>
+            <th>Chi tiết</th>
           </tr>
         </thead>
         <tbody id="historyTableBody">
-          <!-- Render lịch sử -->
+          <!-- Render lịch sử ngày -->
         </tbody>
       </table>
     </div>
     <div class="modal-buttons" style="margin-top: 12px;">
       <button class="btn-close" onclick="closeModal('historyModal')">Đóng</button>
-      <button class="action-btn btn-delete" style="flex: 1; padding: 12px; border-radius: 12px;" onclick="clearHistory()">Xóa lịch sử</button>
     </div>
   </div>
 </div>
@@ -278,11 +278,11 @@
     };
   });
 
-  function logHistory(actionType, detailStr) {
+  function logHistory(actionType, detailStr, dateKey) {
     const now = new Date();
     const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' ' + now.toLocaleDateString('vi-VN');
-    editHistory.unshift({ time: timeStr, action: actionType, detail: detailStr });
-    if (editHistory.length > 50) editHistory.pop();
+    editHistory.unshift({ time: timeStr, action: actionType, detail: detailStr, date: dateKey });
+    if (editHistory.length > 100) editHistory.pop();
     localStorage.setItem('my_attendance_history', JSON.stringify(editHistory));
   }
 
@@ -387,30 +387,36 @@
     if (type === 'Vào') {
       records[today].checkIn = timeNow;
       records[today].workType = workType;
-      logHistory('Vào làm', `Ngày ${formatDateVi(today)} vào lúc ${timeNow}`);
+      logHistory('Vào làm', `Ngày ${formatDateVi(today)} vào lúc ${timeNow}`, today);
       alert(`Đã ghi nhận VÀO LÀM lúc ${timeNow}`);
     } else if (type === 'Về') {
       records[today].checkOut = timeNow;
       records[today].workType = workType;
-      logHistory('Tan làm', `Ngày ${formatDateVi(today)} về lúc ${timeNow}`);
+      logHistory('Tan làm', `Ngày ${formatDateVi(today)} về lúc ${timeNow}`, today);
       alert(`Đã ghi nhận TAN LÀM lúc ${timeNow}`);
     }
 
     saveAndSync();
   }
 
-  function chamCongNgayBatKyMee() {
+  function themCongNgayBatKyMee() {
     const date = document.getElementById('txtBatKyNgay').value;
     if (!date) return alert('Vui lòng chọn ngày!');
+
+    // Kiểm tra nếu ngày đó đã tồn tại công rồi thì không cho thêm mới
+    if (records[date]) {
+      alert(`Ngày ${formatDateVi(date)} đã có dữ liệu chấm công rồi! Vui lòng dùng nút "Sửa" ở bảng bên dưới nếu muốn thay đổi.`);
+      return;
+    }
 
     const workType = document.getElementById('selBatKyCong').value;
     const checkIn = document.getElementById('txtBatKyGioVao').value;
     const checkOut = document.getElementById('txtBatKyGioVe').value;
 
     records[date] = { checkIn, checkOut, workType };
-    logHistory('Thêm/Sửa', `Ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`);
+    logHistory('Thêm mới', `Thêm ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`, date);
     saveAndSync();
-    alert(`Đã lưu / cập nhật công ngày ${formatDateVi(date)} thành công!`);
+    alert(`Đã thêm mới công ngày ${formatDateVi(date)} thành công!`);
   }
 
   function setQuickFilter(mode) {
@@ -468,6 +474,7 @@
         <td>${item.checkOut || '--:--'}</td>
         <td><b>${item.workType}</b></td>
         <td>
+          <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
           <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
           <button class="action-btn btn-delete" onclick="deleteRecord('${date}')">Xóa</button>
         </td>
@@ -498,7 +505,7 @@
       const oldItem = records[date];
       const infoStr = oldItem ? `(${oldItem.workType} công, Vào: ${oldItem.checkIn || '--'}, Về: ${oldItem.checkOut || '--'})` : '';
       
-      logHistory('Xóa công', `Đã xóa ngày ${formatDateVi(date)} ${infoStr}`);
+      logHistory('Xóa công', `Đã xóa ngày ${formatDateVi(date)} ${infoStr}`, date);
       
       delete records[date];
       saveAndSync();
@@ -522,19 +529,23 @@
     const checkOut = document.getElementById('editCheckOut').value;
 
     records[date] = { workType, checkIn, checkOut };
-    logHistory('Sửa Modal', `Ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`);
+    logHistory('Sửa công', `Cập nhật ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`, date);
     closeModal('editModal');
     saveAndSync();
   }
 
-  function openHistoryModal() {
+  function openHistoryModal(dateKey) {
+    document.getElementById('historyDateLabel').innerText = formatDateVi(dateKey);
     const tbody = document.getElementById('historyTableBody');
     tbody.innerHTML = '';
     
-    if (editHistory.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 15px;">Chưa có lịch sử chỉnh sửa nào.</td></tr>`;
+    // Lọc lịch sử theo đúng ngày được chọn
+    const filteredLogs = editHistory.filter(item => item.date === dateKey);
+
+    if (filteredLogs.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 15px;">Chưa có lịch sử chỉnh sửa cho ngày này.</td></tr>`;
     } else {
-      editHistory.forEach(item => {
+      filteredLogs.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td style="font-size: 0.75rem; color: #64748b;">${item.time}</td>
@@ -545,14 +556,6 @@
       });
     }
     document.getElementById('historyModal').style.display = 'flex';
-  }
-
-  function clearHistory() {
-    if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử chỉnh sửa không?")) {
-      editHistory = [];
-      localStorage.removeItem('my_attendance_history');
-      openHistoryModal();
-    }
   }
 
   function openChangeCodeModal() {
