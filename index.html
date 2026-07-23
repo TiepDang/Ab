@@ -112,7 +112,17 @@
         let userCode = localStorage.getItem('timelog_userCode') || '12345';
         document.getElementById('user-code-span').innerText = userCode;
 
-        let records = JSON.parse(localStorage.getItem('timelog_records')) || {};
+        let rawRecords = JSON.parse(localStorage.getItem('timelog_records')) || {};
+        let records = {};
+        // Chuẩn hóa lại key để đảm bảo luôn đúng định dạng YYYY-MM-DD
+        Object.keys(rawRecords).forEach(k => {
+            let cleanKey = k.trim();
+            if (cleanKey.includes('.')) {
+                let parts = cleanKey.split('.');
+                if (parts.length === 3) cleanKey = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+            }
+            records[cleanKey] = rawRecords[k];
+        });
 
         setInterval(() => {
             const now = new Date();
@@ -165,12 +175,12 @@
             document.getElementById('total-work-display').innerText = total + " công";
         }
 
-        // Bắt sự kiện toàn cục trong bảng để loại bỏ hoàn toàn lỗi không phản hồi trên di động
-        document.getElementById('records-table-body').onclick = function(e) {
+        // Bắt sự kiện click trực tiếp bằng addEventListener thay vì thuộc tính HTML onclick
+        document.getElementById('records-table-body').addEventListener('click', function(e) {
             let btn = e.target.closest('button');
             if (!btn) return;
             let dateStr = btn.getAttribute('data-date');
-            if (!dateStr || !records[dateStr]) return;
+            if (!dateStr) return;
 
             if (btn.classList.contains('btn-history')) {
                 showHistory(dateStr);
@@ -179,7 +189,7 @@
             } else if (btn.classList.contains('btn-delete')) {
                 deleteDay(dateStr);
             }
-        };
+        });
 
         function showHistory(dateStr) {
             let item = records[dateStr];
