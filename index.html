@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f3f4f6; }
-        /* Tăng vùng chạm cho thiết bị di động */
         button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
@@ -75,18 +74,17 @@
 
     <!-- Bảng công chi tiết -->
     <div class="w-full max-w-md bg-white rounded-3xl shadow-lg p-4">
-        <h2 class="text-base font-bold text-gray-800 mb-1">Bảng công chi tiết</h2>
-        <p class="text-[11px] text-gray-400 mb-3 italic">* Mẹo: Bấm trực tiếp vào dòng ngày tháng để sửa nhanh.</p>
+        <h2 class="text-base font-bold text-gray-800 mb-2">Bảng công chi tiết</h2>
         
         <div class="overflow-x-auto mb-3">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-gray-100 text-gray-400 text-[10px] font-semibold uppercase">
-                        <th class="py-2 px-1 w-[32%]">Ngày</th>
+                        <th class="py-2 px-1 w-[28%]">Ngày</th>
                         <th class="py-2 px-1 w-[18%]">Vào</th>
                         <th class="py-2 px-1 w-[18%]">Về</th>
                         <th class="py-2 px-1 w-[12%]">Công</th>
-                        <th class="py-2 px-1 text-center w-[20%]">Xóa</th>
+                        <th class="py-2 px-1 text-center w-[24%]">Hành động</th>
                     </tr>
                 </thead>
                 <tbody id="records-table-body" class="text-xs text-gray-700 divide-y divide-gray-50"></tbody>
@@ -96,6 +94,16 @@
         <button onclick="exportCSV()" class="w-full bg-blue-500 text-white font-semibold py-2.5 px-3 rounded-2xl shadow-sm mb-2.5 text-xs">Xuất file Excel (CSV)</button>
         <button onclick="changeUserCode()" class="w-full bg-slate-600 text-white text-[11px] font-medium py-2.5 px-3 rounded-2xl text-center">Mã của bạn: <span id="user-code-span">121221</span> (Đổi mã)</button>
         <p id="cloud-status" class="text-center text-[11px] text-gray-400 mt-2 italic">Trạng thái: Sẵn sàng</p>
+    </div>
+
+    <!-- Modal Lịch sử -->
+    <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl">
+            <h3 class="text-base font-bold text-gray-800 mb-1">Lịch sử chỉnh sửa</h3>
+            <p id="modal-date-title" class="text-xs font-semibold text-indigo-600 mb-3"></p>
+            <div id="modal-history-content" class="bg-gray-50 border border-gray-100 rounded-2xl p-3 text-xs text-gray-600 max-h-48 overflow-y-auto space-y-2 mb-4"></div>
+            <button onclick="closeHistoryModal()" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs">Đóng</button>
+        </div>
     </div>
 
     <script>
@@ -115,9 +123,10 @@
 
         function getFormattedDateVN(dateStr) {
             let parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
             let d = new Date(parts[0], parts[1] - 1, parts[2]);
             let days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-            return `${days[d.getDay()]} - ${parts[2]}/${parts[1]}/${parts[0]}`;
+            return `${days[d.getDay()]}<br>${parts[2]}/${parts[1]}/${parts[0]}`;
         }
 
         function renderTable() {
@@ -138,41 +147,44 @@
                 let style = item.isDeleted ? "opacity-40 bg-gray-50 line-through" : "";
 
                 let tr = document.createElement('tr');
-                tr.className = `hover:bg-indigo-50 transition-colors ${style}`;
+                tr.className = `hover:bg-gray-50 ${style}`;
                 tr.innerHTML = `
-                    <td class="py-2.5 px-1 font-semibold text-indigo-600 text-[11px] cursor-pointer">${getFormattedDateVN(dateStr)}</td>
-                    <td class="py-2.5 px-1 text-gray-600">${item.checkIn || '--:--'}</td>
-                    <td class="py-2.5 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
-                    <td class="py-2.5 px-1 font-bold text-gray-800">${item.workType}</td>
-                    <td class="py-2.5 px-1 text-center">
-                        <button type="button" class="btn-delete bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-[11px] font-bold">Xóa</button>
+                    <td class="py-2 px-1 font-medium text-gray-800 text-[11px]">${getFormattedDateVN(dateStr)}</td>
+                    <td class="py-2 px-1 text-gray-600">${item.checkIn || '--:--'}</td>
+                    <td class="py-2 px-1 text-gray-600">${item.checkOut || '--:--'}</td>
+                    <td class="py-2 px-1 font-bold text-gray-800">${item.workType}</td>
+                    <td class="py-2 px-1 text-center whitespace-nowrap">
+                        <button type="button" class="btn-history bg-indigo-100 text-indigo-700 w-6 h-6 rounded-md text-[11px] font-bold mr-0.5">📜</button>
+                        <button type="button" class="btn-edit bg-amber-100 text-amber-700 w-6 h-6 rounded-md text-[11px] font-bold mr-0.5">✏️</button>
+                        <button type="button" class="btn-delete bg-rose-100 text-rose-700 w-6 h-6 rounded-md text-[11px] font-bold">❌</button>
                     </td>
                 `;
 
-                // Bấm trực tiếp vào cột ngày tháng để sửa (thay thế nút ✏️ bị lỗi trên di động)
-                tr.querySelector('td:first-child').onclick = function() {
-                    document.getElementById('custom-date').value = dateStr;
-                    document.getElementById('custom-check-in').value = item.checkIn || "08:00";
-                    document.getElementById('custom-check-out').value = item.checkOut || "17:00";
-                    document.getElementById('custom-work-type').value = item.workType || "1";
-                    document.getElementById('custom-section').scrollIntoView({ behavior: 'smooth' });
-                };
-
-                tr.querySelector('.btn-delete').onclick = function() {
-                    if (confirm(`Xóa ngày công ${dateStr}?`)) {
-                        const timestamp = new Date().toLocaleString('vi-VN');
-                        if (!records[dateStr].history) records[dateStr].history = [];
-                        records[dateStr].history.push(`[${timestamp}] Đã xóa ngày công`);
-                        records[dateStr].workType = "0";
-                        records[dateStr].isDeleted = true;
-                        saveDataAndSync();
-                    }
-                };
+                tr.querySelector('.btn-history').onclick = function(e) { e.stopPropagation(); showHistory(dateStr); };
+                tr.querySelector('.btn-edit').onclick = function(e) { e.stopPropagation(); editDay(dateStr); };
+                tr.querySelector('.btn-delete').onclick = function(e) { e.stopPropagation(); deleteDay(dateStr); };
 
                 tbody.appendChild(tr);
             });
 
             document.getElementById('total-work-display').innerText = total + " công";
+        }
+
+        function showHistory(dateStr) {
+            let item = records[dateStr];
+            document.getElementById('modal-date-title').innerText = `Ngày: ${dateStr}`;
+            let contentDiv = document.getElementById('modal-history-content');
+            contentDiv.innerHTML = '';
+            if (item && item.history && item.history.length > 0) {
+                item.history.forEach(h => { contentDiv.innerHTML += `<div>• ${h}</div>`; });
+            } else {
+                contentDiv.innerHTML = `<div class="text-gray-400 italic text-center">Không có lịch sử.</div>`;
+            }
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('history-modal').classList.add('hidden');
         }
 
         function syncDataToCloud() {
@@ -246,6 +258,27 @@
             alert("Đã lưu thành công!");
         }
 
+        function editDay(dateStr) {
+            let item = records[dateStr];
+            if (!item) return;
+            document.getElementById('custom-date').value = dateStr;
+            document.getElementById('custom-check-in').value = item.checkIn || "08:00";
+            document.getElementById('custom-check-out').value = item.checkOut || "17:00";
+            document.getElementById('custom-work-type').value = item.workType || "1";
+            document.getElementById('custom-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteDay(dateStr) {
+            if (confirm(`Xóa ngày công ${dateStr}?`)) {
+                const timestamp = new Date().toLocaleString('vi-VN');
+                if (!records[dateStr].history) records[dateStr].history = [];
+                records[dateStr].history.push(`[${timestamp}] Đã xóa ngày công`);
+                records[dateStr].workType = "0";
+                records[dateStr].isDeleted = true;
+                saveDataAndSync();
+            }
+        }
+
         function changeUserCode() {
             let newCode = prompt("Nhập mã nhân viên của bạn:", userCode);
             if (newCode && newCode.trim() !== "") {
@@ -258,10 +291,10 @@
         }
 
         function exportCSV() {
-            let csv = "data:text/csv;charset=utf-8,Ngay,GioVao,GioVe,Cong,TrangThai\n";
+            let csv = "data:text/csv;charset=utf-8,Ngay,GioVao,GioVe,Cong,TrangThai,LichSu\n";
             for (let date in records) {
                 let r = records[date];
-                csv += `${date},${r.checkIn},${r.checkOut},${r.workType},${r.isDeleted ? 'Xoa' : 'Dung'}\n`;
+                csv += `${date},${r.checkIn},${r.checkOut},${r.workType},${r.isDeleted ? 'Xoa' : 'Dung'},"${(r.history||[]).join(' | ')}"\n`;
             }
             let link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
