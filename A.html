@@ -231,6 +231,7 @@
         .action-btn { padding: 5px 6px; font-size: 0.65rem; border-radius: 6px; margin: 0 1px; font-weight: 800; border: none; cursor: pointer; display: inline-block; }
         .btn-edit { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
         .btn-delete { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+        .btn-restore { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
         .btn-log-item { background: linear-gradient(135deg, #64748b 0%, #475569 100%); color: white; }
         
         .network-badge { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: 30px; font-size: 0.7rem; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1.5px; width: 100%; text-align: center; }
@@ -671,7 +672,7 @@
           <td>${item.note || ''}</td>
           <td>
             <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
-            <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Khôi phục</button>
+            <button class="action-btn btn-restore" onclick="restoreRecord('${date}')">Khôi phục</button>
           </td>
         `;
       } else {
@@ -711,12 +712,26 @@
 
   function deleteRecord(date) {
     if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu ngày ${formatDateVi(date)}?`)) {
-      const oldItem = records[date];
       logHistory('Xóa công', `Đã xóa dữ liệu ngày ${formatDateVi(date)}`, date);
       
       if (!records[date]) records[date] = {};
       records[date].isDeleted = true;
       records[date].workType = 0;
+
+      saveAndSync();
+    }
+  }
+
+  function restoreRecord(date) {
+    if (confirm(`Bạn có muốn khôi phục lại dữ liệu ngày ${formatDateVi(date)} không?`)) {
+      logHistory('Khôi phục công', `Đã khôi phục lại ngày ${formatDateVi(date)}`, date);
+      
+      if (records[date]) {
+        records[date].isDeleted = false;
+        if (!records[date].workType || records[date].workType == 0) {
+          records[date].workType = "1";
+        }
+      }
 
       saveAndSync();
     }
