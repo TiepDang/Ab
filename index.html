@@ -18,7 +18,7 @@
         .stats-count { font-size: 1.6rem; font-weight: 800; color: #2563eb; }
         .label-text { font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; text-align: left; display: block; }
         
-        select, input { 
+        select, input, textarea { 
             width: 100%; 
             min-width: 0; 
             max-width: 100%;
@@ -33,6 +33,7 @@
             outline: none; 
             display: block; 
             -webkit-appearance: none;
+            font-family: inherit;
         }
 
         .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px; }
@@ -58,15 +59,19 @@
         .grid-2 input, .grid-2 select { width: 100%; margin-bottom: 12px; }
 
         .footer-id-btn { background-color: #607d8b; width: 100%; margin-top: 12px; font-size: 0.85rem; padding: 12px; color: white; border: none; border-radius: 12px; word-break: break-all; white-space: normal; line-height: 1.4; }
+        
         .table-container { overflow-x: auto; margin-top: 10px; background: #fff; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 480px; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 540px; table-layout: fixed; }
         th, td { padding: 10px 4px; border-bottom: 1px solid #e2e8f0; text-align: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         th { color: #64748b; background: #f8fafc; font-weight: 700; }
-        th:nth-child(1), td:nth-child(1) { width: 115px; text-align: left; padding-left: 6px; }
-        th:nth-child(2), td:nth-child(2) { width: 55px; }
-        th:nth-child(3), td:nth-child(3) { width: 55px; }
-        th:nth-child(4), td:nth-child(4) { width: 45px; }
-        th:nth-child(5), td:nth-child(5) { width: 160px; }
+        
+        /* Cấu hình độ rộng các cột trong bảng chính */
+        th:nth-child(1), td:nth-child(1) { width: 105px; text-align: left; padding-left: 6px; }
+        th:nth-child(2), td:nth-child(2) { width: 50px; }
+        th:nth-child(3), td:nth-child(3) { width: 50px; }
+        th:nth-child(4), td:nth-child(4) { width: 40px; }
+        th:nth-child(5), td:nth-child(5) { width: 95px; text-align: left; padding-left: 4px; }
+        th:nth-child(6), td:nth-child(6) { width: 145px; }
         
         .history-table th:nth-child(1), .history-table td:nth-child(1) { width: 110px; }
         .history-table th:nth-child(2), .history-table td:nth-child(2) { width: 90px; text-align: center; }
@@ -102,7 +107,7 @@
             background-color: #f8fafc;
         }
         .deleted-row td .action-btn {
-            text-decoration: none; /* Không gạch ngang chữ trên nút bấm */
+            text-decoration: none; 
         }
     </style>
 </head>
@@ -123,9 +128,11 @@
             <option value="0.5">0.5 công (Nửa ngày)</option>
             <option value="0">0 công (Nghỉ lễ/Phép)</option>
         </select>
+        <label class="label-text">Ghi chú hôm nay (nếu có):</label>
+        <input type="text" id="txtNoteHomNay" placeholder="Nhập ghi chú...">
         <div class="btn-row">
-            <button class="btn-in" onclick="chamCongMee('Vào', document.getElementById('selCongHomNay').value)">Vào Làm (Hôm Nay)</button>
-            <button class="btn-out" onclick="chamCongMee('Về', document.getElementById('selCongHomNay').value)">Tan Làm (Hôm Nay)</button>
+            <button class="btn-in" onclick="chamCongMee('Vào', document.getElementById('selCongHomNay').value)">Vào Làm</button>
+            <button class="btn-out" onclick="chamCongMee('Về', document.getElementById('selCongHomNay').value)">Tan Làm</button>
         </div>
     </div>
     
@@ -149,6 +156,8 @@
             <div><label class="label-text">Giờ Vào:</label><input type="time" id="txtBatKyGioVao" value="08:00"></div>
             <div><label class="label-text">Giờ Về:</label><input type="time" id="txtBatKyGioVe" value="17:00"></div>
         </div>
+        <label class="label-text">Ghi chú:</label>
+        <input type="text" id="txtBatKyNote" placeholder="Ghi chú công việc trong ngày...">
         <button class="btn-save" onclick="themCongNgayBatKyMee()">Thêm công mới</button>
     </div>
 
@@ -180,6 +189,7 @@
                 <th>Vào</th>
                 <th>Về</th>
                 <th>Công</th>
+                <th>Ghi chú</th>
                 <th>Hành động</th>
               </tr>
             </thead>
@@ -212,6 +222,9 @@
       <div><label class="label-text">Giờ Vào:</label><input type="time" id="editCheckIn"></div>
       <div><label class="label-text">Giờ Về:</label><input type="time" id="editCheckOut"></div>
     </div>
+
+    <label class="label-text">Ghi chú:</label>
+    <input type="text" id="editNote" placeholder="Nhập ghi chú...">
 
     <div class="modal-buttons">
       <button class="btn-close" onclick="closeModal('editModal')">Hủy</button>
@@ -408,22 +421,27 @@
   function chamCongMee(type, workType) {
     const today = getTodayStr();
     const timeNow = new Date().toTimeString().substring(0, 5);
+    const noteVal = document.getElementById('txtNoteHomNay').value.trim();
 
     if (!records[today] || records[today].isDeleted) {
-      records[today] = { checkIn: '', checkOut: '', workType: workType, isDeleted: false };
+      records[today] = { checkIn: '', checkOut: '', workType: workType, note: '', isDeleted: false };
+    }
+
+    if (noteVal) {
+      records[today].note = noteVal;
     }
 
     if (type === 'Vào') {
       records[today].checkIn = timeNow;
       records[today].workType = workType;
       records[today].isDeleted = false;
-      logHistory('Vào làm', `Ngày ${formatDateVi(today)} vào lúc ${timeNow}`, today);
+      logHistory('Vào làm', `Ngày ${formatDateVi(today)} vào lúc ${timeNow} ${records[today].note ? '(Ghi chú: ' + records[today].note + ')' : ''}`, today);
       alert(`Đã ghi nhận VÀO LÀM lúc ${timeNow}`);
     } else if (type === 'Về') {
       records[today].checkOut = timeNow;
       records[today].workType = workType;
       records[today].isDeleted = false;
-      logHistory('Tan làm', `Ngày ${formatDateVi(today)} về lúc ${timeNow}`, today);
+      logHistory('Tan làm', `Ngày ${formatDateVi(today)} về lúc ${timeNow} ${records[today].note ? '(Ghi chú: ' + records[today].note + ')' : ''}`, today);
       alert(`Đã ghi nhận TAN LÀM lúc ${timeNow}`);
     }
 
@@ -437,9 +455,10 @@
     const workType = document.getElementById('selBatKyCong').value;
     const checkIn = document.getElementById('txtBatKyGioVao').value;
     const checkOut = document.getElementById('txtBatKyGioVe').value;
+    const note = document.getElementById('txtBatKyNote').value.trim();
 
-    records[date] = { checkIn, checkOut, workType, isDeleted: false };
-    logHistory('Thêm mới', `Thêm ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`, date);
+    records[date] = { checkIn, checkOut, workType, note, isDeleted: false };
+    logHistory('Thêm mới', `Thêm ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut}) [Ghi chú: ${note || 'Không'}]`, date);
     saveAndSync();
     alert(`Đã thêm mới công ngày ${formatDateVi(date)} thành công!`);
   }
@@ -502,6 +521,7 @@
           <td>${item.checkIn || '--'}</td>
           <td>${item.checkOut || '--'}</td>
           <td>${item.workType || 0}</td>
+          <td style="text-align: left;">${item.note || ''}</td>
           <td>
             <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
             <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Khôi phục</button>
@@ -513,6 +533,7 @@
           <td>${item.checkIn || '--:--'}</td>
           <td>${item.checkOut || '--:--'}</td>
           <td><b>${item.workType}</b></td>
+          <td style="text-align: left;" title="${item.note || ''}">${item.note || ''}</td>
           <td>
             <button class="action-btn btn-log-item" onclick="openHistoryModal('${date}')">Ls</button>
             <button class="action-btn btn-edit" onclick="openEditModal('${date}')">Sửa</button>
@@ -544,7 +565,7 @@
   function deleteRecord(date) {
     if (confirm(`Bạn có chắc chắn muốn xóa dữ liệu ngày ${formatDateVi(date)}?`)) {
       const oldItem = records[date];
-      const infoStr = oldItem ? `(${oldItem.workType} công, Vào: ${oldItem.checkIn || '--'}, Về: ${oldItem.checkOut || '--'})` : '';
+      const infoStr = oldItem ? `(${oldItem.workType} công, Ghi chú: ${oldItem.note || 'Không'})` : '';
       
       logHistory('Xóa công', `Đã xóa dữ liệu ngày ${formatDateVi(date)} ${infoStr}`, date);
       
@@ -565,6 +586,7 @@
     document.getElementById('editWorkType').value = item.workType || '1';
     document.getElementById('editCheckIn').value = item.checkIn || '08:00';
     document.getElementById('editCheckOut').value = item.checkOut || '17:00';
+    document.getElementById('editNote').value = item.note || '';
     document.getElementById('editModal').style.display = 'flex';
   }
 
@@ -573,9 +595,10 @@
     const workType = document.getElementById('editWorkType').value;
     const checkIn = document.getElementById('editCheckIn').value;
     const checkOut = document.getElementById('editCheckOut').value;
+    const note = document.getElementById('editNote').value.trim();
 
-    records[date] = { workType, checkIn, checkOut, isDeleted: false };
-    logHistory('Sửa công', `Cập nhật/Khôi phục ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut})`, date);
+    records[date] = { workType, checkIn, checkOut, note, isDeleted: false };
+    logHistory('Sửa công', `Cập nhật/Khôi phục ngày ${formatDateVi(date)} (${workType} công, Vào: ${checkIn}, Về: ${checkOut}) [Ghi chú: ${note || 'Không'}]`, date);
     closeModal('editModal');
     saveAndSync();
   }
@@ -627,7 +650,7 @@
     const from = document.getElementById('filterFrom').value;
     const to = document.getElementById('filterTo').value;
 
-    let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Công\n";
+    let csv = "\uFEFFNgày,Giờ Vào,Giờ Về,Công,Ghi Chú\n";
     const sortedDates = Object.keys(records).sort();
 
     let tongCongXuat = 0;
@@ -642,10 +665,11 @@
       const congVal = parseFloat(item.workType || 0);
       tongCongXuat += congVal;
 
-      csv += `"${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}"\n`;
+      const cleanNote = (item.note || '').replace(/"/g, '""');
+      csv += `"${formatDateVi(date)}","${item.checkIn || ''}","${item.checkOut || ''}","${congVal}","${cleanNote}"\n`;
     });
 
-    csv += `"TỔNG CÔNG","","","${tongCongXuat}"\n`;
+    csv += `"TỔNG CÔNG","","","${tongCongXuat}",""\n`;
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
