@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm Công Cá Nhân</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            background: #fff;
+            margin: 0 auto padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .status {
+            text-align: center;
+            font-size: 14px;
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        .timer {
+            font-size: 24px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
+        .section {
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        select, input[type="text"], input[type="time"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-primary { background-color: #3498db; }
+        .btn-success { background-color: #2ecc71; }
+        .btn-danger { background-color: #e74c3c; }
+        .btn-excel-full { background-color: #217346; }
+        .btn-excel-short { background-color: #107c41; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total-box {
+            background-color: #e8f4fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Chấm Công Cá Nhân</h2>
+    <div class="status">● Đang trực tuyến</div>
+    <div class="timer" id="clock">00:00:00</div>
+    
+    <div class="total-box">
+        Tổng công tích lũy (Tất cả): <span id="tongCongTichLuy">0</span> công
+    </div>
+
+    <!-- CHẤM CÔNG HÔM NAY -->
+    <div class="section">
+        <div class="section-title">Chọn loại công hôm nay:</div>
+        <div class="form-group">
+            <select id="loaiCongHomNay">
+                <option value="1">1 công (Ngày làm đủ)</option>
+                <option value="0.5">0.5 công (Nửa ngày)</option>
+                <option value="0">0 công (Nghỉ lễ/Phép)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Ghi chú hôm nay (nếu có):</label>
+            <input type="text" id="ghiChuHomNay" placeholder="Nhập ghi chú...">
+        </div>
+        <div class="btn-group">
+            <button class="btn-primary" onclick="chamCongMoi('Vào Làm')">Vào Làm</button>
+            <button class="btn-success" onclick="chamCongMoi('Tan Làm')">Tan Làm</button>
+        </div>
+    </div>
+
+    <!-- THÊM CÔNG NGÀY BẤT KỲ -->
+    <div class="section">
+        <div class="section-title">Thêm công ngày bất kỳ</div>
+        <div class="form-group">
+            <label>Chọn Ngày:</label>
+            <input type="date" id="themNgay">
+        </div>
+        <div class="form-group">
+            <label>Tính Công:</label>
+            <select id="themLoaiCong">
+                <option value="1">1 công</option>
+                <option value="0.5">0.5 công</option>
+                <option value="0">0 công</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Giờ Vào:</label>
+            <input type="time" id="themGioVao" value="08:00">
+        </div>
+        <div class="form-group">
+            <label>Giờ Về:</label>
+            <input type="time" id="themGioVe" value="17:00">
+        </div>
+        <div class="form-group">
+            <label>Ghi chú:</label>
+            <input type="text" id="themGhiChu" value="Thêm công mới">
+        </div>
+        <button class="btn-primary" style="width:100%;" onclick="themCongBatKy()">Lưu công mới</button>
+    </div>
+
+    <!-- BỘ LỌC & BẢNG CHI TIẾT -->
+    <div class="section">
+        <div class="section-title">Bộ lọc & Bảng công chi tiết</div>
+        <div class="btn-group" style="margin-bottom: 10px;">
+            <button class="btn-primary" style="background-color:#7f8c8d;">Tháng này</button>
+            <button class="btn-primary" style="background-color:#7f8c8d;">Tháng trước</button>
+            <button class="btn-primary" style="background-color:#7f8c8d;">Tất cả</button>
+        </div>
+        
+        <div class="total-box" style="background-color: #f1f2f6;">
+            Tổng công hiển thị: <span id="tongCongHienThi">0</span> công
+        </div>
+
+        <table id="bangChamCong">
+            <thead>
+                <tr>
+                    <th>Ngày</th>
+                    <th>Vào</th>
+                    <th>Về</th>
+                    <th>Công</th>
+                    <th>Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dữ liệu mẫu ban đầu -->
+                <tr>
+                    <td>2026-08-28</td>
+                    <td>08:00</td>
+                    <td>17:00</td>
+                    <td>1</td>
+                    <td>Làm đủ</td>
+                </tr>
+                <tr>
+                    <td>2026-08-29</td>
+                    <td>08:15</td>
+                    <td>12:00</td>
+                    <td>0.5</td>
+                    <td>Làm nửa ngày</td>
+                </tr>
+                <tr>
+                    <td>2026-08-30</td>
+                    <td>--:--</td>
+                    <td>--:--</td>
+                    <td>0</td>
+                    <td>Chủ nhật nghỉ</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- CHỨC NĂNG XUẤT FILE COA LỰA CHỌN THEO YÊU CẦU -->
+        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-weight: bold; font-size: 14px;">Tùy chọn tải dữ liệu Excel (CSV):</div>
+            <div class="btn-group">
+                <button class="btn-excel-full" onclick="xuatExcelTuyChon('full')">📊 Xuất đầy đủ (Có ngày giờ)</button>
+                <button class="btn-excel-short" onclick="xuatExcelTuyChon('short')">📋 Xuất rút gọn (Chỉ ngày công)</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 15px; font-size: 12px; color: #7f8c8d;">
+            Trạng thái Google Sheets: <span style="color:#27ae60; font-weight:bold;">Sẵn sàng</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Hàm cập nhật đồng hồ trực tuyến
+    function updateClock() {
+        const now = new Date();
+        const hrs = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const secs = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('clock').textContent = `${hrs}:${mins}:${secs}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Hàm cập nhật tổng số công dựa vào bảng dữ liệu hiện có
+    function capNhatTongCong() {
+        const rows = document.querySelectorAll("#bangChamCong tbody tr");
+        let tong = 0;
+        rows.forEach(row => {
+            const congVal = parseFloat(row.cells[3].innerText) || 0;
+            tong += congVal;
+        });
+        document.getElementById("tongCongTichLuy").innerText = tong;
+        document.getElementById("tongCongHienThi").innerText = tong;
+    }
+    // Chạy lần đầu tiên để cập nhật số công mẫu
+    capNhatTongCong();
+
+    // Hàm thêm công hôm nay khi nhấn Vào làm / Tan làm
+    function chamCongMoi(hanhDong) {
+        const today = new Date().toISOString().split('T')[0];
+        const nowTime = new Date().toTimeString().split(' ')[0].substring(0,5);
+        const loaiCong = document.getElementById("loaiCongHomNay").value;
+        const ghiChu = document.getElementById("ghiChuHomNay").value || hanhDong;
+        
+        const tbody = document.querySelector("#bangChamCong tbody");
+        const row = tbody.insertRow(0); // Thêm lên đầu bảng
+        
+        row.insertCell(0).innerText = today;
+        row.insertCell(1).innerText = hanhDong === 'Vào Làm' ? nowTime : '08:00';
+        row.insertCell(2).innerText = hanhDong === 'Tan Làm' ? nowTime : '--:--';
+        row.insertCell(3).innerText = loaiCong;
+        row.insertCell(4).innerText = ghiChu;
+        
+        capNhatTongCong();
+        alert(`Đã ghi nhận hành động: ${hanhDong}`);
+    }
+
+    // Hàm thêm công ngày bất kỳ
+    function themCongBatKy() {
+        const ngay = document.getElementById("themNgay").value;
+        if(!ngay) {
+            alert("Vui lòng chọn ngày trước!");
+            return;
+        }
+        const loaiCong = document.getElementById("themLoaiCong").value;
+        const gioVao = document.getElementById("themGioVao").value;
+        const gioVe = document.getElementById("themGioVe").value;
+        const ghiChu = document.getElementById("themGhiChu").value;
+        
+        const tbody = document.querySelector("#bangChamCong tbody");
+        const row = tbody.insertRow(); // Thêm vào cuối bảng
+        
+        row.insertCell(0).innerText = ngay;
+        row.insertCell(1).innerText = gioVao;
+        row.insertCell(2).innerText = gioVe;
+        row.insertCell(3).innerText = loaiCong;
+        row.insertCell(4).innerText = ghiChu;
+        
+        capNhatTongCong();
+        alert("Đã lưu công mới vào danh sách!");
+    }
+
+    // LOGIC XUẤT EXCEL CHỌN CHẾ ĐỘ THEO YÊU CẦU
+    function xuatExcelTuyChon(cheDo) {
+        const rowsCollection = document.querySelectorAll("#bangChamCong tbody tr");
+        const dataGoc = [];
+        
+        rowsCollection.forEach(row => {
+            const cells = row.querySelectorAll("td");
+            if(cells.length >= 5) {
+                dataGoc.push({
+                    ngay: cells[0].innerText.trim(),
+                    gioVao: cells[1].innerText.trim(),
+                    gioVe: cells[2].innerText.trim(),
+                    cong: cells[3].innerText.trim(),
+                    ghiChu: cells[4].innerText.trim()
+                });
+            }
+        });
+
+        if (dataGoc.length === 0) {
+            alert("Bảng hiện tại không có dữ liệu để xuất file!");
+            return;
+        }
+
+        let duLieuXuat = [];
+        let dongTongCong = {};
+        let tongCong = 0;
+
+        // Tính toán tổng số công thực tế trong mảng dữ liệu
+        dataGoc.forEach(item => {
+            tongCong += parseFloat(item.cong || 0);
+        });
+
+        if (cheDo === 'short') {
+            // CHẾ ĐỘ RÚT GỌN: Chỉ lấy Ngày, Công, Ghi chú
+            duLieuXuat = dataGoc.map(item => ({
+                'Ngày': item.ngay,
+                'Công': item.cong,
+                'Ghi chú': item.ghiChu
+            }));
+            
+            dongTongCong = {
+                'Ngày': 'Tổng công hiển thị:',
+                'Công': `${tongCong} công`,
+                'Ghi chú': ''
+            };
+        } else {
+            // CHẾ ĐỘ ĐẦY ĐỦ: Lấy toàn bộ các cột
+            duLieuXuat = dataGoc.map(item => ({
+                'Ngày': item.ngay,
+                'Giờ Vào': item.gioVao,
+                'Giờ Về': item.gioVe,
+                'Công': item.cong,
+                'Ghi chú': item.ghiChu
+            }));
+            
+            dongTongCong = {
+                'Ngày': 'Tổng công hiển thị:',
+                'Giờ Vào': '',
+                'Giờ Về': '',
+                'Công': `${tongCong} công`,
+                'Ghi chú': ''
+            };
+        }
+        
+        // Đẩy dòng tổng cộng vào cuối danh sách dữ liệu xuất file
+        duLieuXuat.push(dongTongCong);
+
+        const tenFile = cheDo === 'short' ? 'bang_cong_rut_gon.csv' : 'bang_cong_chi_tiet.csv';
+        downloadCSVFile(duLieuXuat, tenFile);
+    }
+
+    // Hàm chuyển mảng thành định dạng CSV mã hóa UTF-8 BOM phòng lỗi font chữ Việt
+    function downloadCSVFile(dataArray, filename) {
+        const headers = Object.keys(dataArray[0]).join(',');
+        const rows = dataArray.map(obj => 
+            Object.values(obj).map(val => `"${String(val).replace(/"/g, '""')}"`).join(',')
+        );
+        
+        const csvContent = "﻿" + [headers, ...rows].join('
+');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+</script>
+
+</body>
+</html>
